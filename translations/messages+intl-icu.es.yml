@@ -1,0 +1,59 @@
+messages.appTitle: "Vacaciones"
+
+navitem.administration: "Administración"
+navitem.users: "Usuarios"
+
+link.logout: "Salir"
+
+security.login.username: "Nombre de usuario"
+security.login.password: "Contraseña"
+security.login.remember_me: "Recordarme"
+security.login.submit: "Entrar"
+security.login.invalid_credentials: "El usuario y contraseña no son correctos"
+security.login.system_error: "Debido a un error del sistema, no se puede comprobar el usuario"
+security.login.remember_password: "Se te ha olvidado la contraseña?"
+security.password:
+security.resetted: "La contraseña se ha cambiado"
+btn.loginera.itzuli: "Volver a la página de login"
+"Credenciales no válidas.": "Credenciales no válidas."
+
+user.id: "Id"
+user.username: "Nombre de usuario"
+user.firstName: "Nombre"
+user.roles: "Roles"
+user.email: "Email"
+user.new_password: "Nueva contraseña"
+user.repeat_new_password: "Repetir nueva contraseña"
+
+messages.confirmacion: "Confirmación"
+messages.confirmationDetail: "¿Esta seguro de que desea eliminar el registro?"
+messages.results0: "No se han encontrado resultados"
+messages.si: "Sí"
+messages.no: "No"
+messages.userSaved: "El usuario se ha guardado correctamente"
+messages.userDeleted: "El usuario se ha eliminado correctamente"
+messages.existingUser: "El nombre de usuario o el email ya existe"
+
+ROLE_USER: "Usuario"
+ROLE_ADMIN: "Administrador"
+
+# Menu
+navitem.topics: "Temas"
+
+# buttons
+btn.cancel: "Volver"
+btn.save: "Guardar"
+btn.new: "Nuevo"
+btn.search: "Buscar"
+
+# Titles
+"Show Topic": "Ver tema"
+"List Topics": "Lista de temas"
+"Edit Topic": "Editar temas"
+"List Consultations": "Lista de consultas"
+
+# Confirmation messages
+
+# Successfull messages
+
+# Error messages

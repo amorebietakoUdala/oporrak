@@ -1,0 +1,31 @@
+{% if app.user %}
+
+<nav class="navbar navbar-expand navbar-dark bg-dark mb-1">
+  <a class="navbar-brand" href="#">&nbsp;</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+		<li class='nav-item'>
+		  <a class="nav-link" href="#">{{"navitem.1" | trans | capitalize}}</a>
+		</li>
+
+		<li class='nav-item'>
+		  <a class="nav-link" href="#">{{"navitem.2" | trans | capitalize}}</a>
+		</li>
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle" href="#" id="navbarContacts" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			{{ 'navitem.contacts' | trans | capitalize }}
+		  </a>
+		  <div id="js-menu-contacts" class="dropdown-menu" aria-labelledby="navbarContacts">
+			  <a class="dropdown-item" href="#">{{"navitem.contact_list" | trans | capitalize}}</a>
+			  <a class="dropdown-item" href="#">{{"navitem.contact_import" | trans | capitalize}}</a>
+		  </div>
+		</li>
+    </ul>
+  </div>
+</nav>
+		
+{% endif %}

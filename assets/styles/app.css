@@ -1,0 +1,104 @@
+@import '~bootstrap';
+@import '~js-year-calendar/dist/js-year-calendar.css';
+@import '~bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
+/* @import '~font-awesome'; */
+
+body {
+    padding: 0.1em 0.1em 0.1em 0.1em;
+    line-height: 1;
+    margin-bottom: 2.5rem;
+}
+
+header {
+    display: grid;
+    grid-template-columns: 150px auto 200px 100px;
+    grid-template-areas: "logo titulo erabiltzailea idioma";
+    justify-content: space-beetween;
+    text-align: center;
+    align-items: center;
+}
+
+main {
+    width: 100vw;
+}
+
+.logo {
+    height: 100px;
+    width: auto;
+}
+
+.titulua {
+    display: flex;
+    text-align: center;
+}
+
+.avatar {
+    float: right;
+    height: 3rem;
+    border-radius: 3rem;
+}
+
+/* Material design styles */
+/* .calendar .calendar-header {
+    background-color: #f5f5f5;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+    border: 0;
+}
+
+.calendar .calendar-header .year-title {
+    font-size: 18px;
+}
+
+.calendar .calendar-header .year-title:not(.year-neighbor):not(.year-neighbor2) {
+    border-bottom: 2px solid #2196f3;
+}
+
+.calendar .months-container .month-container {
+    height: 260px;
+    margin-bottom: 25px;
+}
+
+.calendar table.month {
+    background-color: white;
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
+    height: 100%;
+}
+
+.calendar table.month th.month-title {
+    background-color: #2196F3;
+    color: white;
+    padding: 12px;
+    font-weight: 400;
+}
+
+.calendar table.month th.day-header {
+    padding-top: 10px;
+    color: #CDCDCD;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+.calendar table.month td.day .day-content {
+    padding: 8px;
+    border-radius: 100%;
+} */
+
+.modal-body button {
+    display: none;
+}
+
+.modal-body label[for="event_form_status"] {
+    display: none;
+}
+
+
+@media (max-width: 767px) {
+    .logo {
+        height: 50px;
+        width: auto;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+}

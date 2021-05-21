@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{'Events Calendar' | trans }}{% endblock %}
+
+{% block body %}
+   <div class="container-fluid" {{ stimulus_controller('calendar', {
+      'locale': app.request.locale|split('_')[0],
+      'holidays-url': path('api_getHolidays'),
+      'holidays-color': holidaysColor,
+      'my-dates-url': path('api_get_my_dates', { year: 2021}), 
+      'dates-service-url': path('api_save_event'),
+      'formUrl': path('event_save')
+      }) }}
+      data-action="modal-form:success->calendar#refreshCalendar"
+      >
+
+         <div id="calendar" data-calendar-target="content">
+         
+         </div>
+
+        {# <div
+            {{ stimulus_controller('modal-form', {
+                formUrl: path('event_new')
+            }) }}
+            data-action="hidden.bs.modal->modal-form#modalHidden"
+        > #}
+            {# <button
+                class="btn btn-primary btn-sm"
+                data-action="calendar#openModal"
+            >{{'Add Event' | trans }}</button> #}
+
+         {# </div> #}
+         <div id="context-menu"></div>
+         {{ include('event/_modal.html.twig', {
+                     modalTitle: 'Event details',
+                     form: form
+         }) }}
+
+   </div>
+
+{% endblock %}

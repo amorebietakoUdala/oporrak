@@ -1,0 +1,14 @@
+<!doctype html>
+
+<html lang="{{app.request.locale}}">
+<head>
+  <meta charset="utf-8">
+  <title>{{'message.title' | trans }}</title>
+</head>
+
+<body>
+   <div>{{ 'user.username' | trans}} :{{event.user}}</div>
+   <div>{{ 'event.period' | trans}} :{{event.startDate | date('Y-m-d')}} - {{event.endDate | date('Y-m-d')}}</div>
+   <div>{{ 'event.name' | trans}} :{{event.name}}</div>
+</body>
+</html>
