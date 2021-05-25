@@ -1,6 +1,16 @@
 /* @import '~flatpickr/dist/flatpickr.css'; */
+
 @import '~js-year-calendar/dist/js-year-calendar.css';
 
 /* .ui-datepicker {
     font-size: 0.7rem;
 } */
+
+.color-square {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    border: 2px solid transparent;
+    transition: border-color 500ms linear;
+}

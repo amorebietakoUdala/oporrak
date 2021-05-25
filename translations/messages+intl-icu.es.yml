@@ -47,11 +47,32 @@ btn.new: "Nuevo"
 btn.search: "Buscar"
 
 # Titles
-"Show Topic": "Ver tema"
-"List Topics": "Lista de temas"
-"Edit Topic": "Editar temas"
-"List Consultations": "Lista de consultas"
+title.legend: "Leyenda"
+title.status: "Estado"
+title.summary: "Calendario Laboral"
 
+# Labels
+label.eventsThisYear: "Vacaciones este año: "
+label.workdaysThisYear: "Días laborables solicitados este año: "
+label.holidaysThisYear: "Festivos este año: "
+label.approvedThisYear: "Aprobados este año: "
+label.holidays: "Festivos"
+label.annualMaximumWorkingHours: "Jornada Máxima Anual: "
+label.annualMaximumWorkingDays: "Jornadas de Trabajo: "
+label.dailyWorkingHours: "Jornada Diaria: "
+label.break: "Descanso: "
+label.annualTotalWorkHours: "Total Jornada Anual: "
+label.overtimeHours: "Exceso horas: "
+label.vacationDays: "Vacaciones: "
+label.particularBusinessLeave: "Permiso asuntos particulares: "
+label.overtimeDays: "Exceso Jornada: "
+label.days: "días"
+label.minutes: "minutos"
+label.hours: "horas"
+
+Approved: "Aprobados"
+Reserved: "Solicitados"
+Not Approved: "No aprobados"
 # Confirmation messages
 
 # Successfull messages

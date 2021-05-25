@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Entity\Holiday;
+use App\Entity\WorkCalendar;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,10 +27,20 @@ class ApiController extends AbstractController
     public function getHolidays(Request $request, EntityManagerInterface $em): Response
     {
         $year = $request->get('year');
-        if (null === $year) {
-            $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
+        $startDate = $request->get('startDate');
+        $endDate = $request->get('endDate');
+        if (null !== $startDate) {
+            $startDate = new \DateTime($startDate);
+            if (null !== $endDate) {
+                $endDate = new \DateTime($endDate);
+            } else {
+                $endDate = new \DateTime();
+            }
+            $holidays = $em->getRepository(Holiday::class)->findHolidays($startDate, $endDate);
+            return $this->json($holidays, 200, []);
+        } elseif (null === $year) {
+            $year = \DateTime::createFromFormat('Y', (new \DateTime())->format('Y'));
         }
-
         $holidays = $em->getRepository(Holiday::class)->findBy(['year' => $year]);
         return $this->json($holidays, 200, []);
     }
@@ -40,6 +51,9 @@ class ApiController extends AbstractController
     public function getMyDates(Request $request, EntityManagerInterface $em): Response
     {
         $year = $request->get('year');
+        if (null === $year) {
+            $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
+        }
         /** @var User $user */
         $user = $this->getUser();
         if (null === $year) {
@@ -54,18 +68,12 @@ class ApiController extends AbstractController
         return $this->json($dates, 200, [], ['groups' => ['event']]);
     }
     /**
-     * @Route("/event/{id}/edit", name="api_edit_event", methods="POST")
+     * @Route("/work_calendar", name="api_getWorkCalendar", methods="GET")
      */
-    public function editEvent(Request $request, $id)
+    public function workCalendar(Request $request, EntityManagerInterface $em)
     {
-        dd($request, $id);
-    }
-
-    /**
-     * @Route("/event/new", name="api_save_event", methods="POST")
-     */
-    public function saveEvent(Request $request)
-    {
-        dd($request);
+        $year = $request->get('year');
+        $workCalendar = $em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
+        return $this->json($workCalendar, 200, [],);
     }
 }

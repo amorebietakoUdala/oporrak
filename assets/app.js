@@ -13,3 +13,11 @@ import './bootstrap';
 
 import 'bootstrap';
 import 'popper.js';
+
+global.app_base = '/oporrak';
+global.locale = null;
+
+$(function() {
+    global.locale = $('html').attr("lang");
+    console.log(global.locale);
+});

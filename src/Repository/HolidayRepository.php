@@ -19,22 +19,21 @@ class HolidayRepository extends ServiceEntityRepository
         parent::__construct($registry, Holiday::class);
     }
 
-    // /**
-    //  * @return Holiday[] Returns an array of Holiday objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    /**
+     * @return Holiday[] Returns an array of Holiday objects
+     */
+
+    public function findHolidays(\DateTime $startDate, \DateTime $endDate = null)
     {
         return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
+            ->andWhere('h.date >= :startDate')
+            ->andWhere('h.date <= :endDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
             ->orderBy('h.id', 'ASC')
-            ->setMaxResults(10)
             ->getQuery()
-            ->getResult()
-        ;
+            ->getResult();
     }
-    */
 
     /*
     public function findOneBySomeField($value): ?Holiday

@@ -1,0 +1,4 @@
+message.confirmationTitle: "Confirme, por favor"
+message.confirmationText: "¿Está seguro de que desea eliminar el evento?"
+btn.accept: "Aceptar"
+btn.cancel: "Cancelar"

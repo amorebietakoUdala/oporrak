@@ -29,23 +29,28 @@ class HolidayController extends AbstractController
             'GET',
             "https://opendata.euskadi.eus/contenidos/ds_eventos/calendario_laboral_$year/opendata/calendario_laboral_$year.json"
         );
-        $content = $response->getContent();
-        $json = substr($content, 13, -1);
-        $jsonData = json_decode($json, true);
-        foreach ($jsonData as $day) {
-            if (
-                $day['territory'] === 'Todos/denak' ||
-                ($day['municipalityEu'] === 'Amorebieta-Etxano' && $day['territory'] === 'Bizkaia')
-            ) {
-                $found = $em->getRepository(Holiday::class)->findOneBy(['date' => new \DateTime($day['date'])]);
-                if (null === $found) {
-                    $holiday = new Holiday();
-                    $holiday->fill($day);
-                    $em->persist($holiday);
+        if ($response->getStatusCode() === Response::HTTP_OK) {
+            $content = $response->getContent();
+            $json = substr($content, 13, -1);
+            $jsonData = json_decode($json, true);
+            foreach ($jsonData as $day) {
+                if (
+                    $day['territory'] === 'Todos/denak' ||
+                    ($day['municipalityEu'] === 'Amorebieta-Etxano' && $day['territory'] === 'Bizkaia')
+                ) {
+                    $found = $em->getRepository(Holiday::class)->findOneBy(['date' => new \DateTime($day['date'])]);
+                    if (null === $found) {
+                        $holiday = new Holiday();
+                        $holiday->fill($day);
+                        $em->persist($holiday);
+                    }
                 }
             }
+            $em->flush();
+            $this->addFlash('success', 'Holidays refreshed');
+        } else {
+            $this->addFlash('error', 'error.notFound');
         }
-        $em->flush();
         return $this->render('holiday/refresh.html.twig');
     }
 }

@@ -1,0 +1,22 @@
+{% block body_html %}
+	<!doctype html>
+	<html lang="{{app.request.locale}}">
+		<head>
+			<meta charset="utf-8">
+			<title>{{'message.title' | trans }}</title>
+		</head>
+
+		<body>
+			<div>{{ 'user.username' | trans}}:&nbsp;{{event.user}}</div>
+			<div>{{ 'event.period' | trans}}:&nbsp;{{event.startDate | date('Y-m-d')}}
+				-
+				{{event.endDate | date('Y-m-d')}}</div>
+			<div>{{ 'event.name' | trans}}:&nbsp;{{event.name}}</div>
+			<div>
+				<a href="{{ absolute_url(path('event_approve', { 'event': event.id }))}}">{{'Approve' | trans}}</a>
+				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				<a href="{{ absolute_url(path('event_deny', { 'event': event.id }))}}">{{'Deny' | trans}}</a>
+			</div>
+		</body>
+	</html>
+{% endblock %}

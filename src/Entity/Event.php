@@ -131,4 +131,10 @@ class Event
 
         return $this;
     }
+
+    public function getDays(): int
+    {
+        $interval = date_diff($this->startDate, $this->endDate);
+        return intVal($interval->days);
+    }
 }

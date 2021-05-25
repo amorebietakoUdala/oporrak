@@ -15,6 +15,7 @@ class Status
 {
     const RESERVED = 1;
     const APPROVED = 2;
+    const NOT_APPROVED = 3;
     /**
      * @Groups({"event"})
      * @ORM\Id
