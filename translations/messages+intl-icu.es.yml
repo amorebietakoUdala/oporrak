@@ -1,8 +1,5 @@
 messages.appTitle: "Vacaciones"
 
-navitem.administration: "Administración"
-navitem.users: "Usuarios"
-
 link.logout: "Salir"
 
 security.login.username: "Nombre de usuario"
@@ -39,8 +36,13 @@ ROLE_ADMIN: "Administrador"
 
 # Menu
 navitem.topics: "Temas"
+navitem.myCalendar: "Mi calendario"
+navitem.myDepartment: "Mi departamento"
+navitem.administration: "Administración"
+navitem.users: "Usuarios"
+navitem.department: "Departamento"
 
-# buttons
+# Buttons
 btn.cancel: "Volver"
 btn.save: "Guardar"
 btn.new: "Nuevo"
@@ -50,6 +52,8 @@ btn.search: "Buscar"
 title.legend: "Leyenda"
 title.status: "Estado"
 title.summary: "Calendario Laboral"
+title.details: "Detalles"
+title.departmentCalendar: "Calendario del departamento"
 
 # Labels
 label.eventsThisYear: "Vacaciones este año: "
@@ -69,6 +73,19 @@ label.overtimeDays: "Exceso Jornada: "
 label.days: "días"
 label.minutes: "minutos"
 label.hours: "horas"
+btn.approve: "Aprobar"
+btn.deny: "No aprobar"
+
+#Placeholders
+placeholder.choose: "Elije una opción"
+
+# Entities
+event.period: "Periodo"
+event.name: "Descripción"
+event.startDate: "Fecha de inicio"
+event.endDate: "Fecha de fin"
+user.boss: "Responsable"
+user.department: "Departamento"
 
 Approved: "Aprobados"
 Reserved: "Solicitados"
@@ -76,5 +93,8 @@ Not Approved: "No aprobados"
 # Confirmation messages
 
 # Successfull messages
+deleted: "Borrado"
 
 # Error messages
+message.overlapingDates: "Ya ha solicitado alguna fecha en ese periodo ({startDate} - {endDate})."
+message.overlapingWith: "Se solapa con los siguientes:"

@@ -7,7 +7,7 @@
 			{% endblock %}
 		</title>
 		{# Run `composer require symfony/webpack-encore-bundle`
-		           and uncomment the following Encore helpers to start using Symfony UX #}
+				           and uncomment the following Encore helpers to start using Symfony UX #}
 		{% block stylesheets %}
 			{{ encore_entry_link_tags('app') }}
 		{% endblock %}
@@ -24,25 +24,7 @@
 			{{ include('common/menu.html.twig') }}
 		{% endblock %}
 		{% block message %}
-			{% for msg in app.session.flashBag.get('success') %}
-				<div class="alert alert-success margin-top-13">
-					{{ msg | trans}}
-				</div>
-			{% endfor %}
-			{% for msg in app.session.flashBag.get('error') %}
-				<div class="alert alert-danger margin-top-13">
-					{% if message is defined %}
-						{{ msg | trans({'%message%' : message},"messages", app.request.locale) }}
-					{% else %}
-						{{ msg | trans }}
-					{% endif %}
-				</div>
-			{% endfor %}
-			{% for msg in app.session.flashBag.get('warning') %}
-				<div class="alert alert-warning margin-top-13">
-					{{ msg | trans | capitalize }}
-				</div>
-			{% endfor %}
+			{{ include('common/_messages.html.twig') }}
 		{% endblock message %}
 
 		{% block body %}{% endblock %}

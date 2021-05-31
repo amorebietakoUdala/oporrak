@@ -6,13 +6,13 @@ use App\Entity\Event;
 use App\Entity\Status;
 use App\Form\EventFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * @Route("/{_locale}/event")
@@ -23,7 +23,19 @@ class EventController extends AbstractController
      * @Route("/{event}/approve", name="event_approve", methods={"GET"}, options = { "expose" = true })
      * @IsGranted("ROLE_BOSS")
      */
-    public function approve(Event $event, Request $request, MailerInterface $mailer): Response
+    //    private $translator = null;
+    private $mailer = null;
+
+    public function __construct(MailerInterface $mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
+    /**
+     * @Route("/{event}/approve", name="event_approve", methods={"GET"}, options = { "expose" = true })
+     * @IsGranted("ROLE_BOSS")
+     */
+    public function approve(Event $event, Request $request): Response
     {
         if (null !== $event) {
             if ($event->getStatus()->getId() === Status::APPROVED) {
@@ -40,7 +52,7 @@ class EventController extends AbstractController
             ]);
             $user = $event->getUser();
             $subject = 'Opor eskaera erantzuna / Respuesta solicitud de vacaciones';
-            $this->sendEmail($mailer, $user->getEmail(), $subject, $html);
+            $this->sendEmail($user->getEmail(), $subject, $html);
         } else {
             $this->addFlash('error', 'event.notFound');
         }
@@ -51,7 +63,7 @@ class EventController extends AbstractController
      * @Route("/{event}/deny", name="event_deny", methods={"GET"}, options = { "expose" = true })
      * @IsGranted("ROLE_BOSS")
      */
-    public function deny(Event $event, Request $request, MailerInterface $mailer): Response
+    public function deny(Event $event, Request $request): Response
     {
         if (null !== $event) {
             if ($event->getStatus()->getId() === Status::NOT_APPROVED) {
@@ -68,7 +80,7 @@ class EventController extends AbstractController
             ]);
             $user = $event->getUser();
             $subject = 'Opor eskaera erantzuna / Respuesta solicitud de vacaciones';
-            $this->sendEmail($mailer, $user->getEmail(), $subject, $html);
+            $this->sendEmail($user->getEmail(), $subject, $html);
         } else {
             $this->addFlash('error', 'event.notFound');
         }
@@ -84,7 +96,15 @@ class EventController extends AbstractController
             $em = $this->getDoctrine()->getManager();
             $em->remove($event);
             $em->flush();
-
+            $user = $this->getUser();
+            $boss = $user->getBoss();
+            if (null !== $boss && $this->getParameter('sendDeletionEmails')) {
+                $html = $this->renderView('event/eventDeletionMail.html.twig', [
+                    'event' => $event
+                ]);
+                $subject = 'Opor eskaera bertan behera uztea / Cancelación de vacaciones';
+                $this->sendEmail($boss->getEmail(), $subject, $html);
+            }
             return new Response(null, 204);
         }
         $this->addFlash('error', 'message.eventNotFound');
@@ -94,10 +114,12 @@ class EventController extends AbstractController
     /**
      * @Route("/save", name="event_save", methods={"GET","POST"})
      */
-    public function save(Request $request, MailerInterface $mailer): Response
+    public function save(Request $request): Response
     {
         $event = new Event();
-        $form = $this->createForm(EventFormType::class, $event);
+        $form = $this->createForm(EventFormType::class, $event, [
+            'days' => $this->getParameter('days')
+        ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $event = $form->getData();
@@ -106,36 +128,18 @@ class EventController extends AbstractController
             $boss = $user->getBoss();
             $entityManager = $this->getDoctrine()->getManager();
             if (null === $event->getId()) {
+                $myEvents = $this->getDoctrine()->getRepository(Event::class)->findUserEventsBeetweenDates($user, new \DateTime($event->getStartDate()->format('Y') . '-01-01'));
+                if ($this->checkOverlap($myEvents, $event)) {
+                    return $this->renderOverlapError($event, $form, $request->isXmlHttpRequest());
+                }
                 $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::RESERVED));
                 $event->setUser($this->getUser());
-                $entityManager->persist($event);
-                $entityManager->flush();
-                if (null !== $boss) {
-                    $html = $this->renderView('event/eventApprovalMail.html.twig', [
-                        'event' => $event
-                    ]);
-                    $subject = 'Opor eskaera / Solicitud de vacaciones';
-                    $this->sendEmail($mailer, $boss->getEmail(), $subject, $html);
-                }
-                if ($request->isXmlHttpRequest()) {
-                    return new Response(null, 204);
-                }
+                return $this->renderSuccess($event, $boss, $request->isXmlHttpRequest());
             } else {
                 $bdEvent = $entityManager->getRepository(Event::class)->find($event->getId());
                 $bdEvent->fill($event);
                 $bdEvent->setUser($user);
-                $entityManager->persist($bdEvent);
-                $entityManager->flush();
-                if (null !== $boss) {
-                    $html = $this->renderView('event/eventApprovalMail.html.twig', [
-                        'event' => $event
-                    ]);
-                    $subject = 'Opor eskaera / Solicitud de vacaciones';
-                    $this->sendEmail($mailer, $boss->getEmail(), $subject, $html);
-                }
-                if ($request->isXmlHttpRequest()) {
-                    return new Response(null, 204);
-                }
+                return $this->renderSuccess($bdEvent, $boss, $request->isXmlHttpRequest());
             }
             return $this->redirectToRoute('calendar');
         }
@@ -143,7 +147,7 @@ class EventController extends AbstractController
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'new.html.twig';
 
         return $this->render('event/' . $template, [
-            'event' => $event,
+            'event' => $form->getData(),
             'form' => $form->createView(),
         ], new Response(
             null,
@@ -151,7 +155,7 @@ class EventController extends AbstractController
         ));
     }
 
-    private function sendEmail(MailerInterface $mailer, $to, $subject, $html)
+    private function sendEmail($to, $subject, $html)
     {
         $email = (new Email())
             ->from($this->getParameter('mailerFrom'))
@@ -162,16 +166,60 @@ class EventController extends AbstractController
             //->priority(Email::PRIORITY_HIGH)
             ->subject($subject)
             ->html($html);
-        $mailer->send($email);
+        $this->mailer->send($email);
     }
 
     /**
      * @Route("/{event}/days", name="event_days", methods={"GET"})
      */
-    public function days(Event $event = null)
+    // public function days(Event $event = null)
+    // {
+    //     if (null !== $event) {
+    //         return $this->json($event->getDays());
+    //     }
+    // }
+
+    private function checkOverlap(array $allEvents, Event $event)
     {
-        if (null !== $event) {
-            return $this->json($event->getDays());
+        foreach ($allEvents as $myEvent) {
+            $overlap = $myEvent->checkOverlap($event);
+            if ($overlap) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function renderOverlapError($event, $form, $ajax = false)
+    {
+        $this->addFlash('error', new TranslatableMessage('message.overlapingDates', [
+            'startDate' => $event->getStartDate()->format('Y/m/d'),
+            'endDate' => $event->getEndDate()->format('Y/m/d')
+        ], 'messages'));
+        $template = $ajax ? '_form.html.twig' : 'new.html.twig';
+
+        return $this->render('event/' . $template, [
+            'event' => $form->getData(),
+            'form' => $form->createView(),
+        ], new Response(null, 422));
+    }
+
+    private function renderSuccess($event, $boss, $ajax = false)
+    {
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($event);
+        $entityManager->flush();
+        $overlaps = $this->getDoctrine()->getRepository(Event::class)->findOverlapingEventsNotOfCurrentUser($event);
+        if (null !== $boss) {
+            $html = $this->renderView('event/eventApprovalMail.html.twig', [
+                'event' => $event,
+                'overlaps' => $overlaps
+            ]);
+            $subject = 'Opor eskaera / Solicitud de vacaciones';
+            $this->sendEmail($boss->getEmail(), $subject, $html);
+        }
+        if ($ajax) {
+            return new Response(null, 204);
         }
     }
 }

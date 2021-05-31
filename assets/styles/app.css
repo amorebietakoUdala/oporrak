@@ -1,6 +1,7 @@
 @import '~bootstrap';
 @import '~js-year-calendar/dist/js-year-calendar.css';
 @import '~bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
+
 /* @import '~font-awesome'; */
 
 body {
@@ -38,8 +39,12 @@ main {
     border-radius: 3rem;
 }
 
+
 /* Material design styles */
-/* .calendar .calendar-header {
+
+
+/* 
+.calendar .calendar-header {
     background-color: #f5f5f5;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
     border: 0;
@@ -91,13 +96,11 @@ main {
     display: none;
 }
 
-
 @media (max-width: 767px) {
     .logo {
         height: 50px;
         width: auto;
     }
-
     h1 {
         font-size: 1.5rem;
     }

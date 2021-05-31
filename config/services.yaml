@@ -4,54 +4,68 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    holidaysColor: "#de1e1e"
-    mailerFrom: "%env(MAILER_FROM)%"
-    mailerSubject: "%env(MAILER_SUBJECT)%"
+  holidaysColor: "#de1e1e"
+  mailerFrom: "%env(MAILER_FROM)%"
+  mailerSubject: "%env(MAILER_SUBJECT)%"
+  days: 5
+  sendDeletionEmails: "%env(bool:MAILER_SEND_DELETION_EMAILS)%"
+  colorPalette:
+    [
+#      "#050f2c",
+      "#003666",
+      "#00aeff",
+      "#3369e7",
+      "#8e43e7",
+      "#b84592",
+      "#ff4f81",
+      "#ff6c5f",
+      "#ffc168",
+      "#2dde98",
+      "#1cc7d0",
+    ]
 
 services:
-    Symfony\Component\Ldap\Ldap:
-        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+  Symfony\Component\Ldap\Ldap:
+    arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
 
-    ldap:
-        alias: Symfony\Component\Ldap\Ldap
-            
-    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
-        arguments:
-            -   host: '%env(LDAP_HOST)%'
-                port: '%env(LDAP_PORT)%'
-                encryption: none
-                options:
-                    protocol_version: 3
-                    referrals: false    
+  ldap:
+    alias: Symfony\Component\Ldap\Ldap
 
-    # default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+  Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+    arguments:
+      - host: "%env(LDAP_HOST)%"
+        port: "%env(LDAP_PORT)%"
+        encryption: none
+        options:
+          protocol_version: 3
+          referrals: false
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
-            - '../src/Tests/'
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # controllers are imported separately to make sure services can be injected
-    # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller/'
-        tags: ['controller.service_arguments']
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: "../src/"
+    exclude:
+      - "../src/DependencyInjection/"
+      - "../src/Entity/"
+      - "../src/Kernel.php"
+      - "../src/Tests/"
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+  # controllers are imported separately to make sure services can be injected
+  # as action arguments even if you don't extend any base controller class
+  App\Controller\:
+    resource: "../src/Controller/"
+    tags: ["controller.service_arguments"]
 
-    App\Form\UserType:
-        arguments:
-            $class: '%env(USER_CLASS)%'
-#            $allowedRoles: ["ROLE_USER", "ROLE_OPORRAK", "ROLE_BOSS", "ROLE_ADMIN"]
-            $allowedRoles: '%env(csv:ALLOWED_ROLES)%'
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
 
-
+  App\Form\UserType:
+    arguments:
+      $class: "%env(USER_CLASS)%"
+      #            $allowedRoles: ["ROLE_USER", "ROLE_OPORRAK", "ROLE_BOSS", "ROLE_ADMIN"]
+      $allowedRoles: "%env(csv:ALLOWED_ROLES)%"

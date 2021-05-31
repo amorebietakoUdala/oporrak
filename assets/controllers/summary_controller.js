@@ -32,11 +32,11 @@ export default class extends Controller {
     overtimeDays = 0;
 
     connect() {
-        console.log('summary Connected!');
+        console.log('Summary connected');
     }
 
     async refreshSummary(event) {
-        console.log(event.detail.year);
+        console.log('refreshing ', event);
         let params = new URLSearchParams({
             year: event.detail.year
         });

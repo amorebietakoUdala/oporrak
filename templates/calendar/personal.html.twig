@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{'Events Calendar' | trans }}
+{% endblock %}
+
+{% block body %}
+	<div {{ stimulus_controller('summary',{'summary-url': path('api_getWorkCalendar')} ) }} data-action="personal-calendar:yearChanged->summary#refreshSummary">
+		<div class="container-fluid" {{ stimulus_controller('personal-calendar', { 'locale': app.request.locale|split('_')[0], 'holidays-url': path('api_getHolidays'), 'holidays-color': holidaysColor, 'my-dates-url': path('api_get_my_dates'), 'formUrl' : path('event_save') , 'year' : year, 'days' : days } ) }} {# data-action="modal-form:success->calendar#refreshCalendar" #}>
+
+			<div id="calendar" data-personal-calendar-target="content"></div>
+			<div class="row d-flex justify-content-around">
+				{{ include('calendar/_summary.html.twig') }}
+				{{ include('calendar/_status.html.twig') }}
+				{{ include('calendar/_legend.html.twig') }}
+			</div>
+			<div id="context-menu"></div>
+			{{ include('event/_modal.html.twig', {
+                     modalTitle: 'Event details',
+                     form: form
+         }) }}
+		</div>
+	</div>
+	{{ include('common/_alert.html.twig') }}
+
+{% endblock %}

@@ -1,49 +1,48 @@
 import {
-   Controller
+    Controller
 } from 'stimulus';
 import $ from 'jquery';
 import 'bootstrap-datepicker';
 import {
-   useDispatch
+    useDispatch
 } from 'stimulus-use';
 
 export default class extends Controller {
-   static values = {
-      locale: String,
-   }
+    static values = {
+        locale: String,
+    }
 
-   connect() {
-      useDispatch(this, {
-         debug: true
-      });
-      let $startDate = $('#event_form_startDate').datepicker({
-         format: "yyyy-mm-dd",
-         language: this.localeValue
-      });
-      $startDate.datepicker('update', event ? event.startDate : '');
-      let $endDate = $('#event_form_endDate').datepicker({
-         format: "yyyy-mm-dd",
-         language: this.localeValue
-      });
-      $endDate.datepicker('update', event ? event.endDate : '');
-   }
+    connect() {
+        console.log("Event-form connected!!");
+        useDispatch(this, {
+            debug: true
+        });
+        $('#event_form_startDate').datepicker({
+            format: "yyyy-mm-dd",
+            language: this.localeValue
+        });
+        $('#event_form_endDate').datepicker({
+            format: "yyyy-mm-dd",
+            language: this.localeValue
+        });
+    }
 
-   async submitForm(event) {
-      console.log('Event form');
-      event.preventDefault();
-      const $form = $(this).find('form');
+    // async submitForm(event) {
+    //     //        event.preventDefault();
+    //     console.log('Submit form clicked!!!');
+    //     const $form = $(this).find('form');
 
-      try {
-         await $.ajax({
-            url: this.formUrlValue,
-            method: $form.prop('method'),
-            data: $form.serialize(),
-         });
-         this.modal.hide();
-         this.dispatch('success');
-      } catch (e) {
-         this.modalBodyTarget.innerHTML = e.responseText;
-      }
-   }
+    //     try {
+    //         await $.ajax({
+    //             url: this.formUrlValue,
+    //             method: $form.prop('method'),
+    //             data: $form.serialize(),
+    //         });
+    //         this.modal.hide();
+    //         this.dispatch('success');
+    //     } catch (e) {
+    //         this.modalBodyTarget.innerHTML = e.responseText;
+    //     }
+    // }
 
 }

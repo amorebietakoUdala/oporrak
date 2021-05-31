@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Department;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Entity\Holiday;
@@ -60,13 +61,37 @@ class ApiController extends AbstractController
             $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
         }
         $nextYear = intVal($year) + 1;
-        $items = $em->getRepository(Event::class)->findByUserAndDates($user, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+        $items = $em->getRepository(Event::class)->findUserEventsBeetweenDates($user, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
         $dates = [
             'total_count' => $items === null ? 0 : count($items),
             'items' => $items === null ? [] : $items
         ];
         return $this->json($dates, 200, [], ['groups' => ['event']]);
     }
+
+    /**
+     * @Route("/department/dates", name="api_get_mydepartment_dates", methods="GET")
+     */
+    public function getDepartmentDates(Request $request, EntityManagerInterface $em): Response
+    {
+        $year = $request->get('year');
+        if (null === $year) {
+            $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
+        }
+        /** @var User $user */
+        $user = $this->getUser();
+        if (null === $year) {
+            $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
+        }
+        $nextYear = intVal($year) + 1;
+        $items = $em->getRepository(Event::class)->findDepartmentBeetweenDates($user->getDepartment(), new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+        $dates = [
+            'total_count' => $items === null ? 0 : count($items),
+            'items' => $items === null ? [] : $items
+        ];
+        return $this->json($dates, 200, [], ['groups' => ['event']]);
+    }
+
     /**
      * @Route("/work_calendar", name="api_getWorkCalendar", methods="GET")
      */

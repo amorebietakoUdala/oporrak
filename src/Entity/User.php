@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use AMREU\UserBundle\Model\UserInterface as AMREUserInterface;
 use AMREU\UserBundle\Model\User as BaseUser;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Table(name="user")
@@ -23,6 +24,7 @@ class User extends BaseUser implements AMREUserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups({"event"})
      */
     protected $username;
 
@@ -58,7 +60,7 @@ class User extends BaseUser implements AMREUserInterface
     protected $lastLogin;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="users")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="employees")
      */
     private $boss;
 
@@ -67,10 +69,12 @@ class User extends BaseUser implements AMREUserInterface
      */
     private $employees;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Event::class, mappedBy="User", orphanRemoval=true)
-     */
     private $events;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Department::class)
+     */
+    private $department;
 
     public function __construct()
     {
@@ -145,5 +149,25 @@ class User extends BaseUser implements AMREUserInterface
     public function __toString()
     {
         return $this->username;
+    }
+
+    /**
+     * Get the value of department
+     */
+    public function getDepartment()
+    {
+        return $this->department;
+    }
+
+    /**
+     * Set the value of department
+     *
+     * @return  self
+     */
+    public function setDepartment($department)
+    {
+        $this->department = $department;
+
+        return $this;
     }
 }

@@ -1,13 +1,14 @@
 import {
     Controller
 } from 'stimulus';
-import $ from 'jquery';
+import $, { type } from 'jquery';
 import {
     Modal
 } from 'bootstrap';
 import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
 import 'js-year-calendar/locales/js-year-calendar.eu';
+import { workingDaysBetween } from '../js/dateUtils';
 
 import {
     useDispatch
@@ -26,6 +27,8 @@ export default class extends Controller {
         datesServiceUrl: String,
         formUrl: String,
         year: String,
+        // How many days before can we edit calendar
+        days: String,
     };
 
     calendar = null;
@@ -47,13 +50,16 @@ export default class extends Controller {
             language: this.localeValue,
             style: 'background',
             startYear: this.yearValue,
-            contextMenuItems: [{
-                    text: 'Update',
-                    click: (event) => {
-                        console.log('event');
-                        this.editEvent(event);
-                    }
-                },
+            disabledWeekDays: [0, 6],
+            //allowOverlap: false,
+            contextMenuItems: [
+                //    {
+                //         text: 'Update',
+                //         click: (event) => {
+                //             console.log('event');
+                //             this.editEvent(event);
+                //         }
+                //     },
                 {
                     text: 'Delete',
                     click: (event) => {
@@ -105,28 +111,26 @@ export default class extends Controller {
             },
             yearChanged: (event) => {
                 // It makes a year changed on init, so it doesn't need another load after this.
-                console.log('yearChanged');
                 let year = event.currentYear;
                 this.load(event.currentYear);
                 this.dispatch('yearChanged', { year });
             },
         });
-        //        this.load(this.yearValue);
     }
 
     openModal() {
+        let $alert = $(this.modalBodyTarget).find('.alert');
+        $alert.remove();
         this.modal.show();
     }
 
     editEvent(event) {
-        console.log('editEvent', event);
         $('#event_form_id').val(event ? event.id : '');
         $('#event_form_name').val(event ? event.name : '');
         $('#event_form_startDate').datepicker('update', event ? event.startDate : '');
         $('#event_form_endDate').datepicker('update', event ? event.endDate : '');
         $('#event_form_status').val(event ? event.statusId : '');
         this.openModal();
-        //      let respose = await fetch(`${this.holidaysUrlValue}?${params.toString()}`)
     }
 
     async deleteEvent(event) {
@@ -162,7 +166,6 @@ export default class extends Controller {
                 method: $form.prop('method'),
                 data: $form.serialize()
             });
-            console.log(event);
             this.refreshCalendar();
 
             this.modal.hide();
@@ -192,13 +195,10 @@ export default class extends Controller {
             .then(result => result.json())
             .then(result => {
                 if (result.items) {
-                    this.counters = this.createCounters(result.items);
+                    this.counters = this.createCounters(result.items, this.holidays);
                     this.updateCounters();
                     let workdays = this.calculateWorkDays(result.items);
-                    // this.holidaysTarget.innerHTML = this.holidays.length;
                     this.holidaysLegendTarget.innerHTML = this.holidays.length;
-                    // let days = this.calculateDays(result.items);
-                    // this.eventsTarget.innerHTML = days;
                     this.workdaysTarget.innerHTML = workdays;
 
                     return result.items.map(r => ({
@@ -229,64 +229,27 @@ export default class extends Controller {
         this.load(this.calendar.getYear());
     }
 
-    daysBeetween(startDate, endDate) {
-        const date1 = Date.parse(startDate);
-        const date2 = Date.parse(endDate);
-        const diffTime = Math.abs(date2 - date1);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays + 1;
-    }
-
-    calculateDays(events) {
-        let days = 0;
-        events.forEach(element => {
-            days += this.daysBeetween(element.startDate, element.endDate);
-        });
-        console.log(days);
-        return days;
-    }
-
     calculateWorkDays(events) {
         let totalDays = 0;
-        let days = 0;
-        let holidays = 0;
         let workdays = 0;
         events.forEach(element => {
-            days = this.daysBeetween(element.startDate, element.endDate);
-            holidays = this.holidaysBeetween(element.startDate, element.endDate);
-            workdays = days - holidays;
+            workdays = workingDaysBetween(element.startDate, element.endDate, this.holidays);
             totalDays += workdays;
         });
         return totalDays;
     }
 
-    holidaysBeetween(startDate, endDate) {
-        let holidays = 0;
-        this.holidays.forEach(element => {
-            // Holidays has always same startDate and endDate so we only have to check one.
-            if (new Date(element.startDate) >= new Date(startDate) && new Date(element.endDate) <= new Date(endDate)) {
-                holidays += 1;
-            }
-        })
-        return holidays;
-    }
-
-    workdaysBeetween(startDate, endDate) {
-        console.log(this.daysBeetween(startDate, endDate), this.holidaysBeetween(startDate, endDate));
-        return this.daysBeetween(startDate, endDate) - this.holidaysBeetween(startDate, endDate);
-    }
-
-    createCounters(events) {
+    createCounters(events, holidays) {
         let counters = [];
         this.approved = 0;
         events.forEach(element => {
             if (typeof(counters[element.status.id]) === 'undefined') {
-                counters[element.status.id] = this.workdaysBeetween(element.startDate, element.endDate);
+                counters[element.status.id] = workingDaysBetween(element.startDate, element.endDate, holidays);
             } else {
-                counters[element.status.id] += this.workdaysBeetween(element.startDate, element.endDate);
+                counters[element.status.id] += workingDaysBetween(element.startDate, element.endDate, holidays);
             }
             if (element.status.id === 2) {
-                this.approved += this.workdaysBeetween(element.startDate, element.endDate);
+                this.approved += workingDaysBetween(element.startDate, element.endDate, holidays);
             }
         });
         return counters;
@@ -295,11 +258,8 @@ export default class extends Controller {
     updateCounters() {
         $('.color-square').text(0);
         Object.entries(this.counters).forEach(([key, value]) => {
-            console.log(`${key}: ${value}`);
-            console.log($('#colorSquare' + key));
             $('#colorSquare' + key).text(value);
         });
-        console.log(this.approvedTarget);
         this.approvedTarget.innerHTML = this.approved;
     }
 

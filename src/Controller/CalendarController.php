@@ -22,9 +22,9 @@ class CalendarController extends AbstractController
     }
 
     /**
-     * @Route("/{_locale}/calendar", name="calendar")
+     * @Route("/{_locale}/mycalendar", name="myCalendar")
      */
-    public function index(Request $request): Response
+    public function personal(Request $request): Response
     {
         $event = new Event();
         $year = $request->get('year');
@@ -33,11 +33,34 @@ class CalendarController extends AbstractController
         }
         $form = $this->createForm(EventFormType::class, $event);
         $statuses = $this->getDoctrine()->getManager()->getRepository(Status::class)->findAll();
-        return $this->render('calendar/index.html.twig', [
+        return $this->render('calendar/personal.html.twig', [
             'form' => $form->createView(),
             'holidaysColor' => $this->getParameter('holidaysColor'),
             'year' => $year,
-            'statuses' => $statuses
+            'statuses' => $statuses,
+            'days' => $this->getParameter('days'),
+        ]);
+    }
+
+    /**
+     * @Route("/{_locale}/department-calendar", name="departmentCalendar")
+     */
+    public function department(Request $request): Response
+    {
+        $event = new Event();
+        $year = $request->get('year');
+        if (null === $year) {
+            $year = (new \DateTime())->format('Y');
+        }
+        $form = $this->createForm(EventFormType::class, $event);
+        $statuses = $this->getDoctrine()->getManager()->getRepository(Status::class)->findAll();
+        return $this->render('calendar/department.html.twig', [
+            'form' => $form->createView(),
+            'holidaysColor' => $this->getParameter('holidaysColor'),
+            'colorPalette' => $this->getParameter('colorPalette'),
+            'year' => $year,
+            'statuses' => $statuses,
+            'days' => $this->getParameter('days'),
         ]);
     }
 }

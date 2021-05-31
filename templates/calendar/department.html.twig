@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{'title.departmentCalendar' | trans }}
+{% endblock %}
+
+{% block body %}
+	<div {{ stimulus_controller({
+         'summary': {
+            'summary-url': path('api_getWorkCalendar') }, 
+         'day-details': {}
+         }) }} 
+         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails" 
+   >
+		<div class="container-fluid" {{ stimulus_controller('department-calendar', { 'locale': app.request.locale|split('_')[0], 'holidays-url': path('api_getHolidays'), 'holidays-color': holidaysColor, 'department-dates-url': path('api_get_mydepartment_dates'), 'year' : year, 'colorPalette': colorPalette, 'roles': app.user.roles } ) }}>
+			<div id="calendar" {#data-department-calendar-target="content"#}></div>
+			<div class="row d-flex justify-content-around">
+				{{ include('calendar/_summary.html.twig') }}
+				{{ include('calendar/_day-details.html.twig') }}
+				{#{{ include('calendar/_status.html.twig') }}
+																																																																																																												            {{ include('calendar/_legend.html.twig') }} #}
+			</div>
+			<div id="context-menu"></div>
+
+			{# {{ include('event/_modal.html.twig', {
+																																																																																							                     modalTitle: 'Event details',
+																																																																																							                     form: form
+																																																																																							         }) }} #}
+		</div>
+	</div>
+	{{ include('common/_alert.html.twig') }}
+
+{% endblock %}

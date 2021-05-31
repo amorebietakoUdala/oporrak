@@ -45,8 +45,9 @@ class Event
     private $status;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="events")
+     * @ORM\ManyToOne(targetEntity=User::class)
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"event"})
      */
     private $user;
 
@@ -79,7 +80,7 @@ class Event
         return $this->startDate;
     }
 
-    public function setStartDate(\DateTimeInterface $startDate): self
+    public function setStartDate(\DateTimeInterface $startDate = null): self
     {
         $this->startDate = $startDate;
 
@@ -91,7 +92,7 @@ class Event
         return $this->endDate;
     }
 
-    public function setEndDate(\DateTimeInterface $endDate): self
+    public function setEndDate(\DateTimeInterface $endDate = null): self
     {
         $this->endDate = $endDate;
 
@@ -136,5 +137,18 @@ class Event
     {
         $interval = date_diff($this->startDate, $this->endDate);
         return intVal($interval->days);
+    }
+
+    public function checkOverlap($event): bool
+    {
+        if (
+            $this->startDate >= $event->getStartDate() && $this->startDate <= $event->getEndDate()
+            || $this->endDate >= $event->getStartDate() && $this->endDate <= $event->getEndDate()
+            || $event->getStartDate() >= $this->startDate && $event->getStartDate() <= $this->startDate
+            || $event->getEndDate()  >= $this->startDate && $event->getEndDate() <= $this->endDate
+        ) {
+            return true;
+        }
+        return false;
     }
 }

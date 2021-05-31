@@ -5,8 +5,10 @@ namespace App\Form;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use AMREU\UserBundle\Form\UserType as BaseUserType;
+use App\Entity\Department;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class UserType extends BaseUserType
 {
@@ -20,7 +22,17 @@ class UserType extends BaseUserType
         parent::buildForm($builder, $options);
         $builder
             ->add('boss', EntityType::class, [
-                'class' => User::class
+                'class' => User::class,
+                'label' => 'user.boss',
+                'placeholder' => 'placeholder.choose',
+            ])
+            ->add('department', EntityType::class, [
+                'class' => Department::class,
+                'label' => 'user.department',
+                'placeholder' => 'placeholder.choose',
+                'constraints' => [
+                    new NotBlank()
+                ]
             ]);
     }
 

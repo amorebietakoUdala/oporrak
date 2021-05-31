@@ -9,19 +9,19 @@
 		<div class="collapse navbar-collapse" id="navbarSupportedContent">
 			<ul class="navbar-nav mr-auto">
 				<li class='nav-item'>
-					<a class="nav-link" href="{{ path ('calendar', { year: 'now' | date('Y') })}}">{{"Calendar" | trans | capitalize}}</a>
+					<a class="nav-link" href="{{ path ('myCalendar', { year: 'now' | date('Y') })}}">{{"navitem.myCalendar" | trans | capitalize}}</a>
 				</li>
 
 				<li class='nav-item'>
-					<a class="nav-link" href="#">{{"navitem.2" | trans | capitalize}}</a>
+					<a class="nav-link" href="{{ path ('departmentCalendar', { year: 'now' | date('Y') })}}">{{"navitem.myDepartment" | trans | capitalize}}</a>
 				</li>
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="navbarContacts" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-						{{ 'navitem.contacts' | trans | capitalize }}
+					<a class="nav-link dropdown-toggle" href="#" id="navbarAdministration" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						{{ 'navitem.administration' | trans | capitalize }}
 					</a>
-					<div id="js-menu-contacts" class="dropdown-menu" aria-labelledby="navbarContacts">
-						<a class="dropdown-item" href="#">{{"navitem.contact_list" | trans | capitalize}}</a>
-						<a class="dropdown-item" href="#">{{"navitem.contact_import" | trans | capitalize}}</a>
+					<div id="js-menu-administration" class="dropdown-menu" aria-labelledby="navbarAdministration">
+						<a class="dropdown-item" href="{{path('admin_user_list')}}">{{"navitem.users" | trans | capitalize}}</a>
+						<a class="dropdown-item" href="{{path('department_index')}}">{{"navitem.department" | trans | capitalize}}</a>
 					</div>
 				</li>
 			</ul>
