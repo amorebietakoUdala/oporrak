@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit AntiquityDays{% endblock %}
+
+{% block body %}
+    <h1>Edit AntiquityDays</h1>
+
+    {{ include('antiquity_days/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('antiquity_days_index') }}">back to list</a>
+
+    {{ include('antiquity_days/_delete_form.html.twig') }}
+{% endblock %}

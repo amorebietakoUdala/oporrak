@@ -22,27 +22,21 @@ class DepartmentController extends AbstractController
      * 
      * @Route("/", name="department_index", methods={"GET"})
      */
-    public function index(DepartmentRepository $departmentRepository): Response
+    public function index(DepartmentRepository $departmentRepository, Request $request): Response
     {
-        $department = new Department();
-        $form = $this->createForm(DepartmentType::class, $department);
-
-        return $this->render('department/index.html.twig', [
-            'departments' => $departmentRepository->findAll(),
-            'form' => $form->createView(),
-        ]);
-    }
-
-    /**
-     * Renders only the list not the whole page
-     * 
-     * @Route("/_list", name="_department_list")
-     */
-    public function _departmentList(DepartmentRepository $departmentRepository)
-    {
-        return $this->render('department/_list.html.twig', [
-            'departments' => $departmentRepository->findAll(),
-        ]);
+        $ajax = $request->get('ajax') !== null ? $request->get('ajax') : "false";
+        if ($ajax === "false") {
+            $department = new Department();
+            $form = $this->createForm(DepartmentType::class, $department);
+            return $this->render('department/index.html.twig', [
+                'departments' => $departmentRepository->findAll(),
+                'form' => $form->createView(),
+            ]);
+        } else {
+            return $this->render('department/_list.html.twig', [
+                'departments' => $departmentRepository->findAll(),
+            ]);
+        }
     }
 
     /**
@@ -86,7 +80,7 @@ class DepartmentController extends AbstractController
      * 
      * @Route("/{id}", name="department_show", methods={"GET"})
      */
-    public function show(Department $department, Request $request): Response
+    public function show(Request $request, Department $department): Response
     {
         $form = $this->createForm(DepartmentType::class, $department, [
             'readonly' => true,

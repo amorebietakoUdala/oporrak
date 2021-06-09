@@ -32,6 +32,13 @@ class AntiquityDays
         return $this->id;
     }
 
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getYearsWorking(): ?int
     {
         return $this->yearsWorking;
@@ -54,5 +61,12 @@ class AntiquityDays
         $this->vacationDays = $vacationDays;
 
         return $this;
+    }
+
+    public function fill(AntiquityDays $antiquityDay)
+    {
+        $this->id = $antiquityDay->getId();
+        $this->yearsWorking = $antiquityDay->getYearsWorking();
+        $this->vacationDays = $antiquityDay->getVacationDays();
     }
 }

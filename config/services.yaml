@@ -24,6 +24,8 @@ parameters:
   #     "#2dde98",
   #     "#1cc7d0",
   #   ]
+  territoryEu: "%env(TERRITORYEU)%"
+  municipalityEu: "%env(MUNICIPALITYEU)%"
 
 services:
   Symfony\Component\Ldap\Ldap:

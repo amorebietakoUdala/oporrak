@@ -44,6 +44,7 @@ navitem.cityHall: "Calendario del Ayuntamiento"
 navitem.administration: "Administración"
 navitem.users: "Usuarios"
 navitem.department: "Departamento"
+navitem.antiquityDays: "Días por antigüedad"
 
 # Buttons
 btn.cancel: "Volver"
@@ -62,6 +63,8 @@ title.cityHallCalendar: "Calendario completo del Ayuntamiento"
 title.departmentIndex: "Departamentos"
 title.search: "Búsqueda"
 New Department: "Nuevo Departamento"
+title.antiquityIndex: "Días por antigüedad"
+New Antiquity Days: "Añadir Registro"
 
 # Labels
 label.eventsThisYear: "Vacaciones este año: "

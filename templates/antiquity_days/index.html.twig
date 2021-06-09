@@ -1,29 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{'title.departmentIndex' | trans }}{% endblock %}
+{% block title %}{{'title.antiquityIndex' | trans }}{% endblock %}
 
 {% block body %}
-    <h1>{{'title.departmentIndex' | trans }}</h1>
+    <h1>{{'title.antiquityIndex' | trans }}</h1>
       <div {{ stimulus_controller('reload-content', 
-               { 'url': path('department_index', { 'ajax' : 'true'}),
+               { 'url': path('antiquity_days_index', {'ajax' : 'true'}),
                   'locale': app.request.locale|split('_')[0] })}} data-action="entity:success->reload-content#refreshContent entity:init->reload-content#refreshContent">
 
          <div {{ stimulus_controller('entity', 
                   { 'locale': app.request.locale|split('_')[0], 
-                  'entity': 'department',
-                  'entitySaveUrl': path('department_save'),
+                  'entity': 'AntiquityDays',
+                  'entitySaveUrl': path('antiquity_days_save'),
                   })}} 
                class="container-fluid"
                data-action="hidden.bs.modal->entity#modalHidden">
                <div data-reload-content-target="content">
-                  {{ include('department/_list.html.twig', { 'departments': departments }) }}
+                  {{ include('antiquity_days/_list.html.twig', { 'antiquity_days': antiquity_days }) }}
                </div>
             {{ include('common/_modal.html.twig', {
-                  'modalTitle': 'New Department' | trans,
-                  'formTemplate': 'department/_form.html.twig'
+                  'modalTitle': 'New Antiquity Days' | trans,
+                  'formTemplate': 'antiquity_days/_form.html.twig'
                }) 
             }}
-            {# <a href="{{ path('department_new') }}" data-action="entity#openModal()">Create new</a> #}
             <div class="float-right"><btn class="btn btn-primary rounded-circle" data-action="click->entity#openModal"><i class="fa fa-plus" title='{{ "btn.new" | trans | capitalize }}'></i></btn></div>
             {{ include('common/_alert.html.twig') }}
          </div>

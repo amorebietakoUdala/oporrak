@@ -1,0 +1,28 @@
+      <table id="taula" class="table">
+         <thead>
+               <tr>
+                  <th>Id</th>
+                  <th>yearsWorking</th>
+                  <th>vacationDays</th>
+                  <th>actions</th>
+               </tr>
+         </thead>
+         <tbody>
+         {% for antiquityDay in antiquity_days %}
+               <tr>
+                  <td>{{ antiquityDay.id }}</td>
+                  <td>{{ antiquityDay.yearsWorking }}</td>
+                  <td>{{ antiquityDay.vacationDays }}</td>
+                  <td>
+                     <a href="#" data-action="entity#edit" data-url="{{ path('antiquity_days_show', {'id': antiquityDay.id}) }}"><i class="fa fa-eye" title='{{ "btn.show" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#edit" data-url="{{ path('antiquity_days_edit', {'id': antiquityDay.id}) }}" data-allowEdit="true"><i class="fa fa-edit" title='{{ "btn.edit" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#delete" data-url="{{ path('antiquity_days_delete', {'id': antiquityDay.id}) }}"><i class="fa fa-trash" title='{{ "btn.delete" | trans | capitalize }}'></i></a>&nbsp;
+                  </td>
+               </tr>
+         {% else %}
+               <tr>
+                  <td colspan="4">no records found</td>
+               </tr>
+         {% endfor %}
+         </tbody>
+      </table>

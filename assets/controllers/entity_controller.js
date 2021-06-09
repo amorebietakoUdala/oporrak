@@ -14,7 +14,7 @@ import {
 } from 'stimulus-use';
 
 export default class extends Controller {
-    static targets = ['list', 'modal', 'modalTitle', 'modalBody', 'modalSaveButton'];
+    static targets = ['modal', 'modalTitle', 'modalBody', 'modalSaveButton'];
     static values = {
         locale: String,
         entity: String,
