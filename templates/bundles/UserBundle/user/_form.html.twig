@@ -36,11 +36,21 @@
 					{{ form_widget(form.password.second, {'attr': {'class': 'form-control form-control-sm mt-1'}}) }}
 					</div>
 				{% endif %}
-				<div class="col-2 form-group">
+				<div class="col form-group">
+					{{ form_label(form.department) }}
+					{{ form_widget(form.department, {'attr': {'class': 'ml-1 form-control form-control-sm'}}) }}
+				</div>
+				<div class="col form-group">
+					{{ form_label(form.boss) }}
+					{{ form_widget(form.boss, {'attr': {'class': 'ml-1 form-control form-control-sm'}}) }}
+				</div>
+			</div>
+         <div class="form-row">
+				<div class="col form-group">
 					{{ form_label(form.roles) }}
 					{{ form_widget(form.roles, {'attr': {'class': 'ml-1 form-control form-control-sm'}}) }}
 				</div>
-			</div>
+         </div>
 		</div>
 	</div>
 </div>
@@ -56,7 +66,7 @@
 
 <!-- Token CSRF -->
 {{ form_widget(form._token) }}
-{{ form_end(form, {'render_rest': false, 
+{{ form_end(form, {'render_rest': true, 
 				   'attr': {'class': '',
 			       } 
 }) }}

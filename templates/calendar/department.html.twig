@@ -8,11 +8,15 @@
 	<div {{ stimulus_controller({
          'summary': {
             'summary-url': path('api_getWorkCalendar') }, 
-         'day-details': {}
+         'day-details': {
+            'roles': app.user.roles
+         }
          }) }} 
          data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails" 
    >
-		<div class="container-fluid" {{ stimulus_controller('department-calendar', { 'locale': app.request.locale|split('_')[0], 'holidays-url': path('api_getHolidays'), 'holidays-color': holidaysColor, 'department-dates-url': path('api_get_mydepartment_dates'), 'year' : year, 'colorPalette': colorPalette, 'roles': app.user.roles } ) }}>
+		<div class="container-fluid" {{ stimulus_controller('department-calendar', { 'locale': app.request.locale|split('_')[0], 'holidays-url': path('api_getHolidays'), 'holidays-color': holidaysColor, 'department-dates-url': path('api_get_dates'), 'year' : year, 'roles': app.user.roles } ) }}>
+            {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : false }) }}
+         {# </div> #}
 			<div id="calendar" {#data-department-calendar-target="content"#}></div>
 			<div class="row d-flex justify-content-around">
 				{{ include('calendar/_summary.html.twig') }}
@@ -28,6 +32,6 @@
 																																																																																							         }) }} #}
 		</div>
 	</div>
-	{{ include('common/_alert.html.twig') }}
+	{# {{ include('common/_alert.html.twig') }} #}
 
 {% endblock %}

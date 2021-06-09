@@ -1,0 +1,6 @@
+{
+    "php.suggest.basic": false,
+    "editor.quickSuggestions": {
+        "comments": true
+    }
+}

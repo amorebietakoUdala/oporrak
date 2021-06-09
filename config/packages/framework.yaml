@@ -10,6 +10,8 @@ framework:
     handler_id: null
     cookie_secure: auto
     cookie_samesite: lax
+    # If there is more than one application in the same domain set cookie name for the application
+    name: PHP_SESSION_OPORRAK
 
   #esi: true
   #fragments: true

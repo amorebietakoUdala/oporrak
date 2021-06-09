@@ -16,8 +16,10 @@
 
 {% block stylesheets %}
 	{{ parent() }}
+	{{ encore_entry_link_tags('user_edit') }}
 {% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
+	{{ encore_entry_script_tags('user_edit') }}
 {% endblock %}

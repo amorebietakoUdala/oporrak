@@ -1,0 +1,28 @@
+      <table id="taula" class="table">
+         <thead>
+               <tr>
+                  <th>Id</th>
+                  <th>NameEs</th>
+                  <th>NameEu</th>
+                  <th>actions</th>
+               </tr>
+         </thead>
+         <tbody data-department-target="list">
+         {% for department in departments %}
+               <tr>
+                  <td>{{ department.id }}</td>
+                  <td>{{ department.nameEs }}</td>
+                  <td>{{ department.nameEu }}</td>
+                  <td>
+                     <a href="#" data-action="entity#edit" data-url="{{ path('department_show', {'id': department.id}) }}"><i class="fa fa-eye" title='{{ "btn.show" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#edit" data-url="{{ path('department_edit', {'id': department.id}) }}" data-allowEdit="true"><i class="fa fa-edit" title='{{ "btn.edit" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#delete" data-url="{{ path('department_delete', {'id': department.id}) }}"><i class="fa fa-trash" title='{{ "btn.delete" | trans | capitalize }}'></i></a>&nbsp;
+                  </td>
+               </tr>
+         {% else %}
+               <tr>
+                  <td colspan="4">no records found</td>
+               </tr>
+         {% endfor %}
+         </tbody>
+      </table>

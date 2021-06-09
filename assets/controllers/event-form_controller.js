@@ -26,23 +26,4 @@ export default class extends Controller {
             language: this.localeValue
         });
     }
-
-    // async submitForm(event) {
-    //     //        event.preventDefault();
-    //     console.log('Submit form clicked!!!');
-    //     const $form = $(this).find('form');
-
-    //     try {
-    //         await $.ajax({
-    //             url: this.formUrlValue,
-    //             method: $form.prop('method'),
-    //             data: $form.serialize(),
-    //         });
-    //         this.modal.hide();
-    //         this.dispatch('success');
-    //     } catch (e) {
-    //         this.modalBodyTarget.innerHTML = e.responseText;
-    //     }
-    // }
-
 }

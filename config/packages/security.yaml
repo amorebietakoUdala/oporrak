@@ -8,6 +8,10 @@ security:
             migrate_from: 
                 - legacy_bcrypt
 
+    role_hierarchy:
+        ROLE_ADMIN: [ROLE_USER, ROLE_OPORRAK, ROLE_BOSS]
+        ROLE_BOSS: [ROLE_USER, ROLE_OPORRAK]
+        ROLE_HHRR: [ROLE_USER, ROLE_OPORRAK, ROLE_BOSS]
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         # used to reload user from session & other features (e.g. switch_user)

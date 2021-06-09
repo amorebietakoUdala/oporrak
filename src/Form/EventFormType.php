@@ -22,6 +22,8 @@ class EventFormType extends AbstractType
         $builder
             ->add('id', HiddenType::class)
             ->add('name', null, [
+                'label' => 'event.name',
+                'data' => 'Oporrak / Vacaciones',
                 'constraints' => [
                     new NotBlank()
                 ]
@@ -31,6 +33,7 @@ class EventFormType extends AbstractType
                 'html5' => false,
                 'format' => 'yyyy-MM-dd',
                 'attr' => ['class' => 'js-datepicker'],
+                'label' => 'event.startDate',
                 'constraints' => [
                     new NotBlank(),
                     new DateAfter(['days' => $days])
@@ -42,6 +45,7 @@ class EventFormType extends AbstractType
                 'html5' => false,
                 'format' => 'yyyy-MM-dd',
                 'attr' => ['class' => 'js-datepicker'],
+                'label' => 'event.endDate',
                 'constraints' => [
                     new NotBlank(),
                     new DateAfter(['days' => $days])
@@ -50,6 +54,7 @@ class EventFormType extends AbstractType
             ->add('status', EntityType::class, [
                 'attr' => ['class' => 'd-none'],
                 'class' => Status::class,
+                'label' => 'event.status',
             ]);
     }
 

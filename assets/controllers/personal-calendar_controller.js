@@ -17,6 +17,10 @@ import {
 import 'bootstrap-datepicker';
 const routes = require('../../public/js/fos_js_routes.json');
 import Routing from '../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
+
+import Translator from 'bazinga-translator';
+const translations = require('../../public/translations/' + Translator.locale + '.json');
+
 export default class extends Controller {
     static targets = ['modal', 'modalBody', 'content', 'events', 'holidays', 'workdays', 'holidaysLegend', 'approved'];
     static values = {
@@ -39,9 +43,8 @@ export default class extends Controller {
 
     connect() {
         Routing.setRoutingData(routes);
-        // useDispatch(this, {
-        //     debug: true
-        // });
+        Translator.fromJSON(translations);
+        Translator.locale = this.localeValue;
         useDispatch(this);
         this.modal = new Modal(this.modalTarget);
         this.calendar = new Calendar('#calendar', {
@@ -51,15 +54,7 @@ export default class extends Controller {
             style: 'background',
             startYear: this.yearValue,
             disabledWeekDays: [0, 6],
-            //allowOverlap: false,
             contextMenuItems: [
-                //    {
-                //         text: 'Update',
-                //         click: (event) => {
-                //             console.log('event');
-                //             this.editEvent(event);
-                //         }
-                //     },
                 {
                     text: 'Delete',
                     click: (event) => {
@@ -86,7 +81,7 @@ export default class extends Controller {
                         }
                         content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].name + '</div>';
                         if (typeof(e.events[i].type) == "undefined" && typeof(e.events[i].status) != "undefined") {
-                            content += '<div class="event-status">' + e.events[i].status + '</div>';
+                            content += '<div class="event-status">' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
                         }
                         content += '</div>';
                     }
@@ -134,7 +129,6 @@ export default class extends Controller {
     }
 
     async deleteEvent(event) {
-        console.log('Delete event: ', event);
         import ('sweetalert2').then(async(Swal) => {
             Swal.default.fire({
                 template: '#my-template'

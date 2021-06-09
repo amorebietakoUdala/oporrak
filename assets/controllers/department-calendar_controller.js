@@ -11,19 +11,24 @@ import {
     useDispatch
 } from 'stimulus-use';
 
+import Translator, { defaultDomain } from 'bazinga-translator';
+const translations = require('../../public/translations/' + Translator.locale + '.json');
+import '@fortawesome/fontawesome-free/js/all.js';
+
 //import 'bootstrap-datepicker';
-const routes = require('../../public/js/fos_js_routes.json');
-import Routing from '../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
+// const routes = require('../../public/js/fos_js_routes.json');
+// import Routing from '../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
 export default class extends Controller {
-    static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved'];
+    static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect'];
     static values = {
         locale: String,
         holidaysUrl: String,
         holidaysColor: String,
         departmentDatesUrl: String,
         year: String,
-        colorPalette: Array,
-        roles: Array,
+        status: String,
+//        colorPalette: Array,
+//        roles: Array,
         //   // How many days before can we edit calendar
         //   days: String,
     };
@@ -35,38 +40,16 @@ export default class extends Controller {
     approved = 0;
 
     connect() {
-        Routing.setRoutingData(routes);
-        useDispatch(this, {
-            debug: true
-        });
-        //useDispatch(this);
-        console.log(this.rolesValue);
+        useDispatch(this);
+        Translator.fromJSON(translations);
+        Translator.locale = this.localeValue;
         this.calendar = new Calendar('#calendar', {
             enableContextMenu: true,
             enableRangeSelection: false,
             language: this.localeValue,
-            //            style: 'background',
             startYear: this.yearValue,
             disabledWeekDays: [0, 6],
             style: 'border',
-            // contextMenuItems: (this.rolesValue) => {
-            //         return false;
-            //     }
-            // contextMenuItems: [
-            //    {
-            //         text: 'Update',
-            //         click: (event) => {
-            //             console.log('event');
-            //             this.editEvent(event);
-            //         }
-            //     },
-            //  {
-            //      text: 'Delete',
-            //      click: (event) => {
-            //          this.deleteEvent(event);
-            //      }
-            //  }
-            // ],
             selectRange: (event) => {
                 this.openModal();
                 this.editEvent({
@@ -75,19 +58,16 @@ export default class extends Controller {
                 });
             },
             mouseOnDay: function(e) {
-                console.log(e);
                 if (e.events.length > 0) {
                     var content = '';
-
                     for (var i in e.events) {
-                        console.log(e.events[i]);
                         content += '<div class="event-tooltip-content">';
                         if (typeof(e.events[i].id) != "undefined") {
                             content += '<div class="event-id">Id: ' + e.events[i].id + '</div>';
                         }
                         content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].name + '</div>';
                         if (typeof(e.events[i].type) == "undefined" && typeof(e.events[i].status) != "undefined") {
-                            content += '<div class="event-status">' + e.events[i].status + '</div>';
+                            content += '<div class="event-status">' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
                             content += '<div class="event-user">' + 'User: ' + e.events[i].user + '</div>';
                         }
                         content += '</div>';
@@ -117,17 +97,23 @@ export default class extends Controller {
             yearChanged: (event) => {
                 // It makes a year changed on init, so it doesn't need another load after this.
                 let year = event.currentYear;
-                this.load(event.currentYear);
+                let user = $(this.userSelectTarget).val();
+                let department = null;
+                if ( this.hasdepartmentSelectTarget ) {
+                    department = $(this.departmentSelectTarget).val();
+                }
+                this.load(event.currentYear, user, department, this.statusValue);
                 this.dispatch('yearChanged', { year });
             },
         });
     }
 
-    async load(year) {
-        let params = new URLSearchParams({
+    async load(year, user, department, status) {
+        let params = {
             year: year
-        });
-        this.holidays = await fetch(`${this.holidaysUrlValue}?${params.toString()}`)
+        }
+        let urlParams = new URLSearchParams(params);
+        this.holidays = await fetch(`${this.holidaysUrlValue}?${urlParams.toString()}`)
             .then(result => result.json())
             .then(result => {
                 if (result) {
@@ -140,32 +126,34 @@ export default class extends Controller {
                     }));
                 }
             });
-        let dates = await fetch(`${this.departmentDatesUrlValue}?${params.toString()}`)
+        if ('' !== user) {
+            params.user = user;
+        }
+        if ( null !== department && '' !== department ) {
+            params.department = department;
+        }
+        if (null !== status && '' !== status) {
+            params.status = status;
+        } 
+        urlParams = new URLSearchParams(params);
+        let dates = await fetch(`${this.departmentDatesUrlValue}?${urlParams.toString()}`)
             .then(result => result.json())
             .then(result => {
                 if (result.items) {
-                    //   this.counters = this.createCounters(result.items, this.holidays);
-                    //   this.updateCounters();
-                    //   let workdays = this.calculateWorkDays(result.items);
-                    // this.holidaysLegendTarget.innerHTML = this.holidays.length;
-                    // this.workdaysTarget.innerHTML = workdays;
-                    let colorArray = this.assignColor(result.items);
-
                     return result.items.map(r => ({
                         id: r.id,
                         startDate: new Date(r.startDate),
                         endDate: new Date(r.endDate),
                         name: r.name,
                         statusId: r.status.id,
-                        status: r.status.description,
+                        status: Translator.trans(r.status.description, {}, 'messages'),
                         user: r.user.username,
-                        color: colorArray[r.user.username],
+                        color: r.status.color,
                     }));
                 }
             }).then(dates => {
                 this.dates = dates;
                 this.addDates(this.holidays);
-                // console.log(this.dates);
                 this.calendar.setDataSource(this.dates);
             });
     }
@@ -177,24 +165,15 @@ export default class extends Controller {
     }
 
     refreshCalendar() {
-        this.load(this.calendar.getYear());
+        let user = $(this.userSelectTarget).val();
+        let department = null;
+        if ( this.hasdepartmentSelectTarget ) {
+            department = $(this.departmentSelectTarget).val();
+        }
+        this.load(this.calendar.getYear(), user, department, this.statusValue);
     }
 
-    assignColor(items) {
-        let colorArray = [];
-        let i = 0;
-        let totalColors = this.colorPaletteValue.length;
-        //        console.log(this.colorPaletteValue, this.colorPaletteValue.length);
-        items.forEach(item => {
-            //            console.log(item.type, item.user.username);
-            if (typeof(item.type) === 'undefined' && typeof(item.user.username) !== 'undefined') {
-                if (!colorArray.hasOwnProperty(item.user.username)) {
-                    colorArray[item.user.username] = this.colorPaletteValue[i % totalColors];
-                    i++;
-                }
-                //                console.log(colorArray, i);
-            }
-        });
-        return colorArray;
+    search(event) {
+        this.refreshCalendar();
     }
 }

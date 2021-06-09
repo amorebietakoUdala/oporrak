@@ -62,7 +62,7 @@
 				<div class="mt-2 p-2 border border-black text-center bg-light">{{"messages.results0" | trans }}</div>
 			{% endif %}
 			<span class="pull-right">
-				<a href="{{ path ('admin_user_new') }}" class="btn btn-primary">
+				<a href="{{ path ('admin_user_new') }}" class="btn btn-primary rounded-circle">
 					<i class="fa fa-plus" title='{{ "btn.user.new" | trans | capitalize }}'></i>
 				</a>
 			</span>
@@ -72,8 +72,11 @@
 
 {% block stylesheets %}
 	{{ parent() }}
+	{{ encore_entry_link_tags('user_list') }}
 {% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
+	{{ encore_entry_script_tags('user_list') }}
 {% endblock %}
+

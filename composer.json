@@ -43,7 +43,8 @@
         "symfony/webpack-encore-bundle": "^1.11",
         "symfony/yaml": "5.2.*",
         "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "twig/twig": "^2.12|^3.0",
+        "willdurand/js-translation-bundle": "^4.0"
     },
     "require-dev": {
         "friendsofsymfony/jsrouting-bundle": "^2.7",

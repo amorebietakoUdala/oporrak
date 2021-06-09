@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+
 
 class HolidayController extends AbstractController
 {
@@ -21,6 +23,7 @@ class HolidayController extends AbstractController
 
     /**
      * @Route("/holidays/refresh", name="holiday")
+     * @IsGranted("ROLE_ADMIN")
      */
     public function index(Request $request, EntityManagerInterface $em): Response
     {

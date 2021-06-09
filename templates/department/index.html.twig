@@ -1,37 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Department index{% endblock %}
+{% block title %}{{'title.departmentIndex' | trans }}{% endblock %}
 
 {% block body %}
-    <h1>Department index</h1>
+    <h1>{{'title.departmentIndex' | trans }}</h1>
+      <div {{ stimulus_controller('reload-content', 
+               { 'url': path('_department_list'),
+                  'locale': app.request.locale|split('_')[0] })}} data-action="entity:success->reload-content#refreshContent entity:init->reload-content#refreshContent">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>NameEs</th>
-                <th>NameEu</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for department in departments %}
-            <tr>
-                <td>{{ department.id }}</td>
-                <td>{{ department.nameEs }}</td>
-                <td>{{ department.nameEu }}</td>
-                <td>
-                    <a href="{{ path('department_show', {'id': department.id}) }}">show</a>
-                    <a href="{{ path('department_edit', {'id': department.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="4">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('department_new') }}">Create new</a>
+         <div {{ stimulus_controller('entity', 
+                  { 'locale': app.request.locale|split('_')[0], 
+                  'entity': 'department',
+                  'entitySaveUrl': path('department_save'),
+                  })}} 
+               class="container-fluid" data-department-target="list"
+               data-action="hidden.bs.modal->entity#modalHidden">
+               <div data-reload-content-target="content">
+                  {{ include('department/_list.html.twig', { 'departments': departments }) }}
+               </div>
+            {{ include('common/_modal.html.twig', {
+                  'modalTitle': 'New Department' | trans,
+                  'formTemplate': 'department/_form.html.twig'
+               }) 
+            }}
+            {# <a href="{{ path('department_new') }}" data-action="entity#openModal()">Create new</a> #}
+            <div class="float-right"><btn class="btn btn-primary rounded-circle" data-action="click->entity#openModal"><i class="fa fa-plus" title='{{ "btn.new" | trans | capitalize }}'></i></btn></div>
+            {{ include('common/_alert.html.twig') }}
+         </div>
+   </div>
 {% endblock %}

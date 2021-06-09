@@ -32,6 +32,14 @@ class Department
         return $this->id;
     }
 
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+
     public function getNameEs(): ?string
     {
         return $this->nameEs;
@@ -59,5 +67,12 @@ class Department
     public function __toString(): ?string
     {
         return $this->getNameEs() . ' / ' . $this->getNameEs();
+    }
+
+    public function fill(Department $department)
+    {
+        $this->id = $department->getId();
+        $this->nameEs = $department->getNameEs();
+        $this->nameEu = $department->getNameEu();
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Event;
+use App\Entity\Status;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -44,14 +45,45 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findDepartmentBeetweenDates($department, $startDate, $endDate = null)
+    public function findByDepartmentAndUserAndStatusBeetweenDates($department = null, $user = null, $status = null, $startDate, $endDate = null)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-            ->andWhere('u.department = :department')
-            ->setParameter('department', $department)
             ->andWhere('e.startDate >= :startDate')
             ->setParameter('startDate', $startDate);
+        if (null !== $endDate) {
+            $qb->andWhere('e.endDate < :endDate')
+                ->setParameter('endDate', $endDate);
+        }
+        if (null !== $user) {
+            $qb->andWhere('e.user = :user')
+                ->setParameter('user', $user);
+        }
+        if (null !== $status) {
+            $qb->andWhere('e.status = :status')
+                ->setParameter('status', $status);
+        }
+        if (null !== $department) {
+            $qb->andWhere('u.department = :department')
+                ->setParameter('department', $department);
+        }
+        $qb->orderBy('e.id', 'ASC')
+            //            ->setMaxResults(10)
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findAllByStatusBeetweenDates($status, $startDate, $endDate = null)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
+            ->andWhere('e.startDate >= :startDate')
+            ->setParameter('startDate', $startDate)
+            ->andWhere('e.status = :status')
+            ->setParameter('status', $status);
         if (null !== $endDate) {
             $qb->andWhere('e.endDate < :endDate')
                 ->setParameter('endDate', $endDate);
@@ -60,6 +92,14 @@ class EventRepository extends ServiceEntityRepository
             //            ->setMaxResults(10)
         ;
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findAllAprovedBeetweenDates($startDate, $endDate = null)
+    {
+        return $this->findAllByStatusBeetweenDates(Status::APPROVED, $startDate, $endDate);
     }
 
     /**
@@ -87,16 +127,4 @@ class EventRepository extends ServiceEntityRepository
         $qb->orderBy('e.id', 'ASC');
         return $qb->getQuery()->getResult();
     }
-
-    /*
-    public function findOneBySomeField($value): ?Event
-    {
-        return $this->createQueryBuilder('e')
-            ->andWhere('e.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

@@ -7,22 +7,23 @@ parameters:
   holidaysColor: "#de1e1e"
   mailerFrom: "%env(MAILER_FROM)%"
   mailerSubject: "%env(MAILER_SUBJECT)%"
+  mailHHRR: "%env(MAILER_HH_RR_MAIL)%"
   days: 5
   sendDeletionEmails: "%env(bool:MAILER_SEND_DELETION_EMAILS)%"
-  colorPalette:
-    [
-#      "#050f2c",
-      "#003666",
-      "#00aeff",
-      "#3369e7",
-      "#8e43e7",
-      "#b84592",
-      "#ff4f81",
-      "#ff6c5f",
-      "#ffc168",
-      "#2dde98",
-      "#1cc7d0",
-    ]
+  # colorPalette:
+  #   [
+  #     "#050f2c",
+  #     "#003666",
+  #     "#00aeff",
+  #     "#3369e7",
+  #     "#8e43e7",
+  #     "#b84592",
+  #     "#ff4f81",
+  #     "#ff6c5f",
+  #     "#ffc168",
+  #     "#2dde98",
+  #     "#1cc7d0",
+  #   ]
 
 services:
   Symfony\Component\Ldap\Ldap:
