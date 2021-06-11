@@ -16,7 +16,7 @@ use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * @Route("/{_locale}/event")
- * @IsGranted("ROLE_OPORRAK")
+ * @IsGranted("ROLE_USER")
  */
 class EventController extends AbstractController
 {
@@ -132,7 +132,6 @@ class EventController extends AbstractController
             /** @var User $user */
             $user = $this->getUser();
             $boss = $user->getBoss();
-            $entityManager = $this->getDoctrine()->getManager();
             if (null === $event->getId()) {
                 $myEvents = $this->getDoctrine()->getRepository(Event::class)->findUserEventsBeetweenDates($user, new \DateTime($event->getStartDate()->format('Y') . '-01-01'));
                 if ($this->checkOverlap($myEvents, $event)) {

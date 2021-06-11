@@ -16,9 +16,11 @@ class DepartmentType extends AbstractType
         $builder
             ->add('id', HiddenType::class)
             ->add('nameEs', null, [
+                'label' => 'label.departmentNameEs',
                 'disabled' => $readonly
             ])
             ->add('nameEu', null, [
+                'label' => 'label.departmentNameEu',
                 'disabled' => $readonly
             ]);
     }

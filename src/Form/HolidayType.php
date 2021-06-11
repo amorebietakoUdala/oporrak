@@ -2,52 +2,48 @@
 
 namespace App\Form;
 
-use App\Entity\AntiquityDays;
-use IntlChar;
+use App\Entity\Holiday;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
-class AntiquityDaysType extends AbstractType
+class HolidayType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $readonly = $options['readonly'];
         $builder
             ->add('id', HiddenType::class)
-            ->add('yearsWorking', NumberType::class, [
-                'label' => 'antiquityDays.yearsWorking',
+            ->add('date', DateType::class, [
                 'disabled' => $readonly,
-                'data' => 1,
+                'widget' => 'single_text',
+                'html5' => true,
+                'format' => 'yyyy-MM-dd',
+                'attr' => ['class' => 'js-datepicker'],
+                'label' => 'holiday.date',
                 'constraints' => [
-                    new PositiveOrZero(),
-                ],
-                'required' => true,
-                'attr' => [
-                    'int' => true,
+                    new NotBlank(),
                 ]
             ])
-            ->add('vacationDays', NumberType::class, [
-                'label' => 'antiquityDays.vacationDays',
+            ->add('descriptionEs', null, [
                 'disabled' => $readonly,
-                'data' => 1,
-                'constraints' => [
-                    new PositiveOrZero(),
-                ],
-                'required' => true,
-                'attr' => [
-                    'int' => true,
-                ]
+                'label' => 'holiday.descriptionEs'
+            ])
+            ->add('descriptionEu', null, [
+                'disabled' => $readonly,
+                'label' => 'holiday.descriptionEu'
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => AntiquityDays::class,
+            'data_class' => Holiday::class,
             'readonly' => false,
         ]);
     }

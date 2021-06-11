@@ -23,7 +23,7 @@ class HolidayRepository extends ServiceEntityRepository
      * @return Holiday[] Returns an array of Holiday objects
      */
 
-    public function findHolidays(\DateTime $startDate, \DateTime $endDate = null)
+    public function findHolidaysBetween(\DateTime $startDate, \DateTime $endDate = null)
     {
         return $this->createQueryBuilder('h')
             ->andWhere('h.date >= :startDate')
@@ -34,16 +34,4 @@ class HolidayRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-    /*
-    public function findOneBySomeField($value): ?Holiday
-    {
-        return $this->createQueryBuilder('h')
-            ->andWhere('h.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

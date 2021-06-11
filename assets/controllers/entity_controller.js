@@ -14,10 +14,9 @@ import {
 } from 'stimulus-use';
 
 export default class extends Controller {
-    static targets = ['modal', 'modalTitle', 'modalBody', 'modalSaveButton'];
+    static targets = ['modal', 'modalBody', 'modalSaveButton'];
     static values = {
         locale: String,
-        entity: String,
         entitySaveUrl: String,
     };
     modal = null;
@@ -60,7 +59,6 @@ export default class extends Controller {
             }).then((response) => {
                 this.modal = new Modal(this.modalTarget);
                 this.modalBodyTarget.innerHTML = response;
-                this.modalTitleTarget.innerHTML = this.entityValue;
                 if (allowEdit == "false") {
                     $(this.modalSaveButtonTarget).hide();
                 }

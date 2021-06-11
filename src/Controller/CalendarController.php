@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @IsGranted("ROLE_OPORRAK")
+ * @IsGranted("ROLE_USER")
  */
 class CalendarController extends AbstractController
 {

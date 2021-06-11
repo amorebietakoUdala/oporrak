@@ -81,7 +81,7 @@ export default class extends Controller {
                         }
                         content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].name + '</div>';
                         if (typeof(e.events[i].type) == "undefined" && typeof(e.events[i].status) != "undefined") {
-                            content += '<div class="event-status">' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
+                            content += '<div class="event-status">' + Translator.trans('label.status')+ ': ' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
                         }
                         content += '</div>';
                     }

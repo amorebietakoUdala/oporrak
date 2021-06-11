@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AntiquityDaysRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AntiquityDaysRepository::class)
@@ -18,12 +19,12 @@ class AntiquityDays
     private $id;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=false)
      */
     private $yearsWorking;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="integer", nullable=false)
      */
     private $vacationDays;
 

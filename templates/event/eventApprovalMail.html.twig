@@ -102,6 +102,9 @@
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<a class="btn btn-danger" href="{{ absolute_url(path('event_deny', { 'event': event.id }))}}">{{'btn.deny' | trans}}</a>
 			</div>
+         <div>
+            <a class="btn btn-primary" href="{{ absolute_url(path('departmentCalendar')) }}">{{'btn.departmentCalendar' | trans}}</a>
+         </div>
 		</body>
 	</html>
 {% endblock %}

@@ -1,0 +1,32 @@
+      <table id="taula" class="table">
+         <thead>
+               <tr>
+                  <th>Id</th>
+                  <th>{{ 'workcalendar.year' | trans }}</th>
+                  <th>{{ 'workcalendar.vacationDays' | trans }}</th>
+                  <th>{{ 'workcalendar.particularBusinessLeave' | trans }}</th>
+                  <th>{{ 'workcalendar.overtimeDays' | trans }}</th>
+                  <th>{{ 'label.options' | trans }}</th>
+               </tr>
+         </thead>
+         <tbody>
+         {% for workcalendar in workcalendars %}
+               <tr>
+                  <td>{{ workcalendar.id }}</td>
+                  <td>{{ workcalendar.year }}</td>
+                  <td>{{ workcalendar.vacationDays }}</td>
+                  <td>{{ workcalendar.particularBusinessLeave }}</td>
+                  <td>{{ workcalendar.overtimeDays }}</td>
+                  <td>
+                     <a href="#" data-action="entity#edit" data-url="{{ path('workcalendar_show', {'id': workcalendar.id}) }}"><i class="fa fa-eye" title='{{ "btn.show" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#edit" data-url="{{ path('workcalendar_edit', {'id': workcalendar.id}) }}" data-allowEdit="true"><i class="fa fa-edit" title='{{ "btn.edit" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#delete" data-url="{{ path('workcalendar_delete', {'id': workcalendar.id}) }}"><i class="fa fa-trash" title='{{ "btn.delete" | trans | capitalize }}'></i></a>&nbsp;
+                  </td>
+               </tr>
+         {% else %}
+               <tr>
+                  <td colspan="4">{{'no records found' | trans}}</td>
+               </tr>
+         {% endfor %}
+         </tbody>
+      </table>

@@ -5,19 +5,15 @@ import $, { type } from 'jquery';
 import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
 import 'js-year-calendar/locales/js-year-calendar.eu';
-import { workingDaysBetween } from '../js/dateUtils';
 
 import {
     useDispatch
 } from 'stimulus-use';
 
-import Translator, { defaultDomain } from 'bazinga-translator';
+import Translator from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 import '@fortawesome/fontawesome-free/js/all.js';
 
-//import 'bootstrap-datepicker';
-// const routes = require('../../public/js/fos_js_routes.json');
-// import Routing from '../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
 export default class extends Controller {
     static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect'];
     static values = {
@@ -27,10 +23,6 @@ export default class extends Controller {
         departmentDatesUrl: String,
         year: String,
         status: String,
-//        colorPalette: Array,
-//        roles: Array,
-        //   // How many days before can we edit calendar
-        //   days: String,
     };
 
     calendar = null;
@@ -67,8 +59,8 @@ export default class extends Controller {
                         }
                         content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].name + '</div>';
                         if (typeof(e.events[i].type) == "undefined" && typeof(e.events[i].status) != "undefined") {
-                            content += '<div class="event-status">' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
-                            content += '<div class="event-user">' + 'User: ' + e.events[i].user + '</div>';
+                            content += '<div class="event-status">'+ Translator.trans('label.status') + ': ' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
+                            content += '<div class="event-user">' + Translator.trans('label.user') + ': ' + e.events[i].user + '</div>';
                         }
                         content += '</div>';
                     }

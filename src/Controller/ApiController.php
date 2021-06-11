@@ -15,7 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
  * @Route("/api")
- * @IsGranted("ROLE_OPORRAK")
+ * @IsGranted("ROLE_USER")
  */
 class ApiController extends AbstractController
 {
@@ -34,7 +34,7 @@ class ApiController extends AbstractController
          } else {
             $endDate = new \DateTime();
          }
-         $holidays = $em->getRepository(Holiday::class)->findHolidays($startDate, $endDate);
+         $holidays = $em->getRepository(Holiday::class)->findHolidaysBetween($startDate, $endDate);
          return $this->json($holidays, 200, []);
       } elseif (null === $year) {
          $year = \DateTime::createFromFormat('Y', (new \DateTime())->format('Y'));

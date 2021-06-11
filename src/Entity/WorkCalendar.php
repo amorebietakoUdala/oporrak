@@ -42,6 +42,13 @@ class WorkCalendar
         return $this->id;
     }
 
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getVacationDays(): ?int
     {
         return $this->vacationDays;
@@ -87,6 +94,14 @@ class WorkCalendar
     {
         $this->year = $year;
 
+        return $this;
+    }
+    public function fill(WorkCalendar $data): self
+    {
+        $this->year = $data->getYear();
+        $this->overtimeDays = $data->getOvertimeDays();
+        $this->vacationDays = $data->getVacationDays();
+        $this->particularBusinessLeave = $data->getParticularBusinessLeave();
         return $this;
     }
 }

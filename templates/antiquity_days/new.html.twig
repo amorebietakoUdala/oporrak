@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New AntiquityDays{% endblock %}
+{% block title %}{{'title.antiquityIndex' | trans }}{% endblock %}
 
 {% block body %}
-    <h1>Create new AntiquityDays</h1>
+    <h1><h1>{{'title.antiquityIndex' | trans }}</h1></h1>
 
     {{ include('antiquity_days/_form.html.twig') }}
 

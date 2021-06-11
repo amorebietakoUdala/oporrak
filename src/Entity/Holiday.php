@@ -42,6 +42,13 @@ class Holiday
         return $this->id;
     }
 
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
     public function getYear(): ?int
     {
         return $this->year;
@@ -89,12 +96,21 @@ class Holiday
         return $this;
     }
 
-    public function fill(array $data): self
+    public function fillFromArray(array $data): self
     {
         $this->date = new \DateTime($data['date']);
         $this->year = (new \DateTime($data['date']))->format('Y');
         $this->descriptionEs = $data['descriptionEs'];
         $this->descriptionEu = $data['descriptionEu'];
+        return $this;
+    }
+
+    public function fill(Holiday $data): self
+    {
+        $this->date = $data->getDate();
+        $this->year = $data->getYear();
+        $this->descriptionEs = $data->getDescriptionEs();
+        $this->descriptionEu = $data->getDescriptionEu();
         return $this;
     }
 }

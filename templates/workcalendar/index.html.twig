@@ -1,25 +1,25 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{'title.antiquityIndex' | trans }}{% endblock %}
+{% block title %}{{'title.workcalendarIndex' | trans }}{% endblock %}
 
 {% block body %}
-    <h1>{{'title.antiquityIndex' | trans }}</h1>
+    <h1>{{'title.workcalendarIndex' | trans }}</h1>
       <div {{ stimulus_controller('reload-content', 
-               { 'url': path('antiquity_days_index', {'ajax' : 'true'}),
+               { 'url': path('workcalendar_index', { 'ajax' : 'true'}),
                   'locale': app.request.locale|split('_')[0] })}} data-action="entity:success->reload-content#refreshContent entity:init->reload-content#refreshContent">
 
          <div {{ stimulus_controller('entity', 
                   { 'locale': app.request.locale|split('_')[0], 
-                  'entitySaveUrl': path('antiquity_days_save'),
+                  'entitySaveUrl': path('workcalendar_save'),
                   })}} 
                class="container-fluid"
                data-action="hidden.bs.modal->entity#modalHidden">
                <div data-reload-content-target="content">
-                  {{ include('antiquity_days/_list.html.twig', { 'antiquity_days': antiquity_days }) }}
+                  {{ include('workcalendar/_list.html.twig', { 'workcalendars': workcalendars }) }}
                </div>
             {{ include('common/_modal.html.twig', {
-                  'modalTitle': 'modal.title.antiquityDays' | trans,
-                  'formTemplate': 'antiquity_days/_form.html.twig'
+                  'modalTitle': 'modal.title.workcalendar' | trans,
+                  'formTemplate': 'workcalendar/_form.html.twig'
                }) 
             }}
             <div class="float-right"><btn class="btn btn-primary rounded-circle" data-action="click->entity#openModal"><i class="fa fa-plus" title='{{ "btn.new" | trans | capitalize }}'></i></btn></div>

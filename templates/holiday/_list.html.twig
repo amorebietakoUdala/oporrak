@@ -1,0 +1,32 @@
+      <table id="taula" class="table">
+         <thead>
+               <tr>
+                  <th>Id</th>
+                  <th>{{ 'holiday.date' | trans }}</th>
+                  <th>{{ 'holiday.year' | trans }}</th>
+                  <th>{{ 'holiday.descriptionEs' | trans }}</th>
+                  <th>{{ 'holiday.descriptionEu' | trans }}</th>
+                  <th>{{ 'label.options' | trans }}</th>
+               </tr>
+         </thead>
+         <tbody>
+         {% for holiday in holidays %}
+               <tr>
+                  <td>{{ holiday.id }}</td>
+                  <td>{{ holiday.date | date('Y-m-d') }}</td>
+                  <td>{{ holiday.year }}</td>
+                  <td>{{ holiday.descriptionEs }}</td>
+                  <td>{{ holiday.descriptionEu }}</td>
+                  <td>
+                     <a href="#" data-action="entity#edit" data-url="{{ path('holiday_show', {'id': holiday.id}) }}"><i class="fa fa-eye" title='{{ "btn.show" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#edit" data-url="{{ path('holiday_edit', {'id': holiday.id}) }}" data-allowEdit="true"><i class="fa fa-edit" title='{{ "btn.edit" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#delete" data-url="{{ path('holiday_delete', {'id': holiday.id}) }}"><i class="fa fa-trash" title='{{ "btn.delete" | trans | capitalize }}'></i></a>&nbsp;
+                  </td>
+               </tr>
+         {% else %}
+               <tr>
+                  <td colspan="4">{{'no records found' | trans}}</td>
+               </tr>
+         {% endfor %}
+         </tbody>
+      </table>

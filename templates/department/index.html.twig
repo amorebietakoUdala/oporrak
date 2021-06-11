@@ -10,7 +10,6 @@
 
          <div {{ stimulus_controller('entity', 
                   { 'locale': app.request.locale|split('_')[0], 
-                  'entity': 'department',
                   'entitySaveUrl': path('department_save'),
                   })}} 
                class="container-fluid"
@@ -19,11 +18,10 @@
                   {{ include('department/_list.html.twig', { 'departments': departments }) }}
                </div>
             {{ include('common/_modal.html.twig', {
-                  'modalTitle': 'New Department' | trans,
+                  'modalTitle': 'modal.title.department' | trans,
                   'formTemplate': 'department/_form.html.twig'
                }) 
             }}
-            {# <a href="{{ path('department_new') }}" data-action="entity#openModal()">Create new</a> #}
             <div class="float-right"><btn class="btn btn-primary rounded-circle" data-action="click->entity#openModal"><i class="fa fa-plus" title='{{ "btn.new" | trans | capitalize }}'></i></btn></div>
             {{ include('common/_alert.html.twig') }}
          </div>
