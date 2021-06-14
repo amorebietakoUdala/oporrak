@@ -13,7 +13,7 @@
             <span class="btn">{{ form_label(userFilterForm.department) }}</span>
             {# <div class="col-2"> #}
             <span>{{ form_widget(userFilterForm.department, {
-               'attr': {'data-department-calendar-target' : 'departmentSelect'}
+               'attr': {'data-department-calendar-target' : 'departmentSelect', 'data-action': "change->department-calendar#refreshUsers"}
             }) }}</span>
             {# </div> #}
             {% endif %}

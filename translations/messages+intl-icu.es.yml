@@ -105,6 +105,11 @@ label.departmentNameEu: "Nombre del departamento(Eu)"
 label.options: "Opciones"
 btn.approve: "Aprobar"
 btn.deny: "No aprobar"
+Vacaciones/Oporrak: "Vacaciones"
+Asuntos particulares/Norbere kontuetarako baimena: "Asuntos particulares"
+Exceso jornada/Gehiegizko lanaldia: "Exceso jornada"
+Días antigüedad/Antzinatasun egunak: "Días antigüedad"
+Otros/Besteren bat: "Otros"
 
 #Placeholders
 placeholder.choose: "Elije una opción"

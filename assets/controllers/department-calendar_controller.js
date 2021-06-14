@@ -13,6 +13,8 @@ import {
 import Translator from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 import '@fortawesome/fontawesome-free/js/all.js';
+const routes = require('../../public/js/fos_js_routes.json');
+import Routing from '../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
 
 export default class extends Controller {
     static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect'];
@@ -21,6 +23,7 @@ export default class extends Controller {
         holidaysUrl: String,
         holidaysColor: String,
         departmentDatesUrl: String,
+        departmentUsersUrl: String,
         year: String,
         status: String,
     };
@@ -32,6 +35,7 @@ export default class extends Controller {
     approved = 0;
 
     connect() {
+        Routing.setRoutingData(routes);
         useDispatch(this);
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
@@ -91,7 +95,7 @@ export default class extends Controller {
                 let year = event.currentYear;
                 let user = $(this.userSelectTarget).val();
                 let department = null;
-                if ( this.hasdepartmentSelectTarget ) {
+                if ( this.hasDepartmentSelectTarget ) {
                     department = $(this.departmentSelectTarget).val();
                 }
                 this.load(event.currentYear, user, department, this.statusValue);
@@ -159,10 +163,27 @@ export default class extends Controller {
     refreshCalendar() {
         let user = $(this.userSelectTarget).val();
         let department = null;
-        if ( this.hasdepartmentSelectTarget ) {
+        if ( this.hasDepartmentSelectTarget ) {
             department = $(this.departmentSelectTarget).val();
         }
         this.load(this.calendar.getYear(), user, department, this.statusValue);
+    }
+
+    async refreshUsers(event) {
+        let department = $(event.currentTarget).val();
+        if ( department !== "") {
+            let url = app_base + Routing.generate('api_get_department_users', { id: department });
+            await fetch(url)
+                .then( result => result.json() )
+                .then( users => {
+                    $(this.userSelectTarget).find('option').remove().end().append($('<option>', { value : null }).text(''));
+                    for ( let user of users ) {
+                        $(this.userSelectTarget)
+                            .append($('<option>', { value : user.id })
+                            .text(user.username));
+                    }
+                });
+        }
     }
 
     search(event) {

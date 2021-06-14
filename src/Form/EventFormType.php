@@ -13,6 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use App\Validator\DateAfter;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class EventFormType extends AbstractType
 {
@@ -21,12 +22,16 @@ class EventFormType extends AbstractType
         $days = $options['days'];
         $builder
             ->add('id', HiddenType::class)
-            ->add('name', null, [
+            ->add('name', ChoiceType::class, [
                 'label' => 'event.name',
-                'data' => 'Oporrak / Vacaciones',
-                'constraints' => [
-                    new NotBlank()
-                ]
+                'choices' => [
+                    'Vacaciones/Oporrak' => 'Vacaciones/Oporrak',
+                    'Asuntos particulares/Norbere kontuetarako baimena' => 'Asuntos particulares/Norbere kontuetarako baimena',
+                    'Exceso jornada/Gehiegizko lanaldia' => 'Exceso jornada/Gehiegizko lanaldia',
+                    'Días antigüedad/Antzinatasun egunak' => 'Días antigüedad/Antzinatasun egunak',
+                    'Otros/Besteren bat' => 'Otros/Besteren bat',
+                ],
+                'empty_data' => 'Vacaciones/Oporrak',
             ])
             ->add('startDate', DateType::class, [
                 'widget' => 'single_text',

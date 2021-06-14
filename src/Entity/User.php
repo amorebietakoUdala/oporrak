@@ -19,12 +19,13 @@ class User extends BaseUser implements AMREUserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"list"})
      */
     protected $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"event"})
+     * @Groups({"event","list"})
      */
     protected $username;
 
@@ -72,7 +73,8 @@ class User extends BaseUser implements AMREUserInterface
     private $events;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Department::class)
+     * @ORM\ManyToOne(targetEntity=Department::class, inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
      */
     private $department;
 
@@ -151,20 +153,12 @@ class User extends BaseUser implements AMREUserInterface
         return $this->username;
     }
 
-    /**
-     * Get the value of department
-     */
     public function getDepartment()
     {
         return $this->department;
     }
 
-    /**
-     * Set the value of department
-     *
-     * @return  self
-     */
-    public function setDepartment($department)
+    public function setDepartment(?Department $department): self
     {
         $this->department = $department;
 

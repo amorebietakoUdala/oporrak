@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Department;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Entity\Holiday;
@@ -100,5 +101,14 @@ class ApiController extends AbstractController
       $year = $request->get('year');
       $workCalendar = $em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
       return $this->json($workCalendar, 200, [],);
+   }
+
+   /**
+    * @Route("/department/{id}/users", name="api_get_department_users", methods="GET", options = { "expose" = true })
+    */
+   public function departmentUsers(Request $request, Department $deparment, EntityManagerInterface $em)
+   {
+      $users = $deparment->getUsers()->toArray();
+      return $this->json($users, 200, [], ['groups' => ['list']]);
    }
 }
