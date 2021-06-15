@@ -70,5 +70,4 @@ services:
   App\Form\UserType:
     arguments:
       $class: "%env(USER_CLASS)%"
-      #            $allowedRoles: ["ROLE_USER", "ROLE_OPORRAK", "ROLE_BOSS", "ROLE_ADMIN"]
       $allowedRoles: "%env(csv:ALLOWED_ROLES)%"

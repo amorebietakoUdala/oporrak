@@ -13,10 +13,7 @@ export default class extends Controller {
     }
 
     connect() {
-        console.log("Event-form connected!!");
-        useDispatch(this, {
-            debug: true
-        });
+        useDispatch(this);
         $('#event_form_startDate').datepicker({
             format: "yyyy-mm-dd",
             language: this.localeValue

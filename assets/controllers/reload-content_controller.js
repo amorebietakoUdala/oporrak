@@ -13,7 +13,6 @@ export default class extends Controller {
     async refreshContent(event) {
         const target = this.hasContentTarget ? this.contentTarget : this.element;
         target.style.opacity = .5;
-        console.log(event);
         if (event.type === 'entity:success') {
             const response = await fetch(this.urlValue);
             target.innerHTML = await response.text();

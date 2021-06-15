@@ -9,9 +9,9 @@ security:
                 - legacy_bcrypt
 
     role_hierarchy:
-        ROLE_ADMIN: [ROLE_USER, ROLE_OPORRAK, ROLE_BOSS]
-        ROLE_BOSS: [ROLE_USER, ROLE_OPORRAK]
-        ROLE_HHRR: [ROLE_USER, ROLE_OPORRAK, ROLE_BOSS]
+        ROLE_ADMIN: [ROLE_USER, ROLE_BOSS, ROLE_HHRR]
+        ROLE_BOSS: [ROLE_USER]
+        ROLE_HHRR: [ROLE_USER, ROLE_BOSS]
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
         # used to reload user from session & other features (e.g. switch_user)
@@ -37,6 +37,10 @@ security:
             form_login:
                 login_path: user_security_login_check
                 check_path: user_security_login_check
+
+            remember_me:
+                secret: "%kernel.secret%"
+                lifetime: 2592000
                 
             logout:
                 path: user_security_logout

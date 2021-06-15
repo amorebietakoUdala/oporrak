@@ -1,3 +1,6 @@
 # Roles
+ROLE_HHRR: "Giza baliabideak"
 ROLE_BOSS: "Sailburua"
-ROLE_OPORRAK: "Erabiltzailea"
+ROLE_USER: "Erabiltzailea"
+
+security.login.remember_me: "Oroitu"

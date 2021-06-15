@@ -1,23 +1,23 @@
-<div class="card">
-  <div class="card-body">
+<div class="card" data-action="user-filter:search->department-calendar#refreshCalendar">
+  <div class="card-body" {{ stimulus_controller('user-filter') }}>
       {{ form_start(userFilterForm) }}
          <div class="row">
             {# <h5 class="text-center">{{ 'title.search' | trans }}</h5> #}
             <span class="btn">{{ form_label(userFilterForm.user) }}</span>
             {# <div class="col-2"> #}
-            <span>{{ form_widget(userFilterForm.user, {
-               'attr': {'data-department-calendar-target' : 'userSelect'}
+            <span class="col-2">{{ form_widget(userFilterForm.user, {
+               'attr': { 'data-user-filter-target' : 'userSelect', 'data-department-calendar-target' : 'userSelect'}
             }) }}</span>
             {# </div> #}
             {% if showDepartment and ( is_granted('ROLE_ADMIN') or is_granted('ROLE_HHRR') ) %}
             <span class="btn">{{ form_label(userFilterForm.department) }}</span>
             {# <div class="col-2"> #}
-            <span>{{ form_widget(userFilterForm.department, {
-               'attr': {'data-department-calendar-target' : 'departmentSelect', 'data-action': "change->department-calendar#refreshUsers"}
+            <span class="col-2">{{ form_widget(userFilterForm.department, {
+               'attr': {'data-user-filter-target' : 'departmentSelect', 'data-department-calendar-target' : 'departmentSelect', 'data-action': "change->user-filter#refreshUsers"}
             }) }}</span>
             {# </div> #}
             {% endif %}
-            <div class="col-2"><button type="button" class="btn btn-primary" data-action="department-calendar#search" data-calendar-target="searchButton">{{ button_label|default('Search') }}</button></div>
+            <div class="col-2"><button type="button" class="btn btn-primary" data-action="user-filter#search">{{ button_label|default('btn.search')|trans }}</button></div>
          </div>
       {{ form_end(userFilterForm) }}
   </div>

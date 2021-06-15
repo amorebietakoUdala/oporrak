@@ -21,7 +21,6 @@ class AntiquityDaysType extends AbstractType
             ->add('yearsWorking', NumberType::class, [
                 'label' => 'antiquityDays.yearsWorking',
                 'disabled' => $readonly,
-                'data' => 1,
                 'constraints' => [
                     new PositiveOrZero(),
                 ],
@@ -33,7 +32,6 @@ class AntiquityDaysType extends AbstractType
             ->add('vacationDays', NumberType::class, [
                 'label' => 'antiquityDays.vacationDays',
                 'disabled' => $readonly,
-                'data' => 1,
                 'constraints' => [
                     new PositiveOrZero(),
                 ],

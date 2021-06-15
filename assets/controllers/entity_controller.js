@@ -72,29 +72,21 @@ export default class extends Controller {
     async delete(event) {
         event.preventDefault();
         let url = event.currentTarget.dataset.url;
-        console.log(url);
         import ('sweetalert2').then(async(Swal) => {
             Swal.default.fire({
                 template: '#my-template'
             }).then(async(result) => {
-                console.log(result);
                 if (result.value) {
                     await $.ajax({
                         url: url,
                         method: 'DELETE'
                     }).then((response) => {
-                        console.log(response);
                         this.dispatch('success');
                     }).catch((err) => {
-                        console.log(err);
                         Swal.default.fire('There was an error!!!');
                     });
                 }
             });
         });
-    }
-
-    modalHidden() {
-        console.log('it was hidden!');
     }
 }

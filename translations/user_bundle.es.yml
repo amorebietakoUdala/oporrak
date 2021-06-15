@@ -1,4 +1,6 @@
 # Roles
 ROLE_HHRR: "Recursos Humanos"
 ROLE_BOSS: "Jefe de departamento"
-ROLE_OPORRAK: "Usuario"
+ROLE_USER: "Usuario"
+
+security.login.remember_me: "Recordarme"

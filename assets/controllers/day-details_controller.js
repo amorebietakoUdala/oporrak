@@ -18,7 +18,6 @@ export default class extends Controller {
         Routing.setRoutingData(routes);
         Translator.fromJSON(translations);
         Translator.locale = global.locale;
-        console.log(global.locale, Translator.trans('Approved', {}, 'messages'));
         $(this.contentTarget).hide();
     }
 

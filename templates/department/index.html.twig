@@ -12,8 +12,7 @@
                   { 'locale': app.request.locale|split('_')[0], 
                   'entitySaveUrl': path('department_save'),
                   })}} 
-               class="container-fluid"
-               data-action="hidden.bs.modal->entity#modalHidden">
+               class="container-fluid">
                <div data-reload-content-target="content">
                   {{ include('department/_list.html.twig', { 'departments': departments }) }}
                </div>

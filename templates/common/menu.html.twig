@@ -15,9 +15,12 @@
 				<li class='nav-item'>
 					<a class="nav-link" href="{{ path ('departmentCalendar', { year: 'now' | date('Y') })}}">{{"navitem.myDepartment" | trans | capitalize}}</a>
 				</li>
+            {% if is_granted('ROLE_HHRR') %}
 				<li class='nav-item'>
 					<a class="nav-link" href="{{ path ('cityHallCalendar', { year: 'now' | date('Y') })}}">{{"navitem.cityHall" | trans | capitalize}}</a>
 				</li>
+            {% endif %}
+            {% if is_granted('ROLE_ADMIN') %}            
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="navbarAdministration" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						{{ 'navitem.administration' | trans | capitalize }}
@@ -30,6 +33,7 @@
                   <a class="dropdown-item" href="{{path('workcalendar_index')}}">{{"navitem.workcalendar" | trans | capitalize}}</a>
 					</div>
 				</li>
+            {% endif %}
 			</ul>
 		</div>
 	</nav>

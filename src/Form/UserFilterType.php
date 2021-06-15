@@ -20,24 +20,16 @@ class UserFilterType extends AbstractType
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'username',
-                'placeholder' => '',
                 'label' => 'label.user'
             ]);
-        // ->add('roles')
-        // ->add('password')
-        // ->add('firstName')
-        // ->add('email')
-        // ->add('activated')
-        // ->add('lastLogin')
-        // ->add('boss')
         if (null !== $roles && $showDepartment && (in_array('ROLE_HHRR', $roles) || in_array('ROLE_ADMIN', $roles))) {
             $builder->add('department', EntityType::class, [
                 'class' => Department::class,
                 'choice_label' => function ($department) use ($locale) {
                     return ($locale === 'es') ? $department->getNameEs() : $department->getNameEu();
                 },
-                'placeholder' => '',
-                'label' => 'label.department'
+                'label' => 'label.department',
+                'multiple' => false
             ]);
         }
     }

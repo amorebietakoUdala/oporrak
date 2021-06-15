@@ -70,7 +70,6 @@ export default class extends Controller {
                 });
             },
             mouseOnDay: function(e) {
-                console.log(e);
                 if (e.events.length > 0) {
                     var content = '';
 
@@ -133,7 +132,6 @@ export default class extends Controller {
             Swal.default.fire({
                 template: '#my-template'
             }).then(async(result) => {
-                console.log(result);
                 if (result.value) {
                     let url = app_base + Routing.generate('event_delete', { _locale: global.locale, event: event.id });
                     await $.ajax({
@@ -154,7 +152,6 @@ export default class extends Controller {
     async submitForm(event) {
         const $form = $(this.modalBodyTarget).find('form');
         try {
-            console.log($form.serialize);
             await $.ajax({
                 url: this.formUrlValue,
                 method: $form.prop('method'),
@@ -208,7 +205,6 @@ export default class extends Controller {
             }).then(dates => {
                 this.dates = dates;
                 this.addDates(this.holidays);
-                console.log(this.dates);
                 this.calendar.setDataSource(this.dates);
             });
     }

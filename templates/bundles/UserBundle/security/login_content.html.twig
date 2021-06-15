@@ -17,6 +17,15 @@
 						<label for="password">{{ 'user.password' | trans | capitalize }}</label>
 						<input class="form-control" type="password" id="password" name="password" required="required"/>
 					</div>
+               
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="form-inline">
+                            <input class="form-inline" type="checkbox" id="remember_me" name="_remember_me"/>&nbsp;
+                            <label class="form-inline" for="remember_me">{{ 'security.login.remember_me'| trans | capitalize}}</label>
+                        </div>                
+                    </div>
+                </div>
 
 					<div class="container-fluid row">
 						<div class="container-fuild col text-center">

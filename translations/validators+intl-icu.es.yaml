@@ -1,0 +1,1 @@
+invalid.date: 'La fecha "{ value }" no es válida. Debe ser mayor que { minDate }. No se pueden añadir fechas anteriores a esa.'

@@ -12,8 +12,7 @@
                   { 'locale': app.request.locale|split('_')[0], 
                   'entitySaveUrl': path('antiquity_days_save'),
                   })}} 
-               class="container-fluid"
-               data-action="hidden.bs.modal->entity#modalHidden">
+               class="container-fluid">
                <div data-reload-content-target="content">
                   {{ include('antiquity_days/_list.html.twig', { 'antiquity_days': antiquity_days }) }}
                </div>

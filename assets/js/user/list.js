@@ -10,8 +10,6 @@ import 'bootstrap-table/dist/locale/bootstrap-table-eu-EU';
 import { createConfirmationAlert } from '../common/alert';
 
 $(function() {
-    console.log("User list view!!!!");
-
     $('#taula').bootstrapTable({
         cache: false,
         showExport: true,
