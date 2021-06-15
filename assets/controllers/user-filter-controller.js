@@ -19,12 +19,14 @@ export default class extends Controller {
       Routing.setRoutingData(routes);
       useDispatch(this);      
       $(this.userSelectTarget).select2();
-      $(this.departmentSelectTarget).select2();
+      if ( this.hasDepartmentSelectTarget ) {
+         $(this.departmentSelectTarget).select2();
+         $(this.departmentSelectTarget).on('select2:select', function(e) {
+            let event = new Event('change', { bubbles: true })
+            e.currentTarget.dispatchEvent(event);
+         });
+      }
       // Workaround to dispatch change event on select2 input
-      $(this.departmentSelectTarget).on('select2:select', function(e) {
-         let event = new Event('change', { bubbles: true })
-         e.currentTarget.dispatchEvent(event);
-      });
    }
 
    async refreshUsers(event) {

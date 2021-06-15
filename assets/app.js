@@ -15,10 +15,9 @@ import 'bootstrap';
 import 'popper.js';
 
 global.app_base = '/oporrak';
-//global.locale = null;
 
 $(function() {
-    //    global.locale = $('html').attr("lang");
+    global.locale = $('html').attr("lang");
     $('.js-back').on('click', function(e) {
         e.preventDefault();
         var url = e.currentTarget.dataset.url;

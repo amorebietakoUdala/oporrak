@@ -11,14 +11,13 @@ import {
 } from 'stimulus-use';
 
 import Translator from 'bazinga-translator';
-const translations = require('../../public/translations/' + Translator.locale + '.json');
+const translations = require('../../public/translations/' + $('html').attr("lang") + '.json');
 import '@fortawesome/fontawesome-free/js/all.js';
 const routes = require('../../public/js/fos_js_routes.json');
 import Routing from '../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
 
 export default class extends Controller {
     static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect'];
-//    static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved'];
     static values = {
         locale: String,
         holidaysUrl: String,
