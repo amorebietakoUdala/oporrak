@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\Department;
 use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,12 +16,22 @@ class UserFilterType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $roles = array_key_exists('data', $options) ? $options['data']['roles'] : null;
-        $showDepartment = array_key_exists('data', $options) ? $options['data']['showDepartment'] : null;;
+        $showDepartment = array_key_exists('data', $options) ? $options['data']['showDepartment'] : null;
+        $department = array_key_exists('data', $options) ? $options['data']['department'] : null;
         $locale = $options['locale'];
         $builder
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'username',
+                'query_builder' => function (EntityRepository $ur) use ($department) {
+                    $qb = $ur->createQueryBuilder('u');
+                    if ($department !== null) {
+                        $qb->andWhere('u.department = :department')
+                            ->setParameter('department', $department);
+                    }
+                    $qb->orderBy('u.username', 'ASC');
+                    return $qb;
+                },
                 'label' => 'label.user'
             ]);
         if (null !== $roles && $showDepartment && (in_array('ROLE_HHRR', $roles) || in_array('ROLE_ADMIN', $roles))) {
@@ -41,6 +53,7 @@ class UserFilterType extends AbstractType
             'roles' => null,
             'locale' => null,
             'showDepartment' => false,
+            'department' => null
         ]);
     }
 }

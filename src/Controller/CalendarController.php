@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\AntiquityDays;
 use App\Entity\Event;
 use App\Entity\Status;
+use App\Entity\User;
 use App\Form\EventFormType;
 use App\Form\UserFilterType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -55,7 +56,9 @@ class CalendarController extends AbstractController
      */
     public function department(Request $request): Response
     {
-        return $this->renderCalendar($request, 'calendar/department.html.twig', false);
+        /** @var User $user */
+        $user = $this->getUser();
+        return $this->renderCalendar($request, 'calendar/department.html.twig', false, $user->getDepartment());
     }
 
     /**
@@ -66,7 +69,7 @@ class CalendarController extends AbstractController
         return $this->renderCalendar($request, 'calendar/city-hall.html.twig', true);
     }
 
-    private function renderCalendar(Request $request, $template, $showDepartment): Response
+    private function renderCalendar(Request $request, $template, $showDepartment, $department = null): Response
     {
         $event = new Event();
         $year = $request->get('year');
@@ -77,7 +80,8 @@ class CalendarController extends AbstractController
         $userFilterForm = $this->createForm(UserFilterType::class, [
             'roles' => $this->getUser()->getRoles(),
             'locale' => $request->getLocale(),
-            'showDepartment' => $showDepartment
+            'showDepartment' => $showDepartment,
+            'department' => $department
         ]);
         $statuses = $this->getDoctrine()->getManager()->getRepository(Status::class)->findAll();
         $antiquityDays = $this->getDoctrine()->getManager()->getRepository(AntiquityDays::class)->findAll();
