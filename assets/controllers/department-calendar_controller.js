@@ -1,7 +1,7 @@
 import {
     Controller
 } from 'stimulus';
-import $, { type } from 'jquery';
+import $ from 'jquery';
 import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
 import 'js-year-calendar/locales/js-year-calendar.eu';
@@ -10,7 +10,7 @@ import {
     useDispatch
 } from 'stimulus-use';
 
-import Translator from 'bazinga-translator';
+import Translator, { defaultDomain } from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 import '@fortawesome/fontawesome-free/js/all.js';
 const routes = require('../../public/js/fos_js_routes.json');
@@ -35,6 +35,7 @@ export default class extends Controller {
     approved = 0;
 
     connect() {
+        console.log(this.departmentDatesUrlValue, this.departmentUsersUrlValue, this.yearValue);
         Routing.setRoutingData(routes);
         useDispatch(this);
         Translator.fromJSON(translations);

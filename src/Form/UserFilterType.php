@@ -23,6 +23,7 @@ class UserFilterType extends AbstractType
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'username',
+                'placeholder' => '',
                 'query_builder' => function (EntityRepository $ur) use ($department) {
                     $qb = $ur->createQueryBuilder('u');
                     if ($department !== null) {
@@ -32,11 +33,12 @@ class UserFilterType extends AbstractType
                     $qb->orderBy('u.username', 'ASC');
                     return $qb;
                 },
-                'label' => 'label.user'
+                'label' => 'label.user',
             ]);
         if (null !== $roles && $showDepartment && (in_array('ROLE_HHRR', $roles) || in_array('ROLE_ADMIN', $roles))) {
             $builder->add('department', EntityType::class, [
                 'class' => Department::class,
+                'placeholder' => '',
                 'choice_label' => function ($department) use ($locale) {
                     return ($locale === 'es') ? $department->getNameEs() : $department->getNameEu();
                 },
