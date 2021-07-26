@@ -16,7 +16,7 @@ import {
 
 import 'bootstrap-datepicker';
 const routes = require('../../public/js/fos_js_routes.json');
-import Routing from '../../vendor/friendsofsymfony/jsrouting-bundle/Resources/public/js/router.min.js';
+import Routing from '../../public/js/router.min.js';
 
 import Translator from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
