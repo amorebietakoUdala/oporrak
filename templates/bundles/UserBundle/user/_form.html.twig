@@ -20,10 +20,10 @@
 					<span class="text-danger">{{ form_errors(form.email) }}</span>
 					{{ form_widget(form.email, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-                <div class="col-1 form-group form-check form-check-inline align-items-end">
+                <div class="col-2 form-group form-check form-check-inline align-items-end">
                   {{ form_label(form.activated) }}
                   <span class="text-danger">{{ form_errors(form.activated) }}</span>
-                  {{ form_widget(form.activated, {'attr': {'class': 'form-check-input form-control form-control-sm'}}) }}
+                  {{ form_widget(form.activated, {'attr': {'class': 'form-check-input'}}) }}
                 </div>                
 			</div>
 			<div class="form-row">
