@@ -33,12 +33,12 @@
         "version": "v0.5.3"
     },
     "doctrine/doctrine-bundle": {
-        "version": "2.3",
+        "version": "2.4",
         "recipe": {
             "repo": "github.com/symfony/recipes",
             "branch": "master",
-            "version": "2.3",
-            "ref": "6e0f582596a8f1c865aaa0d3cceb9bf0daf609b4"
+            "version": "2.4",
+            "ref": "bac5c852ff628886de2753215fe5eb1f9ce980fb"
         },
         "files": [
             "config/packages/doctrine.yaml",
@@ -357,6 +357,9 @@
     "symfony/orm-pack": {
         "version": "v2.1.0"
     },
+    "symfony/password-hasher": {
+        "version": "v5.3.7"
+    },
     "symfony/phpunit-bridge": {
         "version": "5.1",
         "recipe": {
@@ -392,6 +395,9 @@
     },
     "symfony/polyfill-php80": {
         "version": "v1.22.1"
+    },
+    "symfony/polyfill-php81": {
+        "version": "v1.23.0"
     },
     "symfony/process": {
         "version": "v5.2.4"
