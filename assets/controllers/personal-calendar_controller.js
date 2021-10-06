@@ -56,9 +56,18 @@ export default class extends Controller {
             disabledWeekDays: [0, 6],
             contextMenuItems: [
                 {
-                    text: 'Delete',
+                    text: Translator.trans('btn.delete'),
                     click: (event) => {
                         this.deleteEvent(event);
+                    },
+                    /* Show context menu only when it's not holiday */
+                    visible: (event) => {
+                        let events = [];
+                        events.push(event);
+                        if (this.hasHoliday(events)) {
+                            return false;
+                        }
+                        return true;
                     }
                 }
             ],
@@ -100,7 +109,7 @@ export default class extends Controller {
                     $(e.element).popover('hide');
                 }
             },
-            dayContextMenu: function(e) {
+            dayContextMenu: (e) => {
                 $(e.element).popover('hide');
             },
             yearChanged: (event) => {
@@ -112,6 +121,15 @@ export default class extends Controller {
         });
     }
 
+    hasHoliday(events) {
+        for (var [key, value] of Object.entries(events)) {
+            if (value.type === 'holiday') {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     openModal() {
         let $alert = $(this.modalBodyTarget).find('.alert');
         $alert.remove();
