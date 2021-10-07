@@ -47,7 +47,7 @@ class EventController extends AbstractController
                 'event' => $event
             ]);
             $user = $event->getUser();
-            $subject = 'Opor eskaera erantzuna / Respuesta solicitud de vacaciones';
+            $subject = "{$user->getUsername()} opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
             $this->sendEmail($user->getEmail(), $subject, $html, true);
         } else {
             $this->addFlash('error', 'event.notFound');
@@ -80,7 +80,7 @@ class EventController extends AbstractController
                 'event' => $event
             ]);
             $user = $event->getUser();
-            $subject = 'Opor eskaera erantzuna / Respuesta solicitud de vacaciones';
+            $subject = "{$user->getUsername()}-en opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
             $this->sendEmail($user->getEmail(), $subject, $html, false);
         } else {
             $this->addFlash('error', 'event.notFound');
@@ -108,7 +108,7 @@ class EventController extends AbstractController
                 $html = $this->renderView('event/eventDeletionMail.html.twig', [
                     'event' => $event
                 ]);
-                $subject = 'Opor eskaera bertan behera uztea / Cancelación de vacaciones';
+                $subject = "{$user->getUsername()}-en opor eskaera bertan behera uztea / Cancelación de vacaciones de {$user->getUsername()}";
                 $this->sendEmail($boss->getEmail(), $subject, $html, false);
             }
             return new Response(null, 204);
