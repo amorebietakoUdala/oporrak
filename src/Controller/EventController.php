@@ -215,7 +215,8 @@ class EventController extends AbstractController
                 'event' => $event,
                 'overlaps' => $overlaps
             ]);
-            $subject = 'Opor eskaera / Solicitud de vacaciones';
+            $user = $event->getUser();
+            $subject = "{$user->getUsername()}-en opor eskaera / Solicitud de vacaciones de {$user->getUsername()}";
             $this->sendEmail($boss->getEmail(), $subject, $html, false);
         }
         if ($ajax) {
