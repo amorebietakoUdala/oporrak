@@ -1,4 +1,4 @@
-<div class="modal fade" tabindex="-1" aria-hidden="true" {# data-modal-form-target="modal" #} data-personal-calendar-target="modal">
+<div class="modal fade" tabindex="-1" aria-hidden="true" data-personal-calendar-target="modal">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -7,7 +7,7 @@
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<div class="modal-body" {# data-modal-form-target="modalBody" #} data-personal-calendar-target="modalBody" {# data-action="submit->calendar#submitForm" #}>
+			<div class="modal-body" data-personal-calendar-target="modalBody">
 				{{ include ('event/_form.html.twig',{
                    form: form
                 }) }}

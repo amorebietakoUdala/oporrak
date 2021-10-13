@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Department;
 use App\Entity\User;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

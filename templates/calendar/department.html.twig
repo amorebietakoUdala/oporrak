@@ -23,22 +23,13 @@
                'year' : year, 
                'roles': app.user.roles } ) }}>
             {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : false }) }}
-         {# </div> #}
-			<div id="calendar" {#data-department-calendar-target="content"#}></div>
+			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">
 				{{ include('calendar/_summary.html.twig') }}
 				{{ include('calendar/_day-details.html.twig') }}
-				{#{{ include('calendar/_status.html.twig') }}
-																																																																																																												            {{ include('calendar/_legend.html.twig') }} #}
+			   {{ include('calendar/_legend.html.twig') }} #}
 			</div>
 			<div id="context-menu"></div>
-
-			{# {{ include('event/_modal.html.twig', {
-																																																																																							                     modalTitle: 'Event details',
-																																																																																							                     form: form
-																																																																																							         }) }} #}
 		</div>
 	</div>
-	{# {{ include('common/_alert.html.twig') }} #}
-
 {% endblock %}

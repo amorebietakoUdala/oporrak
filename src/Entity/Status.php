@@ -83,28 +83,6 @@ class Status
         return $this->event;
     }
 
-    // public function addEvent(Event $event): self
-    // {
-    //     if (!$this->event->contains($event)) {
-    //         $this->event[] = $event;
-    //         $event->setStatus($this);
-    //     }
-
-    //     return $this;
-    // }
-
-    // public function removeEvent(Event $event): self
-    // {
-    //     if ($this->event->removeElement($event)) {
-    //         // set the owning side to null (unless already changed)
-    //         if ($event->getStatus() === $this) {
-    //             $event->setStatus(null);
-    //         }
-    //     }
-
-    //     return $this;
-    // }
-
     public function __toString()
     {
         return $this->description;
