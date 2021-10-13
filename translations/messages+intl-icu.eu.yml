@@ -74,6 +74,7 @@ modal.title.holiday: "Jaiegun berria"
 modal.title.workcalendar: "Lan egutegi berria"
 modal.title.antiquityDays: "Sarrera berria"
 modal.title.department: "Sail berria"
+modal.title.event: "Opor egun berria"
 
 # Labels
 label.eventsThisYear: "Oporrak aurten: "

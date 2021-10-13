@@ -74,6 +74,7 @@ modal.title.holiday: "Nuevo festivo"
 modal.title.workcalendar: "Nuevo calendario laboral"
 modal.title.antiquityDays: "Nuevo Registro"
 modal.title.department: "Nuevo Departamento"
+modal.title.event: "Nuevo evento"
 
 # Labels
 label.eventsThisYear: "Vacaciones este año: "

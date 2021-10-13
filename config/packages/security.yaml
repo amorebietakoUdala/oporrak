@@ -42,7 +42,6 @@ security:
             logout:
                 path: user_security_logout
 
-
             remember_me:
                 secret: "%kernel.secret%"
                 lifetime: 2592000
