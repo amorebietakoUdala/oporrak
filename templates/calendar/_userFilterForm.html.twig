@@ -12,7 +12,10 @@
                'attr': {'data-user-filter-target' : 'departmentSelect', 'data-department-calendar-target' : 'departmentSelect', 'data-action': "change->user-filter#refreshUsers"}
             }) }}</span>
             {% endif %}
-            <div class="col-2"><button type="button" class="btn btn-primary" data-action="user-filter#search">{{ button_label|default('btn.search')|trans }}</button></div>
+            <div class="col-2">
+               <button type="button" class="btn btn-primary" data-action="user-filter#search">{{ button_label|default('btn.search')|trans }}</button>
+               <button type="button" class="btn btn-primary" data-action="user-filter#clean">{{ button_label|default('btn.clean')|trans }}</button>
+            </div>
          </div>
       {{ form_end(userFilterForm) }}
   </div>

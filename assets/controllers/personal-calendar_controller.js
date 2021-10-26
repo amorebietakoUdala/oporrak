@@ -8,7 +8,6 @@ import {
 import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
 import 'js-year-calendar/locales/js-year-calendar.eu';
-import { workingDaysBetween } from '../js/dateUtils';
 
 import {
     useDispatch
@@ -22,13 +21,14 @@ import Translator from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 
 export default class extends Controller {
-    static targets = ['modal', 'modalBody', 'content', 'events', 'holidays', 'workdays', 'holidaysLegend', 'approved'];
+    static targets = ['modal', 'modalBody'];
     static values = {
         locale: String,
         holidaysUrl: String,
         holidaysColor: String,
         myDatesUrl: String,
         datesServiceUrl: String,
+        // To save or get eventForm
         formUrl: String,
         year: String,
         // How many days before can we edit calendar
@@ -36,10 +36,7 @@ export default class extends Controller {
     };
 
     calendar = null;
-    calendarDates = null;
     holidays = null;
-    counters = null;
-    approved = 0;
 
     connect() {
         Routing.setRoutingData(routes);
@@ -72,7 +69,7 @@ export default class extends Controller {
                 }
             ],
             selectRange: (event) => {
-                this.openModal();
+                this.openModal(event);
                 this.editEvent({
                     startDate: event.startDate,
                     endDate: event.endDate,
@@ -86,9 +83,15 @@ export default class extends Controller {
                         content += '<div class="event-tooltip-content">';
                         if (typeof(e.events[i].id) != "undefined") {
                             content += '<div class="event-id">Id: ' + e.events[i].id + '</div>';
+                        } 
+                        content += '<div class="event-name" style="color:' + e.events[i].color + '">';
+                        if (typeof(e.events[i].name) != "undefined" && e.events[i].type == 'holiday') {
+                            content += e.events[i].type + ': ' + e.events[i].name
+                        } else {
+                            content += e.events[i].type;
                         }
-                        content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].name + '</div>';
-                        if (typeof(e.events[i].type) == "undefined" && typeof(e.events[i].status) != "undefined") {
+                        content += '</div>'
+                        if (typeof(e.events[i].status) != "undefined") {
                             content += '<div class="event-status">' + Translator.trans('label.status')+ ': ' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
                         }
                         content += '</div>';
@@ -130,10 +133,28 @@ export default class extends Controller {
         return false;
     }
     
-    openModal() {
+    async openModal(event) {
         let $alert = $(this.modalBodyTarget).find('.alert');
         $alert.remove();
-        this.modal.show();
+        await $.ajax({
+            url: this.formUrlValue,
+            method: 'GET'
+        }).then((response) => {
+            this.modalBodyTarget.innerHTML = response;
+            const options = {
+                format: "yyyy-mm-dd",
+                language: this.localeValue,
+                weekStart: 1
+            }
+            $('#event_form_startDate').datepicker(options);
+            $('#event_form_endDate').datepicker(options);
+            $('#event_form_startDate').datepicker('update', event ? event.startDate : '');
+            $('#event_form_endDate').datepicker('update', event ? event.endDate : '');
+            this.modal.show();
+        }).catch((err) => {
+            Swal.default.fire('There was an error!!!');
+        });
+
     }
 
     editEvent(event) {
@@ -142,11 +163,13 @@ export default class extends Controller {
         $('#event_form_startDate').datepicker('update', event ? event.startDate : '');
         $('#event_form_endDate').datepicker('update', event ? event.endDate : '');
         $('#event_form_status').val(event ? event.statusId : '');
-        this.openModal();
+        $('#event_form_halfDay').val(event ? event.halfDay : '');
+        $('#event_form_hours').val(event ? event.hours : '');
+        this.openModal(event);
     }
 
     async deleteEvent(event) {
-        import ('sweetalert2').then(async(Swal) => {
+          import ('sweetalert2').then(async(Swal) => {
             Swal.default.fire({
                 template: '#my-template'
             }).then(async(result) => {
@@ -155,12 +178,16 @@ export default class extends Controller {
                     await $.ajax({
                         url: url,
                         method: 'GET'
-                    }).then((response) => {
+                    }).then(() => {
                         var dataSource = this.calendar.getDataSource();
                         this.calendar.setDataSource(dataSource.filter(item => item.id != event.id));
+                        let year = this.calendar.getYear();
+                        this.dispatch('update', { year });
                     }).catch((err) => {
-                        console.log(err);
-                        Swal.default.fire('There was an error!!!');
+                        Swal.default.fire({
+                            template: '#error',
+                            html: err.responseText
+                        });
                     });
                 }
             });
@@ -174,10 +201,12 @@ export default class extends Controller {
                 url: this.formUrlValue,
                 method: $form.prop('method'),
                 data: $form.serialize()
+            }).then(() => {
+                let year = this.calendar.getYear();
+                this.dispatch('update', { year });
+                this.refreshCalendar();
+                this.modal.hide();
             });
-            this.refreshCalendar();
-
-            this.modal.hide();
         } catch (e) {
             this.modalBodyTarget.innerHTML = e.responseText;
         }
@@ -204,20 +233,16 @@ export default class extends Controller {
             .then(result => result.json())
             .then(result => {
                 if (result.items) {
-                    this.counters = this.createCounters(result.items, this.holidays);
-                    this.updateCounters();
-                    let workdays = this.calculateWorkDays(result.items);
-                    this.holidaysLegendTarget.innerHTML = this.holidays.length;
-                    this.workdaysTarget.innerHTML = workdays;
-
                     return result.items.map(r => ({
                         id: r.id,
                         startDate: new Date(r.startDate),
                         endDate: new Date(r.endDate),
-                        name: r.name,
+                        name: r.name == null ? r.type.descriptionEs : r.type.descriptionEu,
                         statusId: r.status.id,
                         status: r.status.description,
                         color: r.status.color,
+                        startHalfDay: r.halfDay,
+                        type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                     }));
                 }
             }).then(dates => {
@@ -236,39 +261,4 @@ export default class extends Controller {
     refreshCalendar() {
         this.load(this.calendar.getYear());
     }
-
-    calculateWorkDays(events) {
-        let totalDays = 0;
-        let workdays = 0;
-        events.forEach(element => {
-            workdays = workingDaysBetween(element.startDate, element.endDate, this.holidays);
-            totalDays += workdays;
-        });
-        return totalDays;
-    }
-
-    createCounters(events, holidays) {
-        let counters = [];
-        this.approved = 0;
-        events.forEach(element => {
-            if (typeof(counters[element.status.id]) === 'undefined') {
-                counters[element.status.id] = workingDaysBetween(element.startDate, element.endDate, holidays);
-            } else {
-                counters[element.status.id] += workingDaysBetween(element.startDate, element.endDate, holidays);
-            }
-            if (element.status.id === 2) {
-                this.approved += workingDaysBetween(element.startDate, element.endDate, holidays);
-            }
-        });
-        return counters;
-    }
-
-    updateCounters() {
-        $('.color-square').text(0);
-        Object.entries(this.counters).forEach(([key, value]) => {
-            $('#colorSquare' + key).text(value);
-        });
-        this.approvedTarget.innerHTML = this.approved;
-    }
-
 }

@@ -1,27 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{'title.workcalendarIndex' | trans }}{% endblock %}
+{% block title %}{{'title.eventTypeIndex' | trans }}{% endblock %}
 
 {% block body %}
-    <h1>{{'title.workcalendarIndex' | trans }}</h1>
+    <h1>{{'title.eventTypeIndex' | trans }}</h1>
       <div {{ stimulus_controller('reload-content', 
-               { 'url': path('workcalendar_index', { 'ajax' : 'true'}),
+               { 'url': path('event_type_index', { 'ajax' : 'true'}),
                   'locale': app.request.locale|split('_')[0] })}} data-action="entity:success->reload-content#refreshContent entity:init->reload-content#refreshContent">
 
          <div {{ stimulus_controller('entity', 
                   { 'locale': app.request.locale|split('_')[0], 
-                  'entitySaveUrl': path('workcalendar_save'),
+                  'entitySaveUrl': path('event_type_save'),
                   })}} 
                class="container-fluid"
                data-action="hidden.bs.modal->entity#modalHidden">
-               <div class="container-fluid" data-reload-content-target="content">
-                  {{ include('workcalendar/_list.html.twig', { 'workcalendars': workcalendars }) }}
+               <div data-reload-content-target="content">
+                  {{ include('event_type/_list.html.twig', { 'eventTypes': eventTypes }) }}
                </div>
-               {{ include('common/_modal.html.twig', {
-                     'modalTitle': 'modal.title.workcalendar' | trans,
-                     'formTemplate': 'workcalendar/_form.html.twig'
-                  }) 
-               }}
+            {{ include('common/_modal.html.twig', {
+                  'modalTitle': 'modal.title.eventType' | trans,
+                  'formTemplate': 'event_type/_form.html.twig'
+               }) 
+            }}
             <div class="float-right"><btn class="btn btn-primary rounded-circle" data-action="click->entity#openModal"><i class="fa fa-plus" title='{{ "btn.new" | trans | capitalize }}'></i></btn></div>
             {{ include('common/_alert.html.twig') }}
          </div>

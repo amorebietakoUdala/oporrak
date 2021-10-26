@@ -1,4 +1,6 @@
 message.confirmationTitle: "Konfirma ezazu mesedez"
 message.confirmationText: "¿Ziur zaude epe hau ezabatu nahi duzula?"
+message.error: "Akatsa"
 btn.accept: "Bai"
+btn.ok: "Onartu"
 btn.cancel: "Ez"

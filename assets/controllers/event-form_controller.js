@@ -5,9 +5,6 @@ import $ from 'jquery';
 import 'bootstrap-datepicker';
 import 'bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js';
 import 'bootstrap-datepicker/js/locales/bootstrap-datepicker.eu.js';
-import {
-    useDispatch
-} from 'stimulus-use';
 
 export default class extends Controller {
     static values = {
@@ -15,7 +12,6 @@ export default class extends Controller {
     }
 
     connect() {
-        useDispatch(this);
         const options = {
             format: "yyyy-mm-dd",
             language: this.localeValue,

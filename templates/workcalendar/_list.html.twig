@@ -6,6 +6,9 @@
                   <th>{{ 'workcalendar.vacationDays' | trans }}</th>
                   <th>{{ 'workcalendar.particularBusinessLeave' | trans }}</th>
                   <th>{{ 'workcalendar.overtimeDays' | trans }}</th>
+                  <th>{{ 'workcalendar.workingHours' | trans }}</th>
+                  <th>{{ 'workcalendar.partitionableDays' | trans }}</th>
+                  <th>{{ 'workcalendar.deadlineNextYear' | trans }}</th>
                   <th>{{ 'label.options' | trans }}</th>
                </tr>
          </thead>
@@ -17,6 +20,9 @@
                   <td>{{ workcalendar.vacationDays }}</td>
                   <td>{{ workcalendar.particularBusinessLeave }}</td>
                   <td>{{ workcalendar.overtimeDays }}</td>
+                  <td>{{ workcalendar.workingHours }}</td>
+                  <td>{{ workcalendar.partitionableDays }}</td>
+                  <td>{{ workcalendar.deadlineNextYear is not null ? workcalendar.deadlineNextYear|date("Y-m-d") : '' }}</td>
                   <td>
                      <a href="#" data-action="entity#edit" data-url="{{ path('workcalendar_show', {'id': workcalendar.id}) }}"><i class="fa fa-eye" title='{{ "btn.show" | trans | capitalize }}'></i></a>&nbsp;
                      <a href="#" data-action="entity#edit" data-url="{{ path('workcalendar_edit', {'id': workcalendar.id}) }}" data-allowEdit="true"><i class="fa fa-edit" title='{{ "btn.edit" | trans | capitalize }}'></i></a>&nbsp;

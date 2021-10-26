@@ -1,13 +1,23 @@
-<div class="card col-2 p-1">
-	<h5 class="card-title text-center">{{'title.legend' | trans }}</h5>
-	<div class="card-body">
-		<div class="line-spain">
-			{% for status in statuses %}
-				<p>
-					<span id="colorSquare{{status.id}}" class="color-square col-1" style="background-color: {{status.color}}"></span>&nbsp;{{status.description | trans}}</p>
-			{% endfor %}
-			<p>
-				<span class="color-square col-1" style="background-color: {{holidaysColor}}; color: white" data-personal-calendar-target="holidaysLegend"></span>&nbsp;{{ 'label.holidays' | trans}}</p>
-		</div>
-	</div>
+<div data-legend-target="stats">
+   <div class="card p-1">
+      <h5 class="card-title text-center">{{'title.legend' | trans }}</h5>
+      <div class="card-body">
+         <div>
+         {% if stats is defined %}
+            {% for stat in stats %}
+               <p>
+                  <span id="colorSquare{{loop.index}}" class="color-square col-1" style="background-color: {{stat.color}}">
+                     {% if stat.count matches '/^\\d+$/' %}
+                        {{ stat.count }}
+                     {% else %}
+                        {{ stat.count | number_format(2, ',', '') }}
+                     {% endif %}                  
+                     
+                  </span>&nbsp;{{stat.description | trans}}
+               </p>
+            {% endfor %}
+         {% endif %}
+         </div>
+      </div>
+   </div>
 </div>

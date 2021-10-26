@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\Event;
 use App\Entity\Status;
 use App\Entity\User;
+use App\Entity\WorkCalendar;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,6 +26,34 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
+    public function findUserEventsCurrentYearAndType(User $user, int $year, $type = null, $onlyHalfDays = false)
+    {
+        $startDate = new \DateTime($year . '-01-01');
+        $endDate = new \DateTime($year + 1 . '-01-01');
+        $qb = $this->createQueryBuilder('e')
+            ->andWhere('e.user = :user')
+            ->setParameter('user', $user)
+            ->andWhere('e.startDate >= :startDate')
+            ->setParameter('startDate', $startDate)
+            ->andWhere('e.endDate < :endDate')
+            ->setParameter('endDate', $endDate);
+        if ($onlyHalfDays) {
+            $qb->andWhere('e.halfDay = :halfDay')
+                ->setParameter('halfDay', $onlyHalfDays);
+        }
+        if (null !== $type) {
+            $qb->andWhere('e.type = :type')
+                ->setParameter('type', $type);
+        }
+        $qb->orderBy('e.id', 'ASC')
+            //            ->setMaxResults(10)
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
     public function findUserEventsBeetweenDates($user, $startDate, $endDate = null)
     {
         $qb = $this->createQueryBuilder('e')
@@ -38,6 +68,63 @@ class EventRepository extends ServiceEntityRepository
         $qb->orderBy('e.id', 'ASC')
             //            ->setMaxResults(10)
         ;
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findEffectiveUserEventsOfTheYear(User $user, int $year)
+    {
+        $thisYearStart = new DateTime("${year}-01-01");
+        $thisYearEnd = new DateTime("${year}-12-31");
+        $nextYear = $year + 1;
+        $nextYearStart = new DateTime("${nextYear}-01-01");
+        $nextYearEnd = new DateTime("${nextYear}-12-31");
+        $condition = "(
+            (e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL )) 
+            OR (e.startDate >= :nextYearStartDate AND e.endDate < :nextYearEndDate AND e.usePreviousYearDays = :true)
+            )";
+        $qb = $this->createQueryBuilder('e')
+            ->andWhere($condition)
+            ->setParameter('startDate', $thisYearStart)
+            ->setParameter('endDate', $thisYearEnd)
+            ->setParameter('false', false)
+            ->setParameter('nextYearStartDate', $nextYearStart)
+            ->setParameter('nextYearEndDate', $nextYearEnd)
+            ->setParameter('true', true)
+            ->andWhere('e.user = :user')
+            ->setParameter('user', $user);
+        $qb->orderBy('e.id', 'ASC');
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findUserEventsOfTheYearWithPreviousYearDays(User $user, int $year, bool $oposite = false)
+    {
+        $thisYearStart = new DateTime("${year}-01-01");
+        $thisYearEnd = new DateTime("${year}-12-31");
+        $qb = $this->createQueryBuilder('e');
+        if (!$oposite) {
+            $condition = "
+                e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :true  ) 
+                ";
+            $qb->andWhere($condition)
+                ->setParameter('true', true);
+        } else {
+            $condition = " 
+                e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) 
+                ";
+            $qb->andWhere($condition)
+                ->setParameter('false', false);
+        }
+        $qb->setParameter('startDate', $thisYearStart)
+            ->setParameter('endDate', $thisYearEnd)
+            ->andWhere('e.user = :user')
+            ->setParameter('user', $user);
+        $qb->orderBy('e.id', 'ASC');
         return $qb->getQuery()->getResult();
     }
 

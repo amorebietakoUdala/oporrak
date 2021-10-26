@@ -14,10 +14,10 @@ import {
 } from 'stimulus-use';
 
 export default class extends Controller {
-    static targets = ['modal', 'modalBody', 'modalSaveButton'];
+    static targets = ['modal', 'modalTitle', 'modalBody', 'modalSaveButton'];
     static values = {
         locale: String,
-        entitySaveUrl: String,
+        entitySaveUrl: String
     };
     modal = null;
 
@@ -51,7 +51,8 @@ export default class extends Controller {
     async edit(event) {
         event.preventDefault();
         let url = event.currentTarget.dataset.url;
-        let allowEdit = event.currentTarget.dataset.allowEdit;
+        let allowEdit = event.currentTarget.dataset.allowedit;
+        console.log(event.currentTarget.dataset, allowEdit);
         try {
             await $.ajax({
                 url: url,
@@ -61,6 +62,8 @@ export default class extends Controller {
                 this.modalBodyTarget.innerHTML = response;
                 if (allowEdit == "false") {
                     $(this.modalSaveButtonTarget).hide();
+                } else {
+                    $(this.modalSaveButtonTarget).show(); 
                 }
                 this.modal.show();
             });
