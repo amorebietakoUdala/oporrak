@@ -20,7 +20,7 @@ class Event
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"event"})
      */
     private $name;
@@ -50,6 +50,41 @@ class Event
      * @Groups({"event"})
      */
     private $user;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true, options={"default" : false} )
+     * @Groups({"event"})
+     */
+    private $halfDay;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=EventType::class)
+     * @Groups({"event"})
+     */
+    private $type;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"event"})
+     */
+    private $askedAt;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     * @Groups({"event"})
+     */
+    private $hours;
+
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $usePreviousYearDays;
+
+    public function __construct()
+    {
+        $this->halfDay = false;
+        $this->usePreviousYearDays = false;
+    }
 
     public function getId(): ?int
     {
@@ -119,6 +154,9 @@ class Event
         $this->endDate = $event->getEndDate();
         $this->status = $event->getStatus();
         $this->user = $event->getUser();
+        $this->halfDay = $event->getHalfDay();
+        $this->askedAt = $event->getAskedAt();
+        $this->type = $event->getType();
     }
 
     public function getUser(): ?User
@@ -135,8 +173,24 @@ class Event
 
     public function getDays(): int
     {
-        $interval = date_diff($this->startDate, $this->endDate);
-        return intVal($interval->days);
+        if (!$this->halfDay) {
+            $interval = date_diff($this->startDate, $this->endDate);
+            return intVal($interval->days) + 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public function getHalfDay(): ?bool
+    {
+        return $this->halfDay;
+    }
+
+    public function setHalfDay($halfDay): self
+    {
+        $this->halfDay = $halfDay;
+
+        return $this;
     }
 
     public function checkOverlap($event): bool
@@ -150,5 +204,53 @@ class Event
             return true;
         }
         return false;
+    }
+
+    public function getType(): ?EventType
+    {
+        return $this->type;
+    }
+
+    public function setType(?EventType $type): self
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getAskedAt(): ?\DateTimeInterface
+    {
+        return $this->askedAt;
+    }
+
+    public function setAskedAt(\DateTimeInterface $askedAt): self
+    {
+        $this->askedAt = $askedAt;
+
+        return $this;
+    }
+
+    public function getHours(): ?float
+    {
+        return $this->hours;
+    }
+
+    public function setHours(?float $hours): self
+    {
+        $this->hours = $hours;
+
+        return $this;
+    }
+
+    public function getUsePreviousYearDays(): ?bool
+    {
+        return $this->usePreviousYearDays;
+    }
+
+    public function setUsePreviousYearDays(?bool $usePreviousYearDays): self
+    {
+        $this->usePreviousYearDays = $usePreviousYearDays;
+
+        return $this;
     }
 }

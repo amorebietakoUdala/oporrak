@@ -3,11 +3,13 @@
 namespace App\Form;
 
 use App\Entity\WorkCalendar;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class WorkCalendarType extends AbstractType
@@ -59,6 +61,36 @@ class WorkCalendarType extends AbstractType
                 'required' => true,
                 'attr' => [
                     'int' => true,
+                ]
+            ])
+            ->add('workingHours', NumberType::class, [
+                'label' => 'workcalendar.workingHours',
+                'disabled' => $readonly,
+                'constraints' => [
+                    new PositiveOrZero(),
+                    new NotBlank(),
+                ],
+                'required' => true,
+            ])
+            ->add('partitionableDays', NumberType::class, [
+                'label' => 'workcalendar.partitionableDays',
+                'disabled' => $readonly,
+                'constraints' => [
+                    new PositiveOrZero(),
+                    new NotBlank(),
+                ],
+                'required' => true,
+                'attr' => [
+                    'int' => true,
+                ]
+            ])->add('deadlineNextYear', DateType::class, [
+                'widget' => 'single_text',
+                'html5' => false,
+                'format' => 'yyyy-MM-dd',
+                'attr' => ['class' => 'js-datepicker'],
+                'label' => 'workcalendar.deadlineNextYear',
+                'constraints' => [
+                    new NotBlank(),
                 ]
             ]);
     }

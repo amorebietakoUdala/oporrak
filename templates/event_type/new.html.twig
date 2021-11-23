@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.eventType' | trans}}{% endblock %}
+
+{% block body %}
+    <h1>{{ 'title.eventType' | trans}}</h1>
+
+    {{ include('event_type/_form.html.twig') }}
+
+    <a href="{{ path('event_type_index') }}">{{ 'btn.cancel' | trans }}</a>
+{% endblock %}

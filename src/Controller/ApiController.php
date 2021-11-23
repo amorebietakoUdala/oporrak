@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\Department;
 use App\Entity\Event;
+use App\Entity\EventType;
 use App\Entity\User;
 use App\Entity\Holiday;
+use App\Entity\Status;
 use App\Entity\WorkCalendar;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -55,14 +57,53 @@ class ApiController extends AbstractController
       }
       /** @var User $user */
       $user = $this->getUser();
-      $nextYear = intVal($year) + 1;
-      $items = $em->getRepository(Event::class)->findUserEventsBeetweenDates($user, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+      //      $nextYear = intVal($year) + 1;
+      $items = $em->getRepository(Event::class)->findUserEventsOfTheYearWithPreviousYearDays($user, $year, true);
+      $eventsWithLastYearDays = $em->getRepository(Event::class)->findUserEventsOfTheYearWithPreviousYearDays($user, $year);
+      $color = $this->getParameter('previousYearsDaysColor');
+      $status = new Status();
+      // Overwrite events color, for previous year days
+      foreach ($eventsWithLastYearDays as $event) {
+         $status->copy($event->getStatus());
+         $status->setColor($color);
+         $event->setStatus($status);
+      }
+      $items = array_merge($items, $eventsWithLastYearDays);
       $dates = [
          'total_count' => $items === null ? 0 : count($items),
          'items' => $items === null ? [] : $items
       ];
       return $this->json($dates, 200, [], ['groups' => ['event']]);
    }
+
+   /**
+    * @Route("/my/stats", name="api_get_my_stats", methods="GET")
+    */
+   // public function getMyStats(Request $request, EntityManagerInterface $em): Response
+   // {
+   //    $year = $request->get('year');
+   //    $user = $this->getUser();
+   //    $stats = [];
+   //    $events = $em->getRepository(Event::class)->findUserEventsBeetweenDates($user, "${year}-01-01", "${year}-12-31");
+   //    $workCalendar = $em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
+   //    $statuses = $em->getRepository(Status::class)->findAll();
+   //    foreach ($statuses as $status) {
+   //       $stats[$status->getId()] = [
+   //          //            'id' => $status->getId(),
+   //          'description' => $status->getDescription(),
+   //          'count' => 0,
+   //          'color' => $status->getColor(),
+   //       ];
+   //    }
+   //    foreach ($events as $event) {
+   //       if ($event->getHalfDay()) {
+   //          $stats[$event->getStatus()->getId()]['count'] += $event->getHours() / $workCalendar->getWorkingHours();
+   //       } else {
+   //          $stats[$event->getStatus()->getId()]['count'] += $event->getDays();
+   //       }
+   //    }
+   //    return $this->json($stats, 200);
+   // }
 
    /**
     * @Route("/dates", name="api_get_dates", methods="GET")

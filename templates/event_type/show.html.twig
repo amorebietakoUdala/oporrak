@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.eventType.show' | trans }}{% endblock %}
+
+{% block body %}
+    <h1>{{ 'title.eventType.show' | trans }}</h1>
+
+    {{ include('event_type/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('event_type_index') }}">back to list</a>
+
+{% endblock %}

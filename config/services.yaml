@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
   holidaysColor: "#de1e1e"
+  previousYearsDaysColor: "#33a2ff"
   mailerFrom: "%env(MAILER_FROM)%"
   mailHHRR: "%env(MAILER_HH_RR_MAIL)%"
   days: 5

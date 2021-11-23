@@ -55,7 +55,19 @@ export default class extends Controller {
         user : user,
         department: department
      });
-}
+   }
+
+   clean(event) {
+      if (this.hasUserSelectTarget) {
+         $(this.userSelectTarget).val('');
+         $(this.userSelectTarget).trigger('change'); 
+      }
+      if (this.hasDepartmentSelectTarget) {
+         $(this.departmentSelectTarget).val('');
+         $(this.departmentSelectTarget).trigger('change');
+      }
+      this.search(event);
+   }
 
 
 }

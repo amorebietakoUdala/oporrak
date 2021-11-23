@@ -37,6 +37,21 @@ class WorkCalendar
      */
     private $overtimeDays;
 
+    /**
+     * @ORM\Column(type="decimal", precision=5, scale=2)
+     */
+    private $workingHours;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $partitionableDays;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $deadlineNextYear;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -96,12 +111,56 @@ class WorkCalendar
 
         return $this;
     }
+
+    public function getPartitionableHours(): float
+    {
+        return $this->workingHours * $this->partitionableDays;
+    }
+
     public function fill(WorkCalendar $data): self
     {
+        $this->id = $data->getId();
         $this->year = $data->getYear();
         $this->overtimeDays = $data->getOvertimeDays();
         $this->vacationDays = $data->getVacationDays();
         $this->particularBusinessLeave = $data->getParticularBusinessLeave();
+        $this->deadlineNextYear = $data->getDeadlineNextYear();
+        return $this;
+    }
+
+    public function getWorkingHours(): ?string
+    {
+        return $this->workingHours;
+    }
+
+    public function setWorkingHours(string $workingHours): self
+    {
+        $this->workingHours = $workingHours;
+
+        return $this;
+    }
+
+    public function getPartitionableDays(): ?int
+    {
+        return $this->partitionableDays;
+    }
+
+    public function setPartitionableDays(int $partitionableDays): self
+    {
+        $this->partitionableDays = $partitionableDays;
+
+        return $this;
+    }
+
+    public function getDeadlineNextYear(): ?\DateTimeInterface
+    {
+        return $this->deadlineNextYear;
+    }
+
+    public function setDeadlineNextYear(?\DateTimeInterface $deadlineNextYear): self
+    {
+        $this->deadlineNextYear = $deadlineNextYear;
+
         return $this;
     }
 }

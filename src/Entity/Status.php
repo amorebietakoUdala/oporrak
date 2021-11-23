@@ -87,4 +87,12 @@ class Status
     {
         return $this->description;
     }
+
+    public function copy(Status $status): self
+    {
+        $this->id = $status->getId();
+        $this->description = $status->getDescription();
+        $this->color = $status->getColor();
+        return $this;
+    }
 }

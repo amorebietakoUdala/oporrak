@@ -39,9 +39,9 @@ export default class extends Controller {
         let content = '<div id="events-details">';
         events.forEach(element => {
             content += '<div><span style="background-color:' + element.color + '">&nbsp;&nbsp;</span>&nbsp;';
-            if (typeof(element.type) === 'undefined') {
+            if (element.type !== 'holiday') {
                 content += element.user + ': <span>(' + this.localizeDate(element.startDate, global.locale) + ' - ' + this.localizeDate(element.endDate, global.locale) +
-                    ')</span><span>&nbsp;-&nbsp;'+element.name+'</span>';
+                    ')</span><span>&nbsp;-&nbsp;'+element.type+'</span>';
                 if (element.status !== null) {
                     content += '<span>&nbsp;-&nbsp;' + element.status + '</span>';
                     if (element.statusId === 1 && (roles.includes("ROLE_BOSS") || roles.includes("ROLE_ADMIN"))) {

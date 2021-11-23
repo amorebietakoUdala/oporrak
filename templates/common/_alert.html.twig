@@ -15,3 +15,15 @@
 	<swal-param name="allowEscapeKey" value="false"/>
 	<swal-param name="customClass" value='{ "popup": "my-popup" }'/>
 </template>
+
+<template id="error">
+	<swal-title>
+		{{ 'message.error' | trans }}
+	</swal-title>
+	<swal-icon type="error" color="red"></swal-icon>
+   <swal-html>Loading...</swal-html>
+	<swal-button type="confirm">
+		{{ 'btn.ok' | trans }}
+	</swal-button>
+	<swal-param name="allowEscapeKey" value="true"/>
+</template>

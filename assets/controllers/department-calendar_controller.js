@@ -62,7 +62,7 @@ export default class extends Controller {
                         if (typeof(e.events[i].id) != "undefined") {
                             content += '<div class="event-id">Id: ' + e.events[i].id + '</div>';
                         }
-                        content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].name + '</div>';
+                        content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].type + '</div>';
                         if (typeof(e.events[i].type) == "undefined" && typeof(e.events[i].status) != "undefined") {
                             content += '<div class="event-status">'+ Translator.trans('label.status') + ': ' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
                             content += '<div class="event-user">' + Translator.trans('label.user') + ': ' + e.events[i].user + '</div>';
@@ -141,11 +141,13 @@ export default class extends Controller {
                         id: r.id,
                         startDate: new Date(r.startDate),
                         endDate: new Date(r.endDate),
-                        name: r.name,
+//                        name: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                         statusId: r.status.id,
                         status: Translator.trans(r.status.description, {}, 'messages'),
-                        user: r.user.username,
                         color: r.status.color,
+                        startHalfDay: r.halfDay,
+                        type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
+                        user: r.user.username,
                     }));
                 }
             }).then(dates => {
