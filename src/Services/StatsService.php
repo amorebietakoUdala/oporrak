@@ -64,7 +64,6 @@ class StatsService
            $workingDays = $event->getDays();
            // Subtract two weekend days for every week in between
            $weeks = floor($workingDays / 7);
-           //        dump($workingDays, $holidaysBetween, $weeks);
            $workingDays -= $weeks * 2;
            // Handle special cases
            $startDay = intVal(date('w', strtotime(($event->getStartDate())->format('Y-m-d'))));

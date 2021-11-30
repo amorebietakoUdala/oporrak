@@ -7,9 +7,10 @@
 {% block body %}
 	<div {{ stimulus_controller({
          'summary': {
-            'summary-url': path('api_getWorkCalendar') }, 
+            'summary-url': path('api_getWorkCalendar') 
+         }, 
          'day-details': {
-            'roles': app.user.roles,
+            'roles': roles,
             'previousYearDaysColor': previousYearDaysColor,
          }
          }) }} 
@@ -21,8 +22,9 @@
                'holidays-url': path('api_getHolidays'), 
                'holidays-color': holidaysColor, 
                'department-dates-url': path('api_get_dates') , 
-               'year' : year, 
-               'roles': app.user.roles } ) }}>
+               'year' : year,
+               'department' : app.user.department.id,
+         } ) }}>
             {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : false }) }}
 			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">

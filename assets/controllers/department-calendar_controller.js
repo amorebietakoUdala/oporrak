@@ -26,6 +26,7 @@ export default class extends Controller {
         departmentUsersUrl: String,
         year: String,
         status: String,
+        department: String,
     };
 
     calendar = null;
@@ -35,7 +36,6 @@ export default class extends Controller {
     approved = 0;
 
     connect() {
-        console.log(this.departmentDatesUrlValue, this.departmentUsersUrlValue, this.yearValue);
         Routing.setRoutingData(routes);
         useDispatch(this);
         Translator.fromJSON(translations);
@@ -95,7 +95,7 @@ export default class extends Controller {
                 // It makes a year changed on init, so it doesn't need another load after this.
                 let year = event.currentYear;
                 let user = $(this.userSelectTarget).val();
-                let department = null;
+                let department = this.departmentValue;
                 if ( this.hasDepartmentSelectTarget ) {
                     department = $(this.departmentSelectTarget).val();
                 }

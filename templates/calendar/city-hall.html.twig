@@ -17,8 +17,8 @@
           'holidays-url': path('api_getHolidays'), 
           'holidays-color': holidaysColor, 
           'department-dates-url': path('api_get_dates'), 
-          'year' : year, 
-          'roles': app.user.roles, 
+          'year' : year,
+          'department' : null, 
           'status': constant('App\\Entity\\Status::APPROVED') } ) }}>
          {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : true }) }}
 			<div id="calendar"></div>

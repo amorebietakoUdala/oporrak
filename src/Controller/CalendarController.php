@@ -99,7 +99,8 @@ class CalendarController extends AbstractController
             'days' => $this->getParameter('days'),
             'antiquityDays' => $antiquityDays,
             'showDepartment' => $showDepartment,
-            'previousYearDaysColor' => $this->getParameter('previousYearsDaysColor')
+            'previousYearDaysColor' => $this->getParameter('previousYearsDaysColor'),
+            'roles' => array_values($this->getUser()->getRoles()),
         ]);
     }
 

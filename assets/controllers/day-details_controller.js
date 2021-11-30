@@ -37,8 +37,9 @@ export default class extends Controller {
     }
 
     renderDetails(events, roles) {
-        let content = '<div id="events-details"><div>';
+        let content = '<div id="events-details">';
         events.forEach(element => {
+            content += '<div>';
             content += '<span style="background-color:' + element.color + '" title="'+ element.status +'">&nbsp;&nbsp;</span>';
             if ( element.usePreviousYearDays ) {
                 content += '<span style="background-color:' + this.previousYearDaysColorValue + '" title="'+ Translator.trans('event.usePreviousYearDays', null, 'messages', global.locale) +'">&nbsp;&nbsp;</span>';

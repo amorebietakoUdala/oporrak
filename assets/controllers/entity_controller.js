@@ -52,7 +52,6 @@ export default class extends Controller {
         event.preventDefault();
         let url = event.currentTarget.dataset.url;
         let allowEdit = event.currentTarget.dataset.allowedit;
-        console.log(event.currentTarget.dataset, allowEdit);
         try {
             await $.ajax({
                 url: url,
