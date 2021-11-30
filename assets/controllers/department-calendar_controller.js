@@ -148,6 +148,7 @@ export default class extends Controller {
                         startHalfDay: r.halfDay,
                         type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                         user: r.user.username,
+                        usePreviousYearDays: r.usePreviousYearDays,
                     }));
                 }
             }).then(dates => {

@@ -77,6 +77,7 @@ class Event
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
+     * @Groups({"event"})
      */
     private $usePreviousYearDays;
 

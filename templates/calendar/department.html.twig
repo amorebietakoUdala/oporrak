@@ -9,7 +9,8 @@
          'summary': {
             'summary-url': path('api_getWorkCalendar') }, 
          'day-details': {
-            'roles': app.user.roles
+            'roles': app.user.roles,
+            'previousYearDaysColor': previousYearDaysColor,
          }
          }) }} 
          data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails" 

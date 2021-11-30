@@ -7,7 +7,9 @@
 {% block body %}
 	<div {{ stimulus_controller({'summary': {
             'summary-url': path('api_getWorkCalendar') }, 
-            'day-details': {}
+            'day-details': {
+               'previousYearDaysColor': previousYearDaysColor,
+            }
          }) }} 
          data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails">
 		<div class="container-fluid" {{ stimulus_controller('department-calendar', {

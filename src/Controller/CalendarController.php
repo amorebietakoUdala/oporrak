@@ -98,7 +98,8 @@ class CalendarController extends AbstractController
             'statuses' => $statuses,
             'days' => $this->getParameter('days'),
             'antiquityDays' => $antiquityDays,
-            'showDepartment' => $showDepartment
+            'showDepartment' => $showDepartment,
+            'previousYearDaysColor' => $this->getParameter('previousYearsDaysColor')
         ]);
     }
 

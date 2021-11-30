@@ -73,6 +73,7 @@ class ApiController extends AbstractController
          'total_count' => $items === null ? 0 : count($items),
          'items' => $items === null ? [] : $items
       ];
+
       return $this->json($dates, 200, [], ['groups' => ['event']]);
    }
 
@@ -102,6 +103,7 @@ class ApiController extends AbstractController
          'total_count' => $items === null ? 0 : count($items),
          'items' => $items === null ? [] : $items
       ];
+
       return $this->json($dates, 200, [], ['groups' => ['event']]);
    }
 

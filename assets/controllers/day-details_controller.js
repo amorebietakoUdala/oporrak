@@ -12,6 +12,7 @@ export default class extends Controller {
     static targets = ['day', 'body', 'content'];
     static values = {
         roles: Array,
+        previousYearDaysColor: String,
     };
 
     connect() {
@@ -36,9 +37,13 @@ export default class extends Controller {
     }
 
     renderDetails(events, roles) {
-        let content = '<div id="events-details">';
+        let content = '<div id="events-details"><div>';
         events.forEach(element => {
-            content += '<div><span style="background-color:' + element.color + '">&nbsp;&nbsp;</span>&nbsp;';
+            content += '<span style="background-color:' + element.color + '" title="'+ element.status +'">&nbsp;&nbsp;</span>';
+            if ( element.usePreviousYearDays ) {
+                content += '<span style="background-color:' + this.previousYearDaysColorValue + '" title="'+ Translator.trans('event.usePreviousYearDays', null, 'messages', global.locale) +'">&nbsp;&nbsp;</span>';
+            }
+            content += '&nbsp;';
             if (element.type !== 'holiday') {
                 content += element.user + ': <span>(' + this.localizeDate(element.startDate, global.locale) + ' - ' + this.localizeDate(element.endDate, global.locale) +
                     ')</span><span>&nbsp;-&nbsp;'+element.type+'</span>';
