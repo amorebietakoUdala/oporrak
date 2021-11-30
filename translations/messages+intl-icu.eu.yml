@@ -21,6 +21,7 @@ user.roles: "Rolak"
 user.email: "Emaila"
 user.new_password: "Pasahitz berria"
 user.repeat_new_password: "Errepikatu pasahitz berria"
+user.yearsWorked: "Lan egindako urteak"
 
 messages.confirmacion: "Konfirmazioa"
 messages.confirmationDetail: "¿Ziur al zaude erregistroa ezabatu nahi duzula?"
