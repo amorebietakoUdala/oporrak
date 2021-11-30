@@ -6,9 +6,11 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use AMREU\UserBundle\Form\UserType as BaseUserType;
 use App\Entity\Department;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class UserType extends BaseUserType
 {
@@ -33,7 +35,14 @@ class UserType extends BaseUserType
                 'constraints' => [
                     new NotBlank()
                 ]
+            ])
+            ->add('yearsWorked', IntegerType::class,[
+                'label' => 'user.yearsWorked',
+                'constraints' => [
+                    new PositiveOrZero()
+                ]
             ]);
+            ;
     }
 
     public function configureOptions(OptionsResolver $resolver)

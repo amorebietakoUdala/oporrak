@@ -9,7 +9,7 @@ class DateAfterValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
-        /* @var $constraint \App\Validator\DateAfter */
+        /** @var $constraint \App\Validator\DateAfter */
 
         if (null === $value || '' === $value) {
             return;

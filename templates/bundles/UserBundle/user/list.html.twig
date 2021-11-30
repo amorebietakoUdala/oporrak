@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block menu %}
-	{{ include('common/menu.html.twig') }}
+	{{ include('common/_menu.html.twig') }}
 {% endblock %}
 
 {% block user_content %}
@@ -21,6 +21,7 @@
 							<th data-sortable="true">{{"user.firstName" | trans | capitalize}}</th>
 							<th data-sortable="true">{{"user.email" | trans | capitalize}}</th>
 							<th data-sortable="true">{{"user.roles" | trans | capitalize}}</th>
+							<th data-sortable="true">{{"user.yearsWorked" | trans | capitalize}}</th>
 							<th data-sortable="true" data-field="options">{{"table.options" | trans | capitalize}}</th>
 						</tr>
 					</thead>
@@ -43,6 +44,7 @@
 										{{ 'ROLE_USER' | trans }}
 									{% endif %}
 								</td>
+								<td>{{user.yearsWorked}}</td>
 								<td>
 									<a href="{{ path ("admin_user_show",{'id': user.id })}}">
 										<i class="fa fa-eye"></i>

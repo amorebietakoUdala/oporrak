@@ -10,7 +10,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 use App\Repository\EventTypeRepository;
 use App\Entity\EventType;
-use App\Form\EventFormType;
 use App\Form\EventTypeFormType;
 
 /**

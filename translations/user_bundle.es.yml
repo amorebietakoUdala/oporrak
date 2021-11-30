@@ -3,4 +3,6 @@ ROLE_HHRR: "Recursos Humanos"
 ROLE_BOSS: "Jefe de departamento"
 ROLE_USER: "Usuario"
 
+user.yearsWorked: "Años trabajados"
+
 security.login.remember_me: "Recordarme"

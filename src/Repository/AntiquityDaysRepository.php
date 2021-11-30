@@ -18,4 +18,19 @@ class AntiquityDaysRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, AntiquityDays::class);
     }
+
+    /**
+     * @param $yearWorked The yearsWorked to look for the AntiquityDays
+     * 
+     * @return AntiquityDays Returns an AntiquityDays object for the yearsWorked parameter
+     */
+    public function findAntiquityDaysForYearsWorked(int $yearWorked) {
+        $qb = $this->createQueryBuilder('a')
+            ->andWhere('a.yearsWorked <= :yearsWorked')
+            ->setParameter('yearsWorked', $yearWorked)
+            ->orderBy('a.yearsWorked', 'DESC')
+            ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

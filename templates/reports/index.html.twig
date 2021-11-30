@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{'title.reports.statistics' | trans | capitalize }}{% endblock %}
+
+{% block body %}
+    <div id="reportsFilter" class="container-fluid">
+        {{ include('reports/_reportsSearchFilter.html.twig') }}
+    </div>
+
+    <div id="list" class="container-fluid" {{ stimulus_controller('reports-list', { 'locale': app.request.locale|split('_')[0], })}}>
+        {{ include('reports/_list.html.twig') }}
+    </div>
+{% endblock %}

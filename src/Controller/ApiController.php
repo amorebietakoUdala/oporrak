@@ -77,35 +77,6 @@ class ApiController extends AbstractController
    }
 
    /**
-    * @Route("/my/stats", name="api_get_my_stats", methods="GET")
-    */
-   // public function getMyStats(Request $request, EntityManagerInterface $em): Response
-   // {
-   //    $year = $request->get('year');
-   //    $user = $this->getUser();
-   //    $stats = [];
-   //    $events = $em->getRepository(Event::class)->findUserEventsBeetweenDates($user, "${year}-01-01", "${year}-12-31");
-   //    $workCalendar = $em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
-   //    $statuses = $em->getRepository(Status::class)->findAll();
-   //    foreach ($statuses as $status) {
-   //       $stats[$status->getId()] = [
-   //          //            'id' => $status->getId(),
-   //          'description' => $status->getDescription(),
-   //          'count' => 0,
-   //          'color' => $status->getColor(),
-   //       ];
-   //    }
-   //    foreach ($events as $event) {
-   //       if ($event->getHalfDay()) {
-   //          $stats[$event->getStatus()->getId()]['count'] += $event->getHours() / $workCalendar->getWorkingHours();
-   //       } else {
-   //          $stats[$event->getStatus()->getId()]['count'] += $event->getDays();
-   //       }
-   //    }
-   //    return $this->json($stats, 200);
-   // }
-
-   /**
     * @Route("/dates", name="api_get_dates", methods="GET")
     */
    public function getDepartmentDates(Request $request, EntityManagerInterface $em): Response

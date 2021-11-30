@@ -2,13 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\AntiquityDays;
 use App\Entity\Event;
 use App\Entity\EventType;
-use App\Entity\Holiday;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
-use DateTime;
+use App\Services\StatsService;
+use \DateTime;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,11 +28,13 @@ class EventController extends AbstractController
 {
     private $mailer = null;
     private $translator = null;
+    private $statsService = null;
 
-    public function __construct(MailerInterface $mailer, TranslatorInterface $translator)
+    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService)
     {
         $this->mailer = $mailer;
         $this->translator = $translator;
+        $this->statsService = $statsService;
     }
 
     /**
@@ -202,6 +205,7 @@ class EventController extends AbstractController
      */
     private function checkDoesNotExcessLimitations(Event $event, WorkCalendar $workCalendar)
     {
+
         /* Check overlap with my own events */
         $user = $this->getUser();
         $myEvents = $this->getDoctrine()->getRepository(Event::class)->findUserEventsBeetweenDates($user, new \DateTime($event->getStartDate()->format('Y') . '-01-01'));
@@ -212,10 +216,12 @@ class EventController extends AbstractController
             ], 'messages'));
             return false;
         }
-        if ($event->getHalfDay() && $event->getStartDate() !== $event->getEndDate()) {
+        
+        if ($event->getHalfDay() && $event->getStartDate() != $event->getEndDate() ) {
             $this->addFlash('error', 'message.partitionableDaysOneByOne');
             return false;
         }
+
         if ($event->getHalfDay() && ($event->getHours() < 2 || $event->getHours() > $workCalendar->getWorkingHours() / 2)) {
             $this->addFlash('error', $this->translator->trans('message.partitionableHoursMinAndMax', [
                 'min' => "2",
@@ -244,6 +250,7 @@ class EventController extends AbstractController
             ]));
             return false;
         }
+
         if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
             if (!$this->checkDoesNotExcessMaximumPartionableHours($event, $event->getStartDate()->format('Y'), $workCalendar)) {
                 return false;
@@ -305,49 +312,6 @@ class EventController extends AbstractController
         }
     }
 
-
-    private function calculateTotalWorkingDays(array $events, $workCalendar)
-    {
-        $totalWorkingDays = 0;
-        foreach ($events as $event) {
-            $workingDays = $this->calculateWorkingDays($event, $workCalendar);
-            $totalWorkingDays += $workingDays;
-        }
-
-        return $totalWorkingDays;
-    }
-
-    private function calculateWorkingDays(Event $event, WorkCalendar $workCalendar)
-    {
-        if (!$event->getHalfDay()) {
-            $holidaysBetween = count($this->getDoctrine()->getRepository(Holiday::class)->findHolidaysBetween($event->getStartDate(), $event->getEndDate()));
-            $workingDays = $event->getDays();
-            // Subtract two weekend days for every week in between
-            $weeks = floor($workingDays / 7);
-            //        dump($workingDays, $holidaysBetween, $weeks);
-            $workingDays -= $weeks * 2;
-            // Handle special cases
-            $startDay = intVal(date('w', strtotime(($event->getStartDate())->format('Y-m-d'))));
-            $endDay = intVal(date('w', strtotime(($event->getEndDate())->format('Y-m-d'))));
-            // Remove weekend not previously removed.   
-            if ($startDay - $endDay > 1) {
-                $workingDays -= 2;
-            }
-            // Remove start day if span starts on Sunday but ends before Saturday
-            if ($startDay == 7 && $endDay != 6) {
-                $workingDays--;
-            }
-            // Remove end day if span ends on Saturday but starts after Sunday
-            if ($endDay == 7 && $startDay != 1) {
-                $workingDays--;
-            }
-            $workingDays -= $holidaysBetween;
-            return $workingDays;
-        } else {
-            return $workingDays = $event->getHours() / $workCalendar->getWorkingHours();
-        }
-    }
-
     /**
      * Returns true it it daesn't excess the maximum days
      */
@@ -364,6 +328,13 @@ class EventController extends AbstractController
         }
         if ($event->getType()->getId() === EventType::EXCESSIVE_WORKING_HOURS) {
             $maxDays = $workCalendar->getOvertimeDays();
+        }
+        if ($event->getType()->getId() === EventType::ANTIQUITY_DAYS) {
+            $em = $this->getDoctrine()->getManager();
+            $user = $this->getUser();
+            /** @var AntiquityDays $antiquity */
+            $antiquity = $em->getRepository(AntiquityDays::class)->findAntiquityDaysForYearsWorked($user->getYearsWorked());
+            $maxDays = $antiquity->getVacationDays();
         }
 
         $valid = $this->checkDoesNotExcessMaximumDays($event, $maxDays, $year, $workCalendar);
@@ -396,12 +367,12 @@ class EventController extends AbstractController
         if (null !== $maxDays) {
             $user = $this->getUser();
             $eventsThisYear = $this->getDoctrine()->getRepository(Event::class)->findUserEventsCurrentYearAndType($user, $year, $event->getType());
-            $workingDays = $this->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
-            if ($workingDays + $this->calculateWorkingDays($event, $workCalendar) > $maxDays) {
+            $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
+            if ($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) > $maxDays) {
                 $this->addFlash(
                     'error',
                     $this->translator->trans('message.maximum_' . $event->getType()->getId() . '_days_exceeded', [
-                        'days' => $workingDays + $this->calculateWorkingDays($event, $workCalendar) - $maxDays
+                        'days' => $workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) - $maxDays
                     ])
                 );
                 return false;

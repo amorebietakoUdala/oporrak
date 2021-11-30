@@ -1,0 +1,43 @@
+{% if counters is defined %}
+<table id="taula" class="table bootstrap-table mt-3" data-reports-list-target="list">
+   <thead>
+      <tr>
+         <th data-sortable="true">{{"user.username" | trans | capitalize}}</th>
+         <th data-sortable="true">{{"Vacaciones/Oporrak" | trans | capitalize}}</th>
+         <th data-sortable="true">{{"Asuntos particulares/Norbere kontuetarako baimena" | trans | capitalize}}</th>
+         <th data-sortable="true">{{"Exceso jornada/Gehiegizko lanaldia" | trans | capitalize}}</th>
+         <th data-sortable="true">{{"Días antigüedad/Antzinatasun egunak" | trans | capitalize}}</th>
+         <th data-sortable="true">{{"Otros/Besteren bat" | trans | capitalize}}</th>
+         <th data-sortable="true" class="table-total" >{{"label.total" | trans | capitalize}}</th>
+      </tr>
+   </thead>
+   <tbody>
+      {% for key in counters|keys %}
+         <tr>
+            <td>{{key}}</td>
+            {% set total = 0 %}
+            {% for i in 1..5 %}
+               {% if counters[key][i] is defined %}
+                  <td>
+                     {% if counters[key][i] matches '/^\\d+$/' %}
+                        {{ counters[key][i] }}
+                     {% else %}
+                        {{ counters[key][i] | number_format(2, ',', '.') }}
+                     {% endif %}
+                  </td>
+                  {% set total = total + counters[key][i] %}
+               {% else %}
+                  <td>{{ 0 }}</td>
+               {% endif %}
+            {% endfor %}
+            {# Calculate total for the user #}
+            {% if total matches '/^\\d+$/' %}
+               <td><b>{{ total }}</b></td>
+            {% else %}
+               <td><b>{{ total | number_format(2, ',', '.') }}</b></td>
+            {% endif %}
+         </tr>
+      {% endfor %}
+   </tbody>
+</table>
+{% endif %}

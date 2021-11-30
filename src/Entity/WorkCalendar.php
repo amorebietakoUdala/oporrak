@@ -117,17 +117,6 @@ class WorkCalendar
         return $this->workingHours * $this->partitionableDays;
     }
 
-    public function fill(WorkCalendar $data): self
-    {
-        $this->id = $data->getId();
-        $this->year = $data->getYear();
-        $this->overtimeDays = $data->getOvertimeDays();
-        $this->vacationDays = $data->getVacationDays();
-        $this->particularBusinessLeave = $data->getParticularBusinessLeave();
-        $this->deadlineNextYear = $data->getDeadlineNextYear();
-        return $this;
-    }
-
     public function getWorkingHours(): ?string
     {
         return $this->workingHours;
@@ -163,4 +152,18 @@ class WorkCalendar
 
         return $this;
     }
+
+    public function fill(WorkCalendar $data): self
+    {
+        $this->id = $data->getId();
+        $this->year = $data->getYear();
+        $this->overtimeDays = $data->getOvertimeDays();
+        $this->vacationDays = $data->getVacationDays();
+        $this->particularBusinessLeave = $data->getParticularBusinessLeave();
+        $this->deadlineNextYear = $data->getDeadlineNextYear();
+        $this->partitionableDays = $data->getPartitionableDays();
+        $this->workingHours = $data->getWorkingHours();
+        return $this;
+    }
+
 }

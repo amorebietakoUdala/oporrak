@@ -2,10 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Department;
 use App\Entity\Event;
 use App\Entity\Status;
 use App\Entity\User;
-use App\Entity\WorkCalendar;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -212,6 +212,37 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('d2s', $event->getStartDate())
             ->setParameter('d2e', $event->getEndDate());
         $qb->orderBy('e.id', 'ASC');
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findApprovedEventsByDateUserAndDepartment(\Datetime $startDate = null, \DateTime $endDate = null, User $user = null, Department $department = null): array
+    {
+        $qb = $this->createQueryBuilder('e');
+        if ( null !== $user ) {
+            $qb->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
+               ->andWhere('e.user  = :user')
+               ->setParameter('user', $user);
+        }
+        if ( null !== $department ) {
+            $qb->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
+               ->andWhere('u.department = :department')
+               ->setParameter('department', $department);
+        }
+        if ( null !== $startDate   ) {
+            $qb->andWhere('e.startDate >= :startDate')
+               ->setParameter('startDate', $startDate);
+        }
+        if ( null !== $endDate ) {
+            $qb->andWhere('e.endDate < :endDate')
+                ->setParameter('endDate', $endDate);
+        }
+        $qb->andWhere('e.status = :status')
+           ->setParameter('status', Status::APPROVED );
+        $qb->orderBy('e.id', 'ASC');
+
         return $qb->getQuery()->getResult();
     }
 }

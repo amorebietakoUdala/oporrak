@@ -79,6 +79,11 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
      */
     private $department;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $yearsWorked;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
@@ -162,6 +167,26 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     public function setDepartment(?Department $department): self
     {
         $this->department = $department;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of yearsWorked
+     */ 
+    public function getYearsWorked()
+    {
+        return $this->yearsWorked === null ? 0 : $this->yearsWorked;
+    }
+
+    /**
+     * Set the value of yearsWorked
+     *
+     * @return  self
+     */ 
+    public function setYearsWorked(int $yearsWorked): self
+    {
+        $this->yearsWorked = $yearsWorked;
 
         return $this;
     }

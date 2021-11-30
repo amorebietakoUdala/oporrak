@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\AntiquityDaysRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=AntiquityDaysRepository::class)
@@ -21,7 +20,7 @@ class AntiquityDays
     /**
      * @ORM\Column(type="integer", nullable=false)
      */
-    private $yearsWorking;
+    private $yearsWorked;
 
     /**
      * @ORM\Column(type="integer", nullable=false)
@@ -40,14 +39,14 @@ class AntiquityDays
         return $this;
     }
 
-    public function getYearsWorking(): ?int
+    public function getYearsWorked(): ?int
     {
-        return $this->yearsWorking;
+        return $this->yearsWorked;
     }
 
-    public function setYearsWorking(int $yearsWorking): self
+    public function setYearsWorked(int $yearsWorked): self
     {
-        $this->yearsWorking = $yearsWorking;
+        $this->yearsWorked = $yearsWorked;
 
         return $this;
     }
@@ -67,7 +66,7 @@ class AntiquityDays
     public function fill(AntiquityDays $antiquityDay)
     {
         $this->id = $antiquityDay->getId();
-        $this->yearsWorking = $antiquityDay->getYearsWorking();
+        $this->yearsWorked = $antiquityDay->getYearsWorked();
         $this->vacationDays = $antiquityDay->getVacationDays();
     }
 }

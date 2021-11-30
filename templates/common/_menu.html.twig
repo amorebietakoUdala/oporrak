@@ -20,6 +20,18 @@
 				<li class='nav-item'>
 					<a class="nav-link {{ ( app.request.attributes.get('_route') == 'cityHallCalendar' ) ? 'active': '' }}" href="{{ path ('cityHallCalendar', { year: 'now' | date('Y') })}}">{{"navitem.cityHall" | trans | capitalize}}</a>
 				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle
+                  {% if (    app.request.attributes.get('_route') == 'reportsIndex' ) %}
+                     {{' active '}}
+                  {% endif %}
+               " href="#" id="navbarReports" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						{{ 'navitem.reports' | trans | capitalize }}
+					</a>
+					<div id="js-menu-reports" class="dropdown-menu" aria-labelledby="navbarReports">
+						<a class="dropdown-item" href="{{ path ('reportsIndex') }}">{{"navitem.statistics" | trans | capitalize}}</a>
+					</div>
+				</li>
             {% endif %}
 
             {% if is_granted('ROLE_ADMIN') %}            

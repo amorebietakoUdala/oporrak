@@ -2,7 +2,7 @@
          <thead>
                <tr>
                   <th>Id</th>
-                  <th>{{ 'antiquityDays.yearsWorking' | trans}}</th>
+                  <th>{{ 'antiquityDays.yearsWorked' | trans}}</th>
                   <th>{{ 'antiquityDays.vacationDays' | trans }}</th>
                   <th>{{ 'label.options' | trans }}</th>
                </tr>
@@ -11,7 +11,7 @@
          {% for antiquityDay in antiquity_days %}
                <tr>
                   <td>{{ antiquityDay.id }}</td>
-                  <td>{{ antiquityDay.yearsWorking }}</td>
+                  <td>{{ antiquityDay.yearsWorked }}</td>
                   <td>{{ antiquityDay.vacationDays }}</td>
                   <td>
                      <a href="#" data-action="entity#edit" data-url="{{ path('antiquity_days_show', {'id': antiquityDay.id}) }}"><i class="fa fa-eye" title='{{ "btn.show" | trans | capitalize }}'></i></a>&nbsp;

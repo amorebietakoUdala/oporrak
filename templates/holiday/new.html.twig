@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ 'New Department' | trans}}{% endblock %}
+{% block title %}{{ 'title.holiday.new' | trans | capitalize }}{% endblock %}
 
 {% block body %}
-    <h1>Create new Department</h1>
+    <h1>{{ 'title.holiday.new' | trans | capitalize }}</h1>
 
     {{ include('department/_form.html.twig') }}
 

@@ -17,8 +17,8 @@ class AntiquityDaysType extends AbstractType
         $readonly = $options['readonly'];
         $builder
             ->add('id', HiddenType::class)
-            ->add('yearsWorking', NumberType::class, [
-                'label' => 'antiquityDays.yearsWorking',
+            ->add('yearsWorked', NumberType::class, [
+                'label' => 'antiquityDays.yearsWorked',
                 'disabled' => $readonly,
                 'constraints' => [
                     new PositiveOrZero(),

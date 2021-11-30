@@ -14,10 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use App\Validator\DateAfter;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
-use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 class EventFormType extends AbstractType
 {
@@ -28,7 +25,6 @@ class EventFormType extends AbstractType
         $builder
             ->add('id', HiddenType::class)
             ->add('type', EntityType::class, [
-                //'attr' => ['class' => 'd-none'],
                 'class' => EventType::class,
                 'label' => 'event.type',
                 'choice_label' => function ($type) use ($locale) {
@@ -39,17 +35,6 @@ class EventFormType extends AbstractType
                     }
                 },
             ])
-            // ->add('name', ChoiceType::class, [
-            //     'label' => 'event.name',
-            //     'choices' => [
-            //         'Vacaciones/Oporrak' => 'Vacaciones/Oporrak',
-            //         'Asuntos particulares/Norbere kontuetarako baimena' => 'Asuntos particulares/Norbere kontuetarako baimena',
-            //         'Exceso jornada/Gehiegizko lanaldia' => 'Exceso jornada/Gehiegizko lanaldia',
-            //         'Días antigüedad/Antzinatasun egunak' => 'Días antigüedad/Antzinatasun egunak',
-            //         'Otros/Besteren bat' => 'Otros/Besteren bat',
-            //     ],
-            //     'empty_data' => 'Vacaciones/Oporrak',
-            // ])
             ->add('startDate', DateType::class, [
                 'widget' => 'single_text',
                 'html5' => false,
