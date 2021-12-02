@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "amorebietakoudala/user-bundle",
-            "version": "1.1.8",
+            "version": "1.1.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amorebietakoUdala/user-bundle.git",
-                "reference": "bb553aed856f4fd86312931d792d90ca2c909706"
+                "reference": "41dd15e1741b2f268f4c58dba0ec235b9ac82058"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amorebietakoUdala/user-bundle/zipball/bb553aed856f4fd86312931d792d90ca2c909706",
-                "reference": "bb553aed856f4fd86312931d792d90ca2c909706",
+                "url": "https://api.github.com/repos/amorebietakoUdala/user-bundle/zipball/41dd15e1741b2f268f4c58dba0ec235b9ac82058",
+                "reference": "41dd15e1741b2f268f4c58dba0ec235b9ac82058",
                 "shasum": ""
             },
             "require": {
@@ -49,9 +49,9 @@
             "description": "AmorebietakoUdala erabiltzaile bundlela",
             "support": {
                 "issues": "https://github.com/amorebietakoUdala/user-bundle/issues",
-                "source": "https://github.com/amorebietakoUdala/user-bundle/tree/1.1.8"
+                "source": "https://github.com/amorebietakoUdala/user-bundle/tree/1.1.9"
             },
-            "time": "2021-09-22T07:57:33+00:00"
+            "time": "2021-10-11T11:56:20+00:00"
         },
         {
             "name": "composer/package-versions-deprecated",
