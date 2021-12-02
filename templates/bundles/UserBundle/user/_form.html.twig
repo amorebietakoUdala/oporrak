@@ -26,7 +26,7 @@
                   {{ form_widget(form.activated, {'attr': {'class': 'form-check-input'}}) }}
                 </div>                
 			</div>
-			<div class="form-row" {{ stimulus_controller('user-filter') }}>
+			<div class="form-row">
 				{% if not readonly and password_change %}
 					<div class="col-2 form-group">
 					{{ form_label(form.password.first) }}
@@ -38,11 +38,11 @@
 				{% endif %}
 				<div class="col form-group">
 					{{ form_label(form.department) }}
-					{{ form_widget(form.department, {'attr': {'class': 'ml-1 form-control form-control-sm', 'data-user-filter-target' : 'departmentSelect'}}) }}
+					{{ form_widget(form.department, {'attr': {'class': 'ml-1 form-control form-control-sm js-select2'}}) }}
 				</div>
 				<div class="col form-group">
 					{{ form_label(form.boss) }}
-					{{ form_widget(form.boss, {'attr': {'class': 'ml-1 form-control form-control-sm', 'data-user-filter-target' : 'userSelect'}}) }}
+					{{ form_widget(form.boss, {'attr': {'class': 'ml-1 form-control form-control-sm js-select2'}}) }}
 				</div>
 				<div class="col form-group">
 					{{ form_label(form.yearsWorked) }}
