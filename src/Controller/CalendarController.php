@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
 use App\Form\UserFilterType;
+use App\Services\StatsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class CalendarController extends AbstractController
 {
+
+    private $statsService;
+
+    public function __construct (StatsService $statsService) {
+        $this->statsService = $statsService;
+    }
 
     /**
      * @Route("/", name="app_home")
@@ -126,25 +133,19 @@ class CalendarController extends AbstractController
 
         $workCalendar = $em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
         $events = $em->getRepository(Event::class)->findEffectiveUserEventsOfTheYear($user, $year);
+        $counters = $this->statsService->calculateStatsByStatus($events, $year);
         $eventsWithLastYearDays = $em->getRepository(Event::class)->findUserEventsOfTheYearWithPreviousYearDays($user, $year);
+        $workingDaysWithPreviousYearDays = $this->statsService->calculateTotalWorkingDays($eventsWithLastYearDays, $workCalendar);
         $statuses = $em->getRepository(Status::class)->findAll();
         $holidays = $em->getRepository(Holiday::class)->findHolidaysBetween(new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
 
         $stats = $this->initializeCounters($statuses);
-        foreach ($events as $event) {
-            if ($event->getHalfDay()) {
-                $stats[$event->getStatus()->getId()]['count'] += $event->getHours() / $workCalendar->getWorkingHours();
-            } else {
-                $stats[$event->getStatus()->getId()]['count'] += $event->getDays();
-            }
+        foreach ($counters as $key => $value) {
+            $stats[$key]['count'] = $value;
         }
-        foreach ($eventsWithLastYearDays as $event) {
-            if ($event->getHalfDay()) {
-                $stats['eventsWithLastYearDays']['count'] += $event->getHours() / $workCalendar->getWorkingHours();
-            } else {
-                $stats['eventsWithLastYearDays']['count'] += $event->getDays();
-            }
-        }
+
+        $stats['eventsWithLastYearDays']['count'] = $workingDaysWithPreviousYearDays;
+
         $stats['holidays'] = [
             'description' => 'label.holidays',
             'count' => count($holidays),

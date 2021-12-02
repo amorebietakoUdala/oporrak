@@ -22,7 +22,6 @@ class StatsService
            $workingDays = $this->calculateWorkingDays($event, $workCalendar);
            $totalWorkingDays += $workingDays;
        }
-
        return $totalWorkingDays;
    }
 
@@ -56,6 +55,31 @@ class StatsService
 
       return $counters;
    }
+
+   public function calculateStatsByStatus(array $events, int $year) {
+      $counters = [];
+      foreach($events as $event) {
+         $workCalendars = [];
+         $workCalendars[$year] = $this->em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);          
+         $workCalendars[$year-1] = $this->em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year-1]);
+         if ( !$event->getUsePreviousYearDays() ) {
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
+         } else {
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
+         }
+
+         $statusId = "{$event->getStatus()->getId()}";
+
+         if ( array_key_exists($statusId, $counters) ) {
+            $counters[$statusId] = $counters[$statusId] + $workingDays;
+         } else {
+            $counters[$statusId] = $workingDays;
+         }
+      }
+
+      return $counters;
+   }
+
    
    public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar)
    {
