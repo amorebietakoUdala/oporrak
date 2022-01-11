@@ -45,7 +45,8 @@ class HolidayController extends AbstractController
             foreach ($jsonData as $day) {
                 if (
                     $day['territory'] === 'Todos/denak' ||
-                    ($day['MunicipalityEu'] === $this->getParameter('municipalityEu') && $day['territory'] === $this->getParameter('territoryEu'))
+                    (trim($day['MunicipalityEu']) === trim($this->getParameter('municipalityEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) ) ||
+                    (trim($day['MunicipalityEu']) === trim($this->getParameter('territoryEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) )
                 ) {
                     $found = $em->getRepository(Holiday::class)->findOneBy(['date' => new \DateTime($day['date'])]);
                     if (null === $found) {
