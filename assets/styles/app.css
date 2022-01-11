@@ -95,6 +95,10 @@ main {
     display: none;
 }
 
+#overtimeDaysSummaryRow {
+    display: none;
+}
+
 @media (max-width: 767px) {
     .logo {
         height: 50px;
