@@ -100,8 +100,18 @@ class Holiday
     {
         $this->date = new \DateTime($data['date']);
         $this->year = (new \DateTime($data['date']))->format('Y');
-        $this->descriptionEs = $data['descriptionEs'];
-        $this->descriptionEu = $data['descriptionEu'];
+        if ( array_key_exists('descriptionEs', $data) )
+        {
+            $this->descriptionEs = $data['descriptionEs'];
+        } elseif (array_key_exists('descripcionEs', $data)) {
+            $this->descriptionEs = $data['descripcionEs'];
+        }
+        if ( array_key_exists('descriptionEu', $data) )
+        {
+            $this->descriptionEu = $data['descriptionEu'];
+        } elseif (array_key_exists('descripcionEu', $data)) {
+            $this->descriptionEu = $data['descripcionEu'];
+        }
         return $this;
     }
 
