@@ -19,5 +19,21 @@ export default class extends Controller {
         }
         $('#event_form_startDate').datepicker(options);
         $('#event_form_endDate').datepicker(options);
+        if ( $('.js-halfDay').is(':checked') ) {
+            $('#event_form_hours').removeClass('d-none');
+            $('label[for="event_form_hours"]').removeClass('d-none');
+        } else {
+            $('#event_form_hours').addClass('d-none');
+            $('label[for="event_form_hours"]').addClass('d-none');
+        }
+        $('.js-halfDay').on('click', function (event) {
+            if ( $('.js-halfDay').is(':checked') ) {
+                $('#event_form_hours').removeClass('d-none');
+                $('label[for="event_form_hours"]').removeClass('d-none');
+            } else {          
+                $('#event_form_hours').addClass('d-none');
+                $('label[for="event_form_hours"]').addClass('d-none');
+            }
+        });
     }
 }

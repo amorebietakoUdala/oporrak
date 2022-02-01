@@ -56,14 +56,19 @@ export default class extends Controller {
             },
             mouseOnDay: function(e) {
                 if (e.events.length > 0) {
+                    console.log(e.events);
                     var content = '';
                     for (var i in e.events) {
                         content += '<div class="event-tooltip-content">';
                         if (typeof(e.events[i].id) != "undefined") {
                             content += '<div class="event-id">Id: ' + e.events[i].id + '</div>';
                         }
-                        content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].type + '</div>';
-                        if (typeof(e.events[i].type) == "undefined" && typeof(e.events[i].status) != "undefined") {
+                        content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].type;
+                        if ( e.events[i].startHalfDay ) {
+                            content += " (" + e.events[i].hours + "h.)";
+                        }
+                        content += '</div>';
+                        if (typeof(e.events[i].status) != "undefined") {
                             content += '<div class="event-status">'+ Translator.trans('label.status') + ': ' + Translator.trans(e.events[i].status, {}, 'messages') + '</div>';
                             content += '<div class="event-user">' + Translator.trans('label.user') + ': ' + e.events[i].user + '</div>';
                         }
@@ -146,6 +151,7 @@ export default class extends Controller {
                         status: Translator.trans(r.status.description, {}, 'messages'),
                         color: r.status.color,
                         startHalfDay: r.halfDay,
+                        hours: r.hours,
                         type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                         user: r.user.username,
                         usePreviousYearDays: r.usePreviousYearDays,
@@ -154,6 +160,7 @@ export default class extends Controller {
             }).then(dates => {
                 this.dates = dates;
                 this.addDates(this.holidays);
+                console.log(this.dates);
                 this.calendar.setDataSource(this.dates);
             });
     }

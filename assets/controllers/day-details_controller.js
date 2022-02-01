@@ -50,6 +50,9 @@ export default class extends Controller {
                     ')</span><span>&nbsp;-&nbsp;'+element.type+'</span>';
                 if (element.status !== null) {
                     content += '<span>&nbsp;-&nbsp;' + element.status + '</span>';
+                    if (element.startHalfDay === true) {
+                        content += '<span>&nbsp;(' + element.hours + 'h.)</span>';
+                    }
                     if (element.statusId === 1 && (roles.includes("ROLE_BOSS") || roles.includes("ROLE_ADMIN"))) {
                         let params = new URLSearchParams({
                             return: document.location.href,

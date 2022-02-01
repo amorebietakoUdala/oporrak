@@ -88,7 +88,11 @@ export default class extends Controller {
                         if (typeof(e.events[i].name) != "undefined" && e.events[i].type == 'holiday') {
                             content += e.events[i].type + ': ' + e.events[i].name
                         } else {
-                            content += e.events[i].type;
+                            if ( !e.events[i].startHalfDay ) {
+                                content += e.events[i].type;
+                            } else {
+                                content += e.events[i].type + " (" + e.events[i].hours + "h.)";
+                            }
                         }
                         content += '</div>'
                         if (typeof(e.events[i].status) != "undefined") {
@@ -242,6 +246,7 @@ export default class extends Controller {
                         status: r.status.description,
                         color: r.status.color,
                         startHalfDay: r.halfDay,
+                        hours: r.hours,
                         type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                     }));
                 }
