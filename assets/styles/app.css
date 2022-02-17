@@ -96,7 +96,7 @@ main {
 }
 
 #overtimeDaysSummaryRow {
-    display: none;
+    display: block;
 }
 
 @media (max-width: 767px) {
