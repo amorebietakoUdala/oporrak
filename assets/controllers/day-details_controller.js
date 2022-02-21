@@ -65,7 +65,6 @@ export default class extends Controller {
                                 '<span><a href="' + urlDeny + '"><i class="fas fa-times"></i></a></span>';
                     }
                     if ( roles.includes("ROLE_HHRR") ) {
-                        let urlDelete = app_base + Routing.generate('event_delete', { _locale: global.locale, event: element.id }) + '?' + params.toString();
                         content += '&nbsp;&nbsp;<span><a href="#" data-eventId="'+ element.id +'" title="'+ Translator.trans('btn.delete', null, 'messages', global.locale) +'" data-action="click->department-calendar#deleteEvent"><i class="fas fa-trash"></i></a></span>&nbsp;'
                     }
                 }
