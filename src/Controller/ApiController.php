@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Department;
 use App\Entity\Event;
-use App\Entity\EventType;
 use App\Entity\User;
 use App\Entity\Holiday;
 use App\Entity\Status;

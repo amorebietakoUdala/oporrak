@@ -8,6 +8,9 @@
 	<div {{ stimulus_controller({'summary': {
             'summary-url': path('api_getWorkCalendar') }, 
             'day-details': {
+               'roles': roles,
+               'user': app.user.username,
+               'boss': app.user.boss.username,
                'previousYearDaysColor': previousYearDaysColor,
             }
          }) }} 
@@ -29,4 +32,5 @@
 			<div id="context-menu"></div>
 		</div>
 	</div>
+   {{ include('common/_alert.html.twig') }}
 {% endblock %}
