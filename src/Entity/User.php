@@ -190,4 +190,5 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
 
         return $this;
     }
+
 }

@@ -56,7 +56,6 @@ export default class extends Controller {
             },
             mouseOnDay: function(e) {
                 if (e.events.length > 0) {
-                    console.log(e.events);
                     var content = '';
                     for (var i in e.events) {
                         content += '<div class="event-tooltip-content">';
@@ -160,7 +159,6 @@ export default class extends Controller {
             }).then(dates => {
                 this.dates = dates;
                 this.addDates(this.holidays);
-                console.log(this.dates);
                 this.calendar.setDataSource(this.dates);
             });
     }
@@ -176,4 +174,32 @@ export default class extends Controller {
         let department = event.detail.department === "" ? null : event.detail.department;
         this.load(this.calendar.getYear(), user, department, this.statusValue);
     }
+    
+    async deleteEvent(event) {
+        event.preventDefault();
+        const id = event.currentTarget.dataset.eventid;
+        import ('sweetalert2').then(async(Swal) => {
+          Swal.default.fire({
+              template: '#my-template'
+          }).then(async(result) => {
+              if (result.value) {
+                  let url = app_base + Routing.generate('event_delete', { _locale: global.locale, event: id });
+                  await $.ajax({
+                      url: url,
+                      method: 'GET'
+                  }).then(() => {
+                      var dataSource = this.calendar.getDataSource();
+                      this.calendar.setDataSource(dataSource.filter(item => item.id != id));
+                      let year = this.calendar.getYear();
+                      this.dispatch('update', { year });
+                  }).catch((err) => {
+                      Swal.default.fire({
+                          template: '#error',
+                          html: err.responseText
+                      });
+                  });
+              }
+          });
+      });
+  }
 }

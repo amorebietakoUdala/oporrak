@@ -191,3 +191,5 @@ message.startDateGreaterThanEndDate: "La fecha de inicio no puede ser mayor que 
 message.partitionableHoursMinAndMax: "En los días fraccionados el mínimo a solicitar son {min} horas y el máximo {max} horas"
 message.partitionableDaysOneByOne: "Los días fraccionados se deben pedir de uno en uno"
 message.selectOneCriteria: "Debe seleccionar al menos un criterio"
+message.notAuthorizedToApprove: "No está autorizado para aprobar las vacaciones de este usuario"
+message.notAuthorizedToDeny: "No está autorizado para denegar las vacaciones de este usuario"

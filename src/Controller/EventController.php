@@ -48,17 +48,21 @@ class EventController extends AbstractController
                 $this->addFlash('success', 'message.alreadyApproved');
                 return $this->render('event/confirmation.html.twig');
             }
-            $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::APPROVED));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($event);
-            $em->flush();
-            $this->addFlash('success', 'message.approved');
-            $html = $this->renderView('event/eventConfirmationMail.html.twig', [
-                'event' => $event
-            ]);
-            $user = $event->getUser();
-            $subject = "{$user->getUsername()} opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
-            $this->sendEmail($user->getEmail(), $subject, $html, true);
+            if ($event->getUser()->getBoss()->getUsername() !== $this->getUser()->getUserIdentifier() && !$this->isGranted('ROLE_HHRR')){
+                $this->addFlash('error', 'message.notAuthorizedToApprove');
+            } else {
+                $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::APPROVED));
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($event);
+                $em->flush();
+                $this->addFlash('success', 'message.approved');
+                $html = $this->renderView('event/eventConfirmationMail.html.twig', [
+                    'event' => $event
+                ]);
+                $user = $event->getUser();
+                $subject = "{$user->getUsername()} opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
+                $this->sendEmail($user->getEmail(), $subject, $html, true);
+            }
         } else {
             $this->addFlash('error', 'event.notFound');
         }
@@ -81,17 +85,21 @@ class EventController extends AbstractController
                 $this->addFlash('success', 'message.alreadyNotApproved');
                 return $this->render('event/confirmation.html.twig');
             }
-            $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::NOT_APPROVED));
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($event);
-            $em->flush();
-            $this->addFlash('success', 'message.notApproved');
-            $html = $this->renderView('event/eventConfirmationMail.html.twig', [
-                'event' => $event
-            ]);
-            $user = $event->getUser();
-            $subject = "{$user->getUsername()}-en opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
-            $this->sendEmail($user->getEmail(), $subject, $html, false);
+            if ($event->getUser()->getBoss()->getUsername() !== $this->getUser()->getUserIdentifier()&& !$this->isGranted('ROLE_HHRR')){
+                $this->addFlash('error', 'message.notAuthorizedToDeny');
+            } else {
+                $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::NOT_APPROVED));
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($event);
+                $em->flush();
+                $this->addFlash('success', 'message.notApproved');
+                $html = $this->renderView('event/eventConfirmationMail.html.twig', [
+                    'event' => $event
+                ]);
+                $user = $event->getUser();
+                $subject = "{$user->getUsername()}-en opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
+                $this->sendEmail($user->getEmail(), $subject, $html, false);
+            }
         } else {
             $this->addFlash('error', 'event.notFound');
         }
@@ -114,7 +122,7 @@ class EventController extends AbstractController
         $deadline = (new \DateTime())->add($interval);
         $deadlineStr = $deadline->format('Y-m-d 23:59:59');
         $deadline = new \DateTime($deadlineStr);
-        if (null !== $event && $event->getStartDate() > $deadline) {
+        if ( (null !== $event && $event->getStartDate() > $deadline ) || $this->isGranted('ROLE_HHRR') ) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($event);
             $em->flush();
@@ -124,7 +132,7 @@ class EventController extends AbstractController
                 $html = $this->renderView('event/eventDeletionMail.html.twig', [
                     'event' => $event
                 ]);
-                $subject = "{$user->getUsername()}-en opor eskaera bertan behera uztea / Cancelación de vacaciones de {$user->getUsername()}";
+                $subject = "{$user->getUserIdentifier()}-en opor eskaera bertan behera uztea / Cancelación de vacaciones de {$user->getUserIdentifier()}";
                 $this->sendEmail($boss->getEmail(), $subject, $html, false);
             }
             return new Response(null, 204);
@@ -132,7 +140,6 @@ class EventController extends AbstractController
             $message = $this->translator->trans('message.canNotDeletePastDay', [
                 'deadline' => $deadline->format('Y-m-d'),
             ], 'messages');
-            //            $this->addFlash('error', $message);
             $response = new Response($message, 422);
             return $response;
         }
