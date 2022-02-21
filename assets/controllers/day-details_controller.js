@@ -40,7 +40,6 @@ export default class extends Controller {
 
     renderDetails(events, user, roles) {
         let content = '<div id="events-details">';
-        console.log(events);
         events.forEach(element => {
             content += '<div>';
             content += '<span style="background-color:' + element.color + '" title="'+ element.status +'">&nbsp;&nbsp;</span>';
@@ -65,7 +64,6 @@ export default class extends Controller {
                             content += '&nbsp;&nbsp;&nbsp;<span><a href="' + urlApprove + '"><i class="fas fa-check"></i></a></span>&nbsp;' +
                                 '<span><a href="' + urlDeny + '"><i class="fas fa-times"></i></a></span>';
                     }
-                    console.log(roles);
                     if ( roles.includes("ROLE_HHRR") ) {
                         let urlDelete = app_base + Routing.generate('event_delete', { _locale: global.locale, event: element.id }) + '?' + params.toString();
                         content += '&nbsp;&nbsp;<span><a href="#" data-eventId="'+ element.id +'" title="'+ Translator.trans('btn.delete', null, 'messages', global.locale) +'" data-action="click->department-calendar#deleteEvent"><i class="fas fa-trash"></i></a></span>&nbsp;'
