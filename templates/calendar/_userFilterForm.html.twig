@@ -1,5 +1,7 @@
 <div class="card" data-action="user-filter:search->department-calendar#refreshCalendar">
-  <div class="card-body" {{ stimulus_controller('user-filter') }}>
+  <div class="card-body" {{ stimulus_controller('user-filter', {
+     'department' : app.user.department.id,
+  }) }}>
       {{ form_start(userFilterForm) }}
          <div class="row">
             <span class="btn">{{ form_label(userFilterForm.user) }}</span>
