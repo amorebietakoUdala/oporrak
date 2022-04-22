@@ -33,6 +33,7 @@ class UserFilterType extends AbstractType
                     return $qb;
                 },
                 'label' => 'label.user',
+                'multiple' => 'multiple',
             ]);
         if (null !== $roles && $showDepartment && (in_array('ROLE_HHRR', $roles) || in_array('ROLE_ADMIN', $roles))) {
             $builder->add('department', EntityType::class, [

@@ -132,7 +132,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findByDepartmentAndUserAndStatusBeetweenDates($department = null, $user = null, $status = null, $startDate, $endDate = null)
+    public function findByDepartmentAndUsersAndStatusBeetweenDates($department = null, array $users = null, $status = null, $startDate, $endDate = null)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
@@ -142,9 +142,9 @@ class EventRepository extends ServiceEntityRepository
             $qb->andWhere('e.endDate < :endDate')
                 ->setParameter('endDate', $endDate);
         }
-        if (null !== $user) {
-            $qb->andWhere('e.user = :user')
-                ->setParameter('user', $user);
+        if (null !== $users) {
+            $qb->andWhere('e.user in (:users)')
+                ->setParameter('users', $users);
         }
         if (null !== $status) {
             $qb->andWhere('e.status = :status')
