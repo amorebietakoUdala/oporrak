@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Entity\Holiday;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
+use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -79,10 +80,11 @@ class ApiController extends AbstractController
    /**
     * @Route("/dates", name="api_get_dates", methods="GET")
     */
-   public function getDepartmentDates(Request $request, EntityManagerInterface $em): Response
+   public function getDepartmentDates(Request $request, EventRepository $repo): Response
    {
       $year = $request->get('year');
-      $user = $request->get('user');
+      $usersParam = $request->get('user');
+      $users = explode(',', $usersParam);
       $status = $request->get('status') === null ? null : intval($request->get('status'));
       /** @var User $me */
       $me = $this->getUser();
@@ -97,7 +99,8 @@ class ApiController extends AbstractController
       } else {
          $department = null;
       }
-      $items = $em->getRepository(Event::class)->findByDepartmentAndUserAndStatusBeetweenDates($department, $user, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+
+      $items = $repo->findByDepartmentAndUsersAndStatusBeetweenDates($department, $users, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
       $dates = [
          'total_count' => $items === null ? 0 : count($items),
          'items' => $items === null ? [] : $items

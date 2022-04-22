@@ -14,12 +14,26 @@ import '../js/common/select2';
 
 export default class extends Controller {
    static targets = ['userSelect', 'departmentSelect'];
+   static values = {
+//      roles: Array,
+      department: String,
+   };
 
    connect() {
       Routing.setRoutingData(routes);
-      useDispatch(this);      
-      $(this.userSelectTarget).select2();
+      useDispatch(this);
+      $(this.userSelectTarget).append($('<option>', {
+         value: '',
+         text: ''
+     }));
+      $(this.userSelectTarget).select2({
+         maximumSelectionLength: 10
+      });
       if ( this.hasDepartmentSelectTarget ) {
+         $(this.departmentSelectTarget).append($('<option>', {
+            value: '',
+            text: ''
+        }));
          $(this.departmentSelectTarget).select2();
          $(this.departmentSelectTarget).on('select2:select', function(e) {
             let event = new Event('change', { bubbles: true })
@@ -47,7 +61,7 @@ export default class extends Controller {
 
   search(event) {
      let user = $(this.userSelectTarget).val();
-     let department = null;
+     let department = this.departmentValue;
      if ( this.hasDepartmentSelectTarget ) {
          department = $(this.departmentSelectTarget).val();
      }
@@ -60,7 +74,7 @@ export default class extends Controller {
    clean(event) {
       if (this.hasUserSelectTarget) {
          $(this.userSelectTarget).val('');
-         $(this.userSelectTarget).trigger('change'); 
+         $(this.userSelectTarget).trigger('change');
       }
       if (this.hasDepartmentSelectTarget) {
          $(this.departmentSelectTarget).val('');
