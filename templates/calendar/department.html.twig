@@ -26,6 +26,7 @@
                'department-dates-url': path('api_get_dates') , 
                'year' : year,
                'department' : app.user.department.id,
+               'colorPalette': colorPalette,
          } ) }}>
             {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : false }) }}
 			<div id="calendar"></div>

@@ -27,6 +27,7 @@ export default class extends Controller {
         year: String,
         status: String,
         department: String,
+        colorPalette: Array,
     };
 
     calendar = null;
@@ -141,6 +142,8 @@ export default class extends Controller {
             .then(result => result.json())
             .then(result => {
                 if (result.items) {
+                    let colorArray = this.assignColor(result.items);
+                    console.log(colorArray);
                     return result.items.map(r => ({
                         id: r.id,
                         startDate: new Date(r.startDate),
@@ -148,7 +151,7 @@ export default class extends Controller {
 //                        name: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                         statusId: r.status.id,
                         status: Translator.trans(r.status.description, {}, 'messages'),
-                        color: r.status.color,
+                        color: colorArray[r.user.username],
                         startHalfDay: r.halfDay,
                         hours: r.hours,
                         type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
@@ -175,6 +178,20 @@ export default class extends Controller {
         this.load(this.calendar.getYear(), user, department, this.statusValue);
     }
     
+    assignColor(items) {
+        let colorArray = [];
+        let i = 0;
+        let totalColors = this.colorPaletteValue.length;
+        //console.log(this.colorPaletteValue);
+        items.forEach(item => {
+            if (!colorArray.hasOwnProperty(item.user.username)) {
+                colorArray[item.user.username] = this.colorPaletteValue[i % totalColors];
+                i++;
+            }
+        });
+        return colorArray;
+    }
+
     async deleteEvent(event) {
         event.preventDefault();
         const id = event.currentTarget.dataset.eventid;

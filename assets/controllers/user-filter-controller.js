@@ -13,9 +13,8 @@ import Routing from '../../public/js/router.min.js';
 import '../js/common/select2';
 
 export default class extends Controller {
-   static targets = ['userSelect', 'departmentSelect'];
+   static targets = ['userSelect', 'departmentSelect']
    static values = {
-//      roles: Array,
       department: String,
    };
 

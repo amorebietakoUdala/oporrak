@@ -10,20 +10,19 @@ parameters:
   mailHHRR: "%env(MAILER_HH_RR_MAIL)%"
   days: 5
   sendDeletionEmails: "%env(bool:MAILER_SEND_DELETION_EMAILS)%"
-  # colorPalette:
-  #   [
-  #     "#050f2c",
-  #     "#003666",
-  #     "#00aeff",
-  #     "#3369e7",
-  #     "#8e43e7",
-  #     "#b84592",
-  #     "#ff4f81",
-  #     "#ff6c5f",
-  #     "#ffc168",
-  #     "#2dde98",
-  #     "#1cc7d0",
-  #   ]
+  colorPalette:
+    [
+      "#8A2BE2",
+      "#A52A2A",
+      "#DEB887",
+      "#5F9EA0",
+      "#7FFF00",
+      "#D2691E",
+      "#FF7F50",
+      "#6495ED",
+      "#DC143C",
+      "#0000FF",
+    ]
   territoryEu: "%env(TERRITORYEU)%"
   municipalityEu: "%env(MUNICIPALITYEU)%"
 

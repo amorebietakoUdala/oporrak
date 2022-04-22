@@ -10,6 +10,11 @@ use App\Entity\User;
 use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
 use App\Form\UserFilterType;
+use App\Repository\AntiquityDaysRepository;
+use App\Repository\EventRepository;
+use App\Repository\HolidayRepository;
+use App\Repository\StatusRepository;
+use App\Repository\WorkCalendarRepository;
 use App\Services\StatsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,10 +28,20 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class CalendarController extends AbstractController
 {
 
-    private $statsService;
+    private StatsService $statsService;
+    private StatusRepository $statusRepo;
+    private AntiquityDaysRepository $adRepo;
+    private WorkCalendarRepository $wcRepo;
+    private EventRepository $eventRepo;
+    private HolidayRepository $holidayRepo;
 
-    public function __construct (StatsService $statsService) {
+    public function __construct (StatsService $statsService, StatusRepository $statusRepo, AntiquityDaysRepository $adRepo, WorkCalendarRepository $wcRepo, EventRepository $eventRepo, HolidayRepository $holidayRepo) {
         $this->statsService = $statsService;
+        $this->statusRepo = $statusRepo;
+        $this->adRepo = $adRepo;
+        $this->wcRepo = $wcRepo;
+        $this->eventRepo = $eventRepo;
+        $this->holidayRepo = $holidayRepo;
     }
 
     /**
@@ -51,8 +66,8 @@ class CalendarController extends AbstractController
             'days' => $this->getParameter('days'),
             'locale' => $request->getLocale(),
         ]);
-        $statuses = $this->getDoctrine()->getManager()->getRepository(Status::class)->findAll();
-        $antiquityDays = $this->getDoctrine()->getManager()->getRepository(AntiquityDays::class)->findAll();
+        $statuses = $this->statusRepo->findAll();
+        $antiquityDays = $this->adRepo->findAll();
         return $this->render('calendar/personal.html.twig', [
             'form' => $form->createView(),
             'holidaysColor' => $this->getParameter('holidaysColor'),
@@ -95,8 +110,8 @@ class CalendarController extends AbstractController
             'showDepartment' => $showDepartment,
             'department' => $department
         ]);
-        $statuses = $this->getDoctrine()->getManager()->getRepository(Status::class)->findAll();
-        $antiquityDays = $this->getDoctrine()->getManager()->getRepository(AntiquityDays::class)->findAll();
+        $statuses = $this->statusRepo->findAll();
+        $antiquityDays = $this->adRepo->findAll();
         return $this->render($template, [
             'form' => $form->createView(),
             'userFilterForm' => $userFilterForm->createView(),
@@ -108,6 +123,7 @@ class CalendarController extends AbstractController
             'showDepartment' => $showDepartment,
             'previousYearDaysColor' => $this->getParameter('previousYearsDaysColor'),
             'roles' => array_values($this->getUser()->getRoles()),
+            'colorPalette' => $this->getParameter('colorPalette'),
         ]);
     }
 
@@ -128,16 +144,15 @@ class CalendarController extends AbstractController
 
     private function calculateStats(int $year)
     {
-        $em = $this->getDoctrine()->getManager();
         $user = $this->getUser();
 
-        $workCalendar = $em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
-        $events = $em->getRepository(Event::class)->findEffectiveUserEventsOfTheYear($user, $year);
+        $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+        $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
         $counters = $this->statsService->calculateStatsByStatus($events, $year);
-        $eventsWithLastYearDays = $em->getRepository(Event::class)->findUserEventsOfTheYearWithPreviousYearDays($user, $year);
+        $eventsWithLastYearDays = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year);
         $workingDaysWithPreviousYearDays = $this->statsService->calculateTotalWorkingDays($eventsWithLastYearDays, $workCalendar);
-        $statuses = $em->getRepository(Status::class)->findAll();
-        $holidays = $em->getRepository(Holiday::class)->findHolidaysBetween(new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
+        $statuses = $this->statusRepo->findAll();
+        $holidays = $this->holidayRepo->findHolidaysBetween(new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
 
         $stats = $this->initializeCounters($statuses);
         foreach ($counters as $key => $value) {
