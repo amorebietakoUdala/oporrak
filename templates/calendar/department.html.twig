@@ -14,9 +14,10 @@
             'user': app.user.username,
             'boss': app.user.boss.username,
             'previousYearDaysColor': previousYearDaysColor,
-         }
+         },
+         'user-legend': {},
          }) }} 
-         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails" 
+         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails department-calendar:loaded->user-legend#load" 
    >
 		<div class="container-fluid"
          {{ stimulus_controller('department-calendar', { 
@@ -27,12 +28,15 @@
                'year' : year,
                'department' : app.user.department.id,
                'colorPalette': colorPalette,
+               'type': 'department'
          } ) }}>
             {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : false }) }}
 			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">
-				{{ include('calendar/_summary.html.twig') }}
-				{{ include('calendar/_day-details.html.twig') }}
+				{{ include('calendar/_userLegend.html.twig') }}
+            {# {{ include('calendar/_summary.html.twig') }} #}
+				
+            {{ include('calendar/_day-details.html.twig') }}
 			</div>
 			<div id="context-menu"></div>
 		</div>

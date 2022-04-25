@@ -28,6 +28,7 @@ export default class extends Controller {
         status: String,
         department: String,
         colorPalette: Array,
+        type: String,
     };
 
     calendar = null;
@@ -128,7 +129,7 @@ export default class extends Controller {
                     }));
                 }
             });
-        if ( '' !== user) {
+        if ( user.length > 0) {
             params.user = user;
         }
         if ( null !== department && '' !== department ) {
@@ -138,12 +139,12 @@ export default class extends Controller {
             params.status = status;
         } 
         urlParams = new URLSearchParams(params);
+        let colorArray = null;
         let dates = await fetch(`${this.departmentDatesUrlValue}?${urlParams.toString()}`)
             .then(result => result.json())
             .then(result => {
                 if (result.items) {
-                    let colorArray = this.assignColor(result.items);
-                    console.log(colorArray);
+                    colorArray = this.assignColor(result.items);
                     return result.items.map(r => ({
                         id: r.id,
                         startDate: new Date(r.startDate),
@@ -151,7 +152,7 @@ export default class extends Controller {
 //                        name: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                         statusId: r.status.id,
                         status: Translator.trans(r.status.description, {}, 'messages'),
-                        color: colorArray[r.user.username],
+                        color: this.typeValue == 'department' ? colorArray[r.user.username] : r.status.color,
                         startHalfDay: r.halfDay,
                         hours: r.hours,
                         type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
@@ -163,6 +164,7 @@ export default class extends Controller {
                 this.dates = dates;
                 this.addDates(this.holidays);
                 this.calendar.setDataSource(this.dates);
+                this.dispatch('loaded', { colorArray });
             });
     }
 
@@ -182,7 +184,6 @@ export default class extends Controller {
         let colorArray = [];
         let i = 0;
         let totalColors = this.colorPaletteValue.length;
-        //console.log(this.colorPaletteValue);
         items.forEach(item => {
             if (!colorArray.hasOwnProperty(item.user.username)) {
                 colorArray[item.user.username] = this.colorPaletteValue[i % totalColors];

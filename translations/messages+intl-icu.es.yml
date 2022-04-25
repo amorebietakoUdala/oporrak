@@ -88,12 +88,15 @@ title.workcalendar.new: "Nuevo calendario laboral"
 title.workcalendar.show: "Ver calendario laboral"
 title.workcalendar.edit: "Editar calendario laboral"
 title.reports.statistics: "Estadísticas"
+title.user.legend: "Usuarios"
+title.remaining_days: "Días restantes"
 modal.title.holiday: "Nuevo festivo"
 modal.title.workcalendar: "Nuevo calendario laboral"
 modal.title.antiquityDays: "Nuevo Registro"
 modal.title.department: "Nuevo Departamento"
 modal.title.event: "Nuevo evento"
 modal.title.eventType: "Tipo de evento"
+
 
 # Labels
 label.eventsThisYear: "Vacaciones este año: "

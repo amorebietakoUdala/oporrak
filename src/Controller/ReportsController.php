@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\DTO\ReportsFilterFormDTO;
-use App\Entity\Event;
 use App\Form\ReportsFilterFormType;
+use App\Repository\EventRepository;
 use App\Services\StatsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,9 +16,11 @@ class ReportsController extends AbstractController
 {
 
     private $statsService = null;
+    private EventRepository $eventRepo;
 
-    public function __construct(StatsService $statsService) {
+    public function __construct(StatsService $statsService, EventRepository $eventRepo) {
         $this->statsService = $statsService;
+        $this->eventRepo = $eventRepo;
     }
 
     /**
@@ -45,17 +47,14 @@ class ReportsController extends AbstractController
                     'form' => $form,
                 ]);
             }
-            $em = $this->getDoctrine()->getManager();
-            $events = $em->getRepository(Event::class)->findApprovedEventsByDateUserAndDepartment(
+            $events = $this->eventRepo->findApprovedEventsByDateUserAndDepartment(
                 $data->getStartDate(), 
                 $data->getEndDate(), 
                 $data->getUser(), 
                 $data->getDepartment()
             );
-
             $counters = $this->statsService->calculateStatsByUserAndEventType($events);
             
-
             return $this->renderForm('reports/index.html.twig', [
                 'form' => $form,
                 'counters' => $counters,

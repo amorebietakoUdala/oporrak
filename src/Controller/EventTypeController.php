@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Repository\EventTypeRepository;
 use App\Entity\EventType;
 use App\Form\EventTypeFormType;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @Route("/{_locale}/event_type")
@@ -23,7 +24,7 @@ class EventTypeController extends AbstractController
      * 
      * @Route("/new", name="event_type_save", methods={"GET","POST"})
      */
-    public function createOrSave(Request $request, EventTypeRepository $repo): Response
+    public function createOrSave(Request $request, EventTypeRepository $repo, EntityManagerInterface $em): Response
     {
         $eventType = new EventType();
         $form = $this->createForm(EventTypeFormType::class, $eventType);
@@ -36,9 +37,8 @@ class EventTypeController extends AbstractController
                 $eventType = $repo->find($data->getId());
                 $eventType->fill($data);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($eventType);
-            $entityManager->flush();
+            $em->persist($eventType);
+            $em->flush();
 
             if ($request->isXmlHttpRequest()) {
                 return new Response(null, 204);
@@ -99,7 +99,7 @@ class EventTypeController extends AbstractController
      * 
      * @Route("/{id}/edit", name="event_type_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, EventType $eventType): Response
+    public function edit(Request $request, EventType $eventType, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(EventTypeFormType::class, $eventType, [
             'readonly' => false,
@@ -108,11 +108,10 @@ class EventTypeController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var EventType $data */
             $data = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
             $eventType->fill($data);
-            $entityManager->persist($eventType);
+            $em->persist($eventType);
 
-            $entityManager->flush();
+            $em->flush();
         }
 
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
@@ -126,11 +125,10 @@ class EventTypeController extends AbstractController
     /**
      * @Route("/{id}/delete", name="event_type_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, EventType $id): Response
+    public function delete(Request $request, EventType $id, EntityManagerInterface $em): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($id);
-        $entityManager->flush();
+        $em->remove($id);
+        $em->flush();
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('event_type_index');
         } else {

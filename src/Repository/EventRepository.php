@@ -102,12 +102,12 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findUserEventsOfTheYearWithPreviousYearDays(User $user, int $year, bool $oposite = false)
+    public function findUserEventsOfTheYearWithPreviousYearDays(User $user, int $year, bool $previousYearDays = false)
     {
         $thisYearStart = new DateTime("${year}-01-01");
         $thisYearEnd = new DateTime("${year}-12-31");
         $qb = $this->createQueryBuilder('e');
-        if (!$oposite) {
+        if ($previousYearDays) {
             $condition = "
                 e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :true  ) 
                 ";

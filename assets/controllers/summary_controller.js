@@ -41,10 +41,18 @@ export default class extends Controller {
     }
 
     updateTargets() {
-        this.yearTarget.innerHTML = this.year;
-        this.vacationDaysTarget.innerHTML = this.vacationDays;
-        this.particularBusinessLeaveTarget.innerHTML = this.particularBusinessLeave;
-        this.overtimeDaysTarget.innerHTML = this.overtimeDays;
+        if (this.hasYearTarget) {
+            this.yearTarget.innerHTML = this.year
+        };
+        if (this.hasVacationDaysTarget) {
+            this.vacationDaysTarget.innerHTML = this.vacationDays;
+        }
+        if (this.hasParticularBusinessLeaveTarget) {
+            this.particularBusinessLeaveTarget.innerHTML = this.particularBusinessLeave;    
+        }
+        if (this.hasOvertimeDaysTarget) {
+            this.overtimeDaysTarget.innerHTML = this.overtimeDays;
+        }
         return this;
     }
 }

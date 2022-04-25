@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Department;
 use App\Form\DepartmentType;
 use App\Repository\DepartmentRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,7 +45,7 @@ class DepartmentController extends AbstractController
      * 
      * @Route("/new", name="department_save", methods={"GET","POST"})
      */
-    public function createOrSave(Request $request, DepartmentRepository $repo): Response
+    public function createOrSave(Request $request, DepartmentRepository $repo, EntityManagerInterface $em): Response
     {
         $department = new Department();
         $form = $this->createForm(DepartmentType::class, $department);
@@ -57,9 +58,8 @@ class DepartmentController extends AbstractController
                 $department = $repo->find($data->getId());
                 $department->fill($data);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($department);
-            $entityManager->flush();
+            $em->persist($department);
+            $em->flush();
 
             if ($request->isXmlHttpRequest()) {
                 return new Response(null, 204);
@@ -98,7 +98,7 @@ class DepartmentController extends AbstractController
      * 
      * @Route("/{id}/edit", name="department_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Department $department): Response
+    public function edit(Request $request, Department $department, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(DepartmentType::class, $department, [
             'readonly' => false,
@@ -107,9 +107,8 @@ class DepartmentController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var Department $department */
             $department = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($department);
-            $entityManager->flush();
+            $em->persist($department);
+            $em->flush();
         }
 
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
@@ -123,11 +122,10 @@ class DepartmentController extends AbstractController
     /**
      * @Route("/{id}/delete", name="department_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Department $id): Response
+    public function delete(Request $request, Department $id, EntityManagerInterface $em): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($id);
-        $entityManager->flush();
+        $em->remove($id);
+        $em->flush();
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('department_index');
         } else {

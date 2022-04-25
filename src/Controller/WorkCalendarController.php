@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\WorkCalendar;
 use App\Form\WorkCalendarType;
 use App\Repository\WorkCalendarRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,24 +18,32 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
  */
 class WorkCalendarController extends AbstractController
 {
+
+    private $wcRepo = null;
+
+    public function __construct(WorkCalendarRepository $wcRepo)
+    {
+        $this->wcRepo = $wcRepo;
+    }
+
     /**
      * List all the WorkCalendars
      * 
      * @Route("/", name="workcalendar_index", methods={"GET"})
      */
-    public function index(WorkCalendarRepository $WorkCalendarRepository, Request $request): Response
+    public function index(Request $request): Response
     {
         $ajax = $request->get('ajax') !== null ? $request->get('ajax') : "false";
         if ($ajax === "false") {
             $WorkCalendar = new WorkCalendar();
             $form = $this->createForm(WorkCalendarType::class, $WorkCalendar);
             return $this->render('workcalendar/index.html.twig', [
-                'workcalendars' => $WorkCalendarRepository->findBy([], ['year' => 'DESC']),
+                'workcalendars' => $this->wcRepo->findBy([], ['year' => 'DESC']),
                 'form' => $form->createView(),
             ]);
         } else {
             return $this->render('workcalendar/_list.html.twig', [
-                'workcalendars' => $WorkCalendarRepository->findBy([], ['year' => 'DESC']),
+                'workcalendars' => $this->wcRepo->findBy([], ['year' => 'DESC']),
             ]);
         }
     }
@@ -44,7 +53,7 @@ class WorkCalendarController extends AbstractController
      * 
      * @Route("/new", name="workcalendar_save", methods={"GET","POST"})
      */
-    public function createOrSave(Request $request, WorkCalendarRepository $repo): Response
+    public function createOrSave(Request $request, EntityManagerInterface $em): Response
     {
         $workCalendar = new WorkCalendar();
         $form = $this->createForm(WorkCalendarType::class, $workCalendar);
@@ -54,12 +63,11 @@ class WorkCalendarController extends AbstractController
             /** @var WorkCalendar $data */
             $data = $form->getData();
             if (null !== $data->getId()) {
-                $workCalendar = $repo->find($data->getId());
+                $workCalendar = $this->wcRepo->find($data->getId());
                 $workCalendar->fill($data);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($workCalendar);
-            $entityManager->flush();
+            $em->persist($workCalendar);
+            $em->flush();
 
             if ($request->isXmlHttpRequest()) {
                 return new Response(null, 204);
@@ -98,7 +106,7 @@ class WorkCalendarController extends AbstractController
      * 
      * @Route("/{id}/edit", name="workcalendar_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, WorkCalendar $workCalendar): Response
+    public function edit(Request $request, WorkCalendar $workCalendar, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(WorkCalendarType::class, $workCalendar, [
             'readonly' => false,
@@ -107,9 +115,8 @@ class WorkCalendarController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var WorkCalendar $workCalendar */
             $workCalendar = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($workCalendar);
-            $entityManager->flush();
+            $em->persist($workCalendar);
+            $em->flush();
         }
 
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
@@ -123,11 +130,10 @@ class WorkCalendarController extends AbstractController
     /**
      * @Route("/{id}/delete", name="workcalendar_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, WorkCalendar $id): Response
+    public function delete(Request $request, WorkCalendar $id, EntityManagerInterface $em): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($id);
-        $entityManager->flush();
+        $em->remove($id);
+        $em->flush();
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('workcalendar_index');
         } else {

@@ -333,7 +333,7 @@ class EventController extends AbstractController
         if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE) {
             $maxDays = $workCalendar->getParticularBusinessLeave();
         }
-        if ($event->getType()->getId() === EventType::EXCESSIVE_WORKING_HOURS) {
+        if ($event->getType()->getId() === EventType::OVERTIME) {
             $maxDays = $workCalendar->getOvertimeDays();
         }
         if ($event->getType()->getId() === EventType::ANTIQUITY_DAYS) {

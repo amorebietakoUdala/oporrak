@@ -21,10 +21,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class HolidayController extends AbstractController
 {
     private $client;
+    private HolidayRepository $holidayRepo;
 
-    public function __construct(HttpClientInterface $client)
+    public function __construct(HttpClientInterface $client, HolidayRepository $holidayRepo)
     {
         $this->client = $client;
+        $this->holidayRepo = $holidayRepo;
     }
 
     /**
@@ -48,7 +50,7 @@ class HolidayController extends AbstractController
                     (trim($day['MunicipalityEu']) === trim($this->getParameter('municipalityEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) ) ||
                     (trim($day['MunicipalityEu']) === trim($this->getParameter('territoryEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) )
                 ) {
-                    $found = $em->getRepository(Holiday::class)->findOneBy(['date' => new \DateTime($day['date'])]);
+                    $found = $this->holidayRepo->findOneBy(['date' => new \DateTime($day['date'])]);
                     if (null === $found) {
                         $holiday = new Holiday();
                         $holiday->fillFromArray($day);
@@ -91,7 +93,7 @@ class HolidayController extends AbstractController
      * 
      * @Route("/new", name="holiday_save", methods={"GET","POST"})
      */
-    public function createOrSave(Request $request, holidayRepository $repo): Response
+    public function createOrSave(Request $request, EntityManagerInterface $em): Response
     {
         $holiday = new Holiday();
         $form = $this->createForm(HolidayType::class, $holiday);
@@ -101,13 +103,12 @@ class HolidayController extends AbstractController
             /** @var Holiday $data */
             $data = $form->getData();
             if (null !== $data->getId()) {
-                $holiday = $repo->find($data->getId());
+                $holiday = $this->holidayRepo->find($data->getId());
                 $holiday->fill($data);
             }
-            $entityManager = $this->getDoctrine()->getManager();
             $holiday->setYear($holiday->getDate()->format('Y'));
-            $entityManager->persist($holiday);
-            $entityManager->flush();
+            $em->persist($holiday);
+            $em->flush();
 
             if ($request->isXmlHttpRequest()) {
                 return new Response(null, 204);
@@ -146,7 +147,7 @@ class HolidayController extends AbstractController
      * 
      * @Route("/{id}/edit", name="holiday_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Holiday $holiday): Response
+    public function edit(Request $request, Holiday $holiday, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(HolidayType::class, $holiday, [
             'readonly' => false,
@@ -155,9 +156,8 @@ class HolidayController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var Holiday $holiday */
             $holiday = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($holiday);
-            $entityManager->flush();
+            $em->persist($holiday);
+            $em->flush();
         }
 
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
@@ -171,11 +171,10 @@ class HolidayController extends AbstractController
     /**
      * @Route("/{id}/delete", name="holiday_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, Holiday $id): Response
+    public function delete(Request $request, Holiday $id, EntityManagerInterface $em): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($id);
-        $entityManager->flush();
+        $em->remove($id);
+        $em->flush();
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('holiday_index');
         } else {

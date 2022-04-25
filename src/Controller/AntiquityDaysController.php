@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\AntiquityDays;
 use App\Form\AntiquityDaysType;
 use App\Repository\AntiquityDaysRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,7 +44,7 @@ class AntiquityDaysController extends AbstractController
      * 
      * @Route("/new", name="antiquity_days_save", methods={"GET","POST"})
      */
-    public function createOrSave(Request $request, AntiquityDaysRepository $repo): Response
+    public function createOrSave(Request $request, AntiquityDaysRepository $repo, EntityManagerInterface $em): Response
     {
         $antiquityDay = new AntiquityDays();
         $form = $this->createForm(AntiquityDaysType::class, $antiquityDay);
@@ -56,9 +57,8 @@ class AntiquityDaysController extends AbstractController
                 $antiquityDay = $repo->find($data->getId());
                 $antiquityDay->fill($data);
             }
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($antiquityDay);
-            $entityManager->flush();
+            $em->persist($antiquityDay);
+            $em->flush();
 
             if ($request->isXmlHttpRequest()) {
                 return new Response(null, 204);
@@ -93,7 +93,7 @@ class AntiquityDaysController extends AbstractController
     /**
      * @Route("/{id}/edit", name="antiquity_days_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, AntiquityDays $antiquityDay): Response
+    public function edit(Request $request, AntiquityDays $antiquityDay, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(AntiquityDaysType::class, $antiquityDay, [
             'readonly' => false,
@@ -102,9 +102,8 @@ class AntiquityDaysController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var AntiquityDays $antiquityDay */
             $antiquityDay = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
-            $entityManager->persist($antiquityDay);
-            $entityManager->flush();
+            $em->persist($antiquityDay);
+            $em->flush();
         }
 
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
@@ -118,11 +117,10 @@ class AntiquityDaysController extends AbstractController
     /**
      * @Route("/{id}", name="antiquity_days_delete", methods={"DELETE"})
      */
-    public function delete(Request $request, AntiquityDays $antiquityDay): Response
+    public function delete(Request $request, AntiquityDays $antiquityDay, EntityManagerInterface $em): Response
     {
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($antiquityDay);
-        $entityManager->flush();
+        $em->remove($antiquityDay);
+        $em->flush();
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('antiquity_days_index');
         } else {
