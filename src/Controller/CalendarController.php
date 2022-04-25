@@ -149,7 +149,7 @@ class CalendarController extends AbstractController
         $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
         $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
         $counters = $this->statsService->calculateStatsByStatus($events, $year);
-        $eventsWithLastYearDays = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year);
+        $eventsWithLastYearDays = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year, true);
         $workingDaysWithPreviousYearDays = $this->statsService->calculateTotalWorkingDays($eventsWithLastYearDays, $workCalendar);
         $statuses = $this->statusRepo->findAll();
         $holidays = $this->holidayRepo->findHolidaysBetween(new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));

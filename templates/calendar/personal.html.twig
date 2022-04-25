@@ -10,7 +10,8 @@
             'legend': {
                'statsUrl': path('api_get_my_stats', {'_locale': app.request.locale|split('_')[0]})
             },
-         }) }} data-action="personal-calendar:yearChanged->summary#refreshSummary personal-calendar:yearChanged->legend#refreshStats personal-calendar:update->legend#refreshStats">
+            'remaining-days': {'remainingDaysUrl': path('api_get_my_remaining_days')}, 
+         }) }} data-action="personal-calendar:yearChanged->summary#refreshSummary personal-calendar:yearChanged->legend#refreshStats personal-calendar:update->legend#refreshStats personal-calendar:yearChanged->remaining-days#refresh personal-calendar:update->remaining-days#refresh">
 		<div class="container-fluid" 
          {{ stimulus_controller({
             'personal-calendar': { 
@@ -27,6 +28,7 @@
 			<div id="calendar" data-personal-calendar-target="content"></div>
 			<div class="row d-flex justify-content-between m-1">
 				{{ include('calendar/_summary.html.twig') }}
+            {{ include('calendar/_remainingDays.html.twig') }}
 				{# {{ include('calendar/_status.html.twig') }} #}
 				{{ include('calendar/_legend.html.twig') }}
 			</div>

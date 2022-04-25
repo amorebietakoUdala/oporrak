@@ -14,7 +14,7 @@ class EventType
 {
     const VACATION = 1;
     const PARTICULAR_BUSSINESS_LEAVE = 2;
-    const EXCESSIVE_WORKING_HOURS = 3;
+    const OVERTIME = 3;
     const ANTIQUITY_DAYS = 4;
     const OTHERS = 5;
 
