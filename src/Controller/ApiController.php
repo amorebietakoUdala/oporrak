@@ -77,7 +77,7 @@ class ApiController extends AbstractController
        /** @var User $user */
        $user = $this->getUser();
        $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
-       $totalAntiquityDays = $antiquityDays->getVacationDays();
+       $totalAntiquityDays = $antiquityDays !== null ? $antiquityDays->getVacationDays() : 0;
        $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
        $totalVacationDays = $workCalendar->getVacationDays();
        $totalParticularBussinessLeaveDays = $workCalendar->getParticularBusinessLeave();
