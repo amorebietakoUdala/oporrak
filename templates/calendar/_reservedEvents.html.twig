@@ -4,12 +4,14 @@
 		<div>
 			{% for event in reservedEvents %}
 				<div>
-					<a href="{{ path('event_approve', { event: event.id }) }}">
-						<i class="fas fa-check"></i>
-					</a>&nbsp;
-					<a href="{{ path('event_deny', { event: event.id }) }}">
-						<i class="fas fa-times"></i>
-					</a>&nbsp;
+               {% if ( is_granted("ROLE_BOSS") or is_granted("ROLE_ADMIN") ) and app.user != event.user %}
+                  <a href="{{ path('event_approve', { event: event.id }) }}">
+                     <i class="fas fa-check"></i>
+                  </a>&nbsp;
+                  <a href="{{ path('event_deny', { event: event.id }) }}">
+                     <i class="fas fa-times"></i>
+                  </a>&nbsp;
+               {% endif %}
 					{{ event.user.username}}:
 					{% if app.request.locale == 'es' %}
 						{{ event.startDate | date('d-m-Y') }} - {{ event.endDate | date('d-m-Y') }}
