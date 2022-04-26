@@ -21,12 +21,9 @@ export default class extends Controller {
    connect() {
       Routing.setRoutingData(routes);
       useDispatch(this);
-      $(this.userSelectTarget).append($('<option>', {
-         value: '',
-         text: ''
-     }));
       $(this.userSelectTarget).select2({
-         maximumSelectionLength: 10
+         maximumSelectionLength: 10,
+         placeholder: "",
       });
       if ( this.hasDepartmentSelectTarget ) {
          $(this.departmentSelectTarget).append($('<option>', {

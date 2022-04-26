@@ -144,7 +144,7 @@ class ApiController extends AbstractController
       $year = $request->get('year');
       $usersParam = $request->get('user');
       $users = null;
-      if ($usersParam !== null) {
+      if ($usersParam !== null && $usersParam !== '') {
          $users = explode(',', $usersParam);
       }
       $status = $request->get('status') === null ? null : intval($request->get('status'));
