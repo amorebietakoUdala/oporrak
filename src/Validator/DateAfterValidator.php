@@ -9,12 +9,11 @@ class DateAfterValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
-        /** @var $constraint \App\Validator\DateAfter */
+        /** @var App\Validator\DateAfter $constraint */
 
         if (null === $value || '' === $value) {
             return;
         }
-
         $days = $constraint->days;
         $interval = date_interval_create_from_date_string("-$days days");
         $today = new \DateTime();

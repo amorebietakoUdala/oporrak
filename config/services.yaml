@@ -12,9 +12,8 @@ parameters:
   sendDeletionEmails: "%env(bool:MAILER_SEND_DELETION_EMAILS)%"
   colorPalette:
     [
-      "#8A2BE2",
-      "#A52A2A",
       "#DEB887",
+      "#8A2BE2",
       "#5F9EA0",
       "#7FFF00",
       "#D2691E",
@@ -22,6 +21,7 @@ parameters:
       "#6495ED",
       "#DC143C",
       "#0000FF",
+      "#A52A2A",
     ]
   territoryEu: "%env(TERRITORYEU)%"
   municipalityEu: "%env(MUNICIPALITYEU)%"

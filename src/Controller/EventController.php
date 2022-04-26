@@ -8,8 +8,13 @@ use App\Entity\EventType;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
+use App\Repository\AntiquityDaysRepository;
+use App\Repository\EventRepository;
+use App\Repository\StatusRepository;
+use App\Repository\WorkCalendarRepository;
 use App\Services\StatsService;
 use \DateTime;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,19 +34,27 @@ class EventController extends AbstractController
     private $mailer = null;
     private $translator = null;
     private $statsService = null;
+    private EventRepository $eventRepo;
+    private StatusRepository $statusRepo;
+    private WorkCalendarRepository $wcRepo;
+    private AntiquityDaysRepository $adRepo;
 
-    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService)
+    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService, EventRepository $eventRepo, StatusRepository $statusRepo, WorkCalendarRepository $wcRepo, AntiquityDaysRepository $adRepo)
     {
         $this->mailer = $mailer;
         $this->translator = $translator;
         $this->statsService = $statsService;
+        $this->eventRepo = $eventRepo;
+        $this->statusRepo = $statusRepo;
+        $this->wcRepo = $wcRepo;
+        $this->adRepo = $adRepo;
     }
 
     /**
      * @Route("/{event}/approve", name="event_approve", methods={"GET"}, options = { "expose" = true })
      * @IsGranted("ROLE_BOSS")
      */
-    public function approve(Event $event, Request $request): Response
+    public function approve(Event $event, Request $request, EntityManagerInterface $em): Response
     {
         if (null !== $event) {
             if ($event->getStatus()->getId() === Status::APPROVED) {
@@ -51,8 +64,7 @@ class EventController extends AbstractController
             if ($event->getUser()->getBoss()->getUsername() !== $this->getUser()->getUserIdentifier() && !$this->isGranted('ROLE_HHRR')){
                 $this->addFlash('error', 'message.notAuthorizedToApprove');
             } else {
-                $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::APPROVED));
-                $em = $this->getDoctrine()->getManager();
+                $event->setStatus($this->statusRepo->find(Status::APPROVED));
                 $em->persist($event);
                 $em->flush();
                 $this->addFlash('success', 'message.approved');
@@ -78,7 +90,7 @@ class EventController extends AbstractController
      * @Route("/{event}/deny", name="event_deny", methods={"GET"}, options = { "expose" = true })
      * @IsGranted("ROLE_BOSS")
      */
-    public function deny(Event $event, Request $request): Response
+    public function deny(Event $event, Request $request, EntityManagerInterface $em): Response
     {
         if (null !== $event) {
             if ($event->getStatus()->getId() === Status::NOT_APPROVED) {
@@ -88,8 +100,7 @@ class EventController extends AbstractController
             if ($event->getUser()->getBoss()->getUsername() !== $this->getUser()->getUserIdentifier()&& !$this->isGranted('ROLE_HHRR')){
                 $this->addFlash('error', 'message.notAuthorizedToDeny');
             } else {
-                $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::NOT_APPROVED));
-                $em = $this->getDoctrine()->getManager();
+                $event->setStatus($this->statusRepo->find(Status::NOT_APPROVED));
                 $em->persist($event);
                 $em->flush();
                 $this->addFlash('success', 'message.notApproved');
@@ -114,7 +125,7 @@ class EventController extends AbstractController
     /**
      * @Route("/{event}/delete", name="event_delete", methods={"GET"}, options = { "expose" = true })
      */
-    public function delete(Event $event = null): Response
+    public function delete(Event $event = null, EntityManagerInterface $em): Response
     {
         $days = $this->getParameter('days');
         $interval = new \DateInterval("P${days}D");
@@ -123,9 +134,9 @@ class EventController extends AbstractController
         $deadlineStr = $deadline->format('Y-m-d 23:59:59');
         $deadline = new \DateTime($deadlineStr);
         if ( (null !== $event && $event->getStartDate() > $deadline ) || $this->isGranted('ROLE_HHRR') ) {
-            $em = $this->getDoctrine()->getManager();
             $em->remove($event);
             $em->flush();
+            /** @var User $user */
             $user = $this->getUser();
             $boss = $user->getBoss();
             if (null !== $boss && $this->getParameter('sendDeletionEmails')) {
@@ -182,11 +193,11 @@ class EventController extends AbstractController
                     $year = intval($event->getStartDate()->format('Y'));
                 }
                 /** @var WorkCalendar $workCalendar */
-                $workCalendar = $this->getDoctrine()->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
+                $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
                 // If any limitations exceeded it return the error directly
                 $valid = $this->checkDoesNotExcessLimitations($event, $workCalendar);
                 if ($valid) {
-                    $event->setStatus($this->getDoctrine()->getRepository(Status::class)->find(Status::RESERVED));
+                    $event->setStatus($this->statusRepo->find(Status::RESERVED));
                     $event->setUser($this->getUser());
                     $event->setAskedAt(new \DateTime());
                     $boss = $user->getBoss();
@@ -215,7 +226,7 @@ class EventController extends AbstractController
 
         /* Check overlap with my own events */
         $user = $this->getUser();
-        $myEvents = $this->getDoctrine()->getRepository(Event::class)->findUserEventsBeetweenDates($user, new \DateTime($event->getStartDate()->format('Y') . '-01-01'));
+        $myEvents = $this->eventRepo->findUserEventsBeetweenDates($user, new \DateTime($event->getStartDate()->format('Y') . '-01-01'));
         if ($this->checkOverlap($myEvents, $event)) {
             $this->addFlash('error', new TranslatableMessage('message.overlapingDates', [
                 'startDate' => $event->getStartDate()->format('Y/m/d'),
@@ -302,7 +313,7 @@ class EventController extends AbstractController
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($event);
         $entityManager->flush();
-        $overlaps = $this->getDoctrine()->getRepository(Event::class)->findOverlapingEventsNotOfCurrentUser($event);
+        $overlaps = $this->eventRepo->findOverlapingEventsNotOfCurrentUser($event);
         if (null !== $boss) {
             $html = $this->renderView('event/eventApprovalMail.html.twig', [
                 'event' => $event,
@@ -337,10 +348,10 @@ class EventController extends AbstractController
             $maxDays = $workCalendar->getOvertimeDays();
         }
         if ($event->getType()->getId() === EventType::ANTIQUITY_DAYS) {
-            $em = $this->getDoctrine()->getManager();
+            /** @var User $user */  
             $user = $this->getUser();
             /** @var AntiquityDays $antiquity */
-            $antiquity = $em->getRepository(AntiquityDays::class)->findAntiquityDaysForYearsWorked($user->getYearsWorked());
+            $antiquity = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
             $maxDays = $antiquity->getVacationDays();
         }
 
@@ -352,7 +363,7 @@ class EventController extends AbstractController
     {
         $user = $this->getUser();
         $totalHours = 0;
-        $eventsThisYear = $this->getDoctrine()->getRepository(Event::class)->findUserEventsCurrentYearAndType($user, $year, $event->getType(), true);
+        $eventsThisYear = $this->eventRepo->findUserEventsCurrentYearAndType($user, $year, $event->getType(), true);
         foreach ($eventsThisYear as $event) {
             if (null !== $event->getHours()) {
                 $totalHours += $event->getHours();
@@ -373,7 +384,7 @@ class EventController extends AbstractController
     {
         if (null !== $maxDays) {
             $user = $this->getUser();
-            $eventsThisYear = $this->getDoctrine()->getRepository(Event::class)->findUserEventsCurrentYearAndType($user, $year, $event->getType());
+            $eventsThisYear = $this->eventRepo->findUserEventsCurrentYearAndType($user, $year, $event->getType());
             $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
             if ($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) > $maxDays) {
                 $this->addFlash(

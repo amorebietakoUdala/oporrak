@@ -1,0 +1,41 @@
+<div class="card col-4 p-1">
+	<h5 class="card-title text-center">{{'title.reserved-events' | trans }}&nbsp;</h5>
+	<div class="card-body">
+		<div>
+			{% for event in reservedEvents %}
+				<div>
+					<a href="{{ path('event_approve', { event: event.id }) }}">
+						<i class="fas fa-check"></i>
+					</a>&nbsp;
+					<a href="{{ path('event_deny', { event: event.id }) }}">
+						<i class="fas fa-times"></i>
+					</a>&nbsp;
+					{{ event.user.username}}:
+					{% if app.request.locale == 'es' %}
+						{{ event.startDate | date('d-m-Y') }} - {{ event.endDate | date('d-m-Y') }}
+               {% else %}
+                  {{ event.startDate | date('Y-m-d') }} - {{ event.endDate | date('Y-m-d') }}
+					{% endif %}
+				</div>
+            {% if overlaps[event.id] | length > 0 %}
+               <div class="overlaps mt-1 mb-1">
+                  {{ 'label.overlapsWith' | trans }}&nbsp;<span class="badge badge-primary badge-pill">{{ overlaps[event.id] | length }}</span>:
+                  <ul class="list-group">
+                  {% for overlap in overlaps[event.id] %}
+                     <li class="list-group-item list-group-item-light">&nbsp;
+                        {{ overlap.user.username}}:
+                        {% if app.request.locale == 'es' %}
+                           {{ overlap.startDate | date('d-m-Y') }} - {{ overlap.endDate | date('d-m-Y') }}
+                        {% else %}
+                           {{ overlap.startDate | date('Y-m-d') }} - {{ overlap.endDate | date('Y-m-d') }}
+                        {% endif %}
+                     </li>
+                  {% endfor %}
+                  </ul>
+               </div>
+            {% endif %}
+
+			{% endfor %}
+		</div>
+	</div>
+</div>

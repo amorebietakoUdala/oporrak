@@ -2,12 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\AntiquityDays;
 use App\Entity\Event;
-use App\Entity\Holiday;
 use App\Entity\Status;
 use App\Entity\User;
-use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
 use App\Form\UserFilterType;
 use App\Repository\AntiquityDaysRepository;
@@ -16,6 +13,7 @@ use App\Repository\HolidayRepository;
 use App\Repository\StatusRepository;
 use App\Repository\WorkCalendarRepository;
 use App\Services\StatsService;
+use DateInterval;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -112,6 +110,16 @@ class CalendarController extends AbstractController
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();
+        $reservedEvents = [];
+        $overlaps = [];
+        if ( $department !== null) {
+            $reservedEvents = $this->eventRepo->findByDepartmentAndUsersAndStatusBeetweenDates($department, null, Status::RESERVED, date_create_from_format('Y-m-d',$year.'-01-01'), date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'));
+            $overlaps = [];
+            foreach ($reservedEvents as $event) {
+                $overlaps[$event->getId()] = $this->eventRepo->findOverlapingEventsNotOfCurrentUser($event);
+            }
+        }
+
         return $this->render($template, [
             'form' => $form->createView(),
             'userFilterForm' => $userFilterForm->createView(),
@@ -124,6 +132,8 @@ class CalendarController extends AbstractController
             'previousYearDaysColor' => $this->getParameter('previousYearsDaysColor'),
             'roles' => array_values($this->getUser()->getRoles()),
             'colorPalette' => $this->getParameter('colorPalette'),
+            'reservedEvents' => $reservedEvents,
+            'overlaps' => $overlaps,
         ]);
     }
 

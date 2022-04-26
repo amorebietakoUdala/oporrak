@@ -34,6 +34,10 @@
 			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">
 				{{ include('calendar/_userLegend.html.twig') }}
+            {{ include('calendar/_reservedEvents.html.twig', { 
+               'reservedEvents': reservedEvents,
+               'overlaps': overlaps,
+            }) }}
             {# {{ include('calendar/_summary.html.twig') }} #}
 				
             {{ include('calendar/_day-details.html.twig') }}

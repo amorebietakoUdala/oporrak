@@ -32,9 +32,9 @@ export default class extends Controller {
 
     localizeDate(date, locale) {
         if (locale === 'es') {
-            return date.toLocaleDateString('es-ES').slice(0, 10).replaceAll('/', '-');
+            return date.toLocaleDateString('es-ES',{year:"2-digit",month:"2-digit", day:"2-digit"}).slice(0, 10).replaceAll('/', '-');
         } else {
-            return date.toLocaleDateString('eu-EU').slice(0, 10).replaceAll('/', '-');
+            return date.toLocaleDateString('eu-EU',{year:"2-digit",month:"2-digit", day:"2-digit"}).slice(0, 10).replaceAll('/', '-');
         }
     }
 

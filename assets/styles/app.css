@@ -39,6 +39,13 @@ main {
     border-radius: 3rem;
 }
 
+.overlaps ul.list-group li.list-group-item {
+    padding-left: 1rem;
+    padding-right: 0.2rem;
+    padding-top: 0.1rem;
+    padding-bottom: 0.1rem;
+}
+
 /* Material design styles */
 
 
