@@ -10,7 +10,7 @@ export default class extends Controller {
    load(event) {
       let colorArray = event.detail.colorArray;
       if (colorArray) {
-         content = '';
+         let content = '';
          for (var [key, value] of Object.entries(colorArray)) {
             content += '<div><span style="background-color:'+ value +'" title="'+ key+'">&nbsp;&nbsp;</span>&nbsp;<span>'+key+'</span></div>';
          }
