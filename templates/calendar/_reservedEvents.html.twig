@@ -1,3 +1,4 @@
+{% if reservedEvents | length > 0%}
 <div class="card col-4 p-1">
 	<h5 class="card-title text-center">{{'title.reserved-events' | trans }}&nbsp;</h5>
 	<div class="card-body">
@@ -41,3 +42,4 @@
 		</div>
 	</div>
 </div>
+{% endif %}
