@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\Event;
 use App\Entity\Holiday;
+use App\Entity\Status;
 use App\Entity\WorkCalendar;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -42,17 +43,18 @@ class StatsService
          $userId = "{$event->getUser()->getUsername()}";
          $typeId = "{$event->getType()->getId()}";
 
-         if ( array_key_exists($userId, $counters) ) {
-            if ( array_key_exists($typeId, $counters[$userId]) ) {
-               $counters[$userId][$typeId] = $counters[$userId][$typeId] + $workingDays;
+         if ($event->getStatus()->getId() !== Status::NOT_APPROVED ) {
+            if ( array_key_exists($userId, $counters) ) {
+               if ( array_key_exists($typeId, $counters[$userId]) ) {
+                  $counters[$userId][$typeId] = $counters[$userId][$typeId] + $workingDays;
+               } else {
+                  $counters[$userId][$typeId] = $workingDays;
+               }
             } else {
                $counters[$userId][$typeId] = $workingDays;
             }
-         } else {
-            $counters[$userId][$typeId] = $workingDays;
          }
       }
-
       return $counters;
    }
 
