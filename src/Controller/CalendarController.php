@@ -11,9 +11,11 @@ use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\HolidayRepository;
 use App\Repository\StatusRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkCalendarRepository;
 use App\Services\StatsService;
 use DateInterval;
+use PhpParser\Node\Expr\FuncCall;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,14 +34,16 @@ class CalendarController extends AbstractController
     private WorkCalendarRepository $wcRepo;
     private EventRepository $eventRepo;
     private HolidayRepository $holidayRepo;
+    private UserRepository $userRepo;
 
-    public function __construct (StatsService $statsService, StatusRepository $statusRepo, AntiquityDaysRepository $adRepo, WorkCalendarRepository $wcRepo, EventRepository $eventRepo, HolidayRepository $holidayRepo) {
+    public function __construct (StatsService $statsService, StatusRepository $statusRepo, AntiquityDaysRepository $adRepo, WorkCalendarRepository $wcRepo, EventRepository $eventRepo, HolidayRepository $holidayRepo, UserRepository $userRepo) {
         $this->statsService = $statsService;
         $this->statusRepo = $statusRepo;
         $this->adRepo = $adRepo;
         $this->wcRepo = $wcRepo;
         $this->eventRepo = $eventRepo;
         $this->holidayRepo = $holidayRepo;
+        $this->userRepo = $userRepo;
     }
 
     /**
@@ -196,4 +200,5 @@ class CalendarController extends AbstractController
         ];
         return $stats;
     }
+
 }

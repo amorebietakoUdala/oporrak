@@ -164,7 +164,7 @@ export default class extends Controller {
                 this.dates = dates;
                 this.addDates(this.holidays);
                 this.calendar.setDataSource(this.dates);
-                this.dispatch('loaded', { colorArray });
+                this.dispatch('loaded', { colorArray, year });
             });
     }
 

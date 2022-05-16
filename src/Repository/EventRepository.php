@@ -132,6 +132,42 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
+    public function findByUsernamesAndBeetweenDates(array $users = null, $startDate, $endDate = null, bool $previousYearDays = false)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
+            ->andWhere('e.startDate >= :startDate')
+            ->setParameter('startDate', $startDate);
+        if ($previousYearDays) {
+            $condition = "
+                e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :true  ) 
+                ";
+            $qb->andWhere($condition)
+                ->setParameter('true', true);
+        } else {
+            $condition = " 
+                e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) 
+                ";
+            $qb->andWhere($condition)
+                ->setParameter('false', false);
+        }            
+        if (null !== $endDate) {
+            $qb->andWhere('e.endDate < :endDate')
+                ->setParameter('endDate', $endDate);
+        }
+        if (null !== $users) {
+            $qb->andWhere('u.username in (:users)')
+                ->setParameter('users', $users);
+        }
+        $qb->orderBy('e.id', 'ASC')
+            //            ->setMaxResults(10)
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
     public function findByDepartmentAndUsersAndStatusBeetweenDates($department = null, array $users = null, $status = null, $startDate, $endDate = null)
     {
         $qb = $this->createQueryBuilder('e')

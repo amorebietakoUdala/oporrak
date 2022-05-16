@@ -167,6 +167,10 @@ eventType.descriptionEu: "Deskripzioa (Eu)"
 Approved: "Onartuak"
 Reserved: "Eskatuak"
 Not Approved: "Ez onartuak"
+Remaining: "Geratzen zaizkio"
+label.approved: "On."
+label.reserved: "Esk."
+label.remaining: "Ger."
 label.eventsWithLastYearDays: "Pasa den urteko egunekin"
 # Confirmation messages
 

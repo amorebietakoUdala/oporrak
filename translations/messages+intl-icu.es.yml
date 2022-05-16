@@ -169,6 +169,11 @@ eventType.descriptionEu: "Descripción (Eu)"
 Approved: "Aprobados"
 Reserved: "Solicitados"
 Not Approved: "No aprobados"
+Remaining: "Restantes"
+label.approved: "Ap."
+label.reserved: "Sol."
+label.remaining: "Res."
+
 label.eventsWithLastYearDays: "Con días del año pasado"
 # Confirmation messages
 

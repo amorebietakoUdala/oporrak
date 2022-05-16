@@ -10,6 +10,7 @@ use App\Entity\WorkCalendar;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\HolidayRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkCalendarRepository;
 use App\Services\StatsService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,15 +31,18 @@ class ApiController extends AbstractController
    private EventRepository $eventRepo;
    private HolidayRepository $hollidayRepo;
    private WorkCalendarRepository $wcRepo;
+   private UserRepository $userRepo;
    private StatsService $statsService;
 
-   public function __construct(AntiquityDaysRepository $adRepo, EventRepository $eventRepo, HolidayRepository $hollidayRepo, WorkCalendarRepository $wcRepo, StatsService $statsService)
+   public function __construct(AntiquityDaysRepository $adRepo, EventRepository $eventRepo, HolidayRepository $hollidayRepo, WorkCalendarRepository $wcRepo, UserRepository $userRepo, StatsService $statsService)
    {
       $this->adRepo = $adRepo;
       $this->eventRepo = $eventRepo;
       $this->hollidayRepo = $hollidayRepo;
       $this->wcRepo = $wcRepo;
+      $this->userRepo = $userRepo;
       $this->statsService = $statsService;
+      
    }
 
    /**
@@ -76,19 +80,11 @@ class ApiController extends AbstractController
        }
        /** @var User $user */
        $user = $this->getUser();
-       $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
-       $totalAntiquityDays = $antiquityDays !== null ? $antiquityDays->getVacationDays() : 0;
-       $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-       $totalVacationDays = $workCalendar->getVacationDays();
-       $totalParticularBussinessLeaveDays = $workCalendar->getParticularBusinessLeave();
-       $totalOvertimeDays = $workCalendar->getOvertimeDays();
-       $totals = [
-          EventType::VACATION => $totalVacationDays,
-          EventType::PARTICULAR_BUSSINESS_LEAVE => $totalParticularBussinessLeaveDays,
-          EventType::OVERTIME => $totalOvertimeDays,
-          EventType::ANTIQUITY_DAYS => $totalAntiquityDays,
-       ];
+       $totals = $this->totalDaysForEachType($user,$year);
        $events = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year, false);
+       $nextYear = intval($year)+1;
+       $eventsNextYearWithLastYearDays = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $nextYear, true);
+       $events = array_merge($events, $eventsNextYearWithLastYearDays);
        $counters = $this->statsService->calculateStatsByUserAndEventType($events);
 
        if (count($counters)) {
@@ -104,6 +100,22 @@ class ApiController extends AbstractController
          $remaining = $totals;
        }
        return $this->json($remaining);
+    }
+
+    private function totalDaysForEachType($user, $year) {
+      $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
+      $totalAntiquityDays = $antiquityDays !== null ? $antiquityDays->getVacationDays() : 0;
+      $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+      $totalVacationDays = $workCalendar->getVacationDays();
+      $totalParticularBussinessLeaveDays = $workCalendar->getParticularBusinessLeave();
+      $totalOvertimeDays = $workCalendar->getOvertimeDays();
+      $totals = [
+         EventType::VACATION => $totalVacationDays,
+         EventType::PARTICULAR_BUSSINESS_LEAVE => $totalParticularBussinessLeaveDays,
+         EventType::OVERTIME => $totalOvertimeDays,
+         EventType::ANTIQUITY_DAYS => $totalAntiquityDays,
+      ];
+      return $totals;
     }
 
    /**
@@ -190,4 +202,60 @@ class ApiController extends AbstractController
       $users = $deparment->getUsers()->toArray();
       return $this->json($users, 200, [], ['groups' => ['list']]);
    }
+
+     /**
+     * @Route("/user/stats", name="api_get_user_stats", methods="GET")
+     */
+    public function getUserStats(Request $request) {
+      $users = $request->get('users');
+      if (null === $users) {
+          $users = [];
+      } else {
+          $users = explode(",",$users);
+      }
+      $year = $request->get('year');
+      if (null === $year) {
+          $year = (new \DateTime())->format('Y');
+      }
+      $events = $this->eventRepo->findByUsernamesAndBeetweenDates($users,new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
+      // Add next year days using this year days
+      $nextYear = intval($year)+1;
+      $eventsNextYearWithPreviousYearDays = $this->eventRepo->findByUsernamesAndBeetweenDates($users,new \DateTime("${nextYear}-01-01"), new \DateTime("${nextYear}-12-31"), true);
+      $events = array_merge($events, $eventsNextYearWithPreviousYearDays);
+      $stats = $this->statsService->calculateStatsByUserAndStatus($events, $year);
+      $usersVacationDays = $this->adaptStats($stats, $year);
+      return $this->json($usersVacationDays, 200, [], ['groups' => ['event']]);
+   }
+
+   private function adaptStats($stats, $year) {
+      $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+      $baseDays = $workCalendar->getVacationDays() + $workCalendar->getParticularBusinessLeave() + $workCalendar->getOvertimeDays();
+      $usersVacationDays = [];
+      foreach ($stats as $key => $value) {
+         $user = $this->userRepo->findOneBy(['username' => $key]);
+         $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
+         if ( null !== $antiquityDays ) {
+            $usersVacationDays[$key]['total'] = $baseDays + $antiquityDays->getVacationDays();
+            foreach ($value as $key2 => $value2) {
+               if ($key2 === Status::APPROVED) {
+                     $usersVacationDays[$key]['approved'] = $value2;
+               } elseif ( $key2 === Status::RESERVED ) {
+                     $usersVacationDays[$key]['reserved'] = $value2;
+               }
+            }
+         } else {
+            $usersVacationDays[$key]['total'] = $baseDays;
+            foreach ($value as $key2 => $value2) {
+                  if ($key2 === Status::APPROVED) {
+                  $usersVacationDays[$key]['approved'] = $value2;
+                  } elseif ( $key2 === Status::RESERVED ) {
+                        $usersVacationDays[$key]['reserved'] = $value2;
+                  }
+               }
+         }
+      }
+      return $usersVacationDays;
+   }
+
+
 }

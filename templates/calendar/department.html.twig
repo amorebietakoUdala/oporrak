@@ -15,7 +15,9 @@
             'boss': app.user.boss.username,
             'previousYearDaysColor': previousYearDaysColor,
          },
-         'user-legend': {},
+         'user-legend': {
+            statsUrl: path('api_get_user_stats')
+         },
          }) }} 
          data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails department-calendar:loaded->user-legend#load" 
    >

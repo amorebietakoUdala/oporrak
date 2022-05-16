@@ -3,17 +3,19 @@
 namespace App\Services;
 
 use App\Entity\Event;
-use App\Entity\Holiday;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\HolidayRepository;
+use App\Repository\WorkCalendarRepository;
 
 class StatsService
 {
-   private $em;
+   private WorkCalendarRepository $wcRepo;
+   private HolidayRepository $holidayRepo;
 
-   public function __construct(EntityManagerInterface $em) {
-      $this->em = $em;
+   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo) {
+      $this->wcRepo = $wcRepo;
+      $this->holidayRepo = $holidayRepo;
    }
 
    public function calculateTotalWorkingDays(array $events, $workCalendar)
@@ -32,8 +34,8 @@ class StatsService
       foreach($events as $event) {
          $year = $event->getStartDate()->format('Y');
          $workCalendars = [];
-         $workCalendars[$year] = $this->em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);          
-         $workCalendars[$year-1] = $this->em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year-1]);
+         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
+         $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
          if ( !$event->getUsePreviousYearDays() ) {
             $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
          } else {
@@ -62,8 +64,8 @@ class StatsService
       $counters = [];
       foreach($events as $event) {
          $workCalendars = [];
-         $workCalendars[$year] = $this->em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);          
-         $workCalendars[$year-1] = $this->em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year-1]);
+         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
+         $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
          if ( !$event->getUsePreviousYearDays() ) {
             $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
          } else {
@@ -82,18 +84,68 @@ class StatsService
       return $counters;
    }
 
+   public function calculateStatsByUserAndStatus(array $events, int $year) {
+      $counters = [];
+      foreach($events as $event) {
+         $workCalendars = [];
+         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
+         $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
+         if ( !$event->getUsePreviousYearDays() ) {
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
+         } else {
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
+         }
+
+         $statusId = "{$event->getStatus()->getId()}";
+         $user = "{$event->getUser()->getUsername()}";
+         if ( array_key_exists($user, $counters) ) {
+            if ( array_key_exists($statusId, $counters[$user]) ) {
+               $counters[$user][$statusId] = $counters[$user][$statusId] + $workingDays;
+            } else {
+               $counters[$user][$statusId] = $workingDays;
+            }
+         } else {
+            $counters[$user][$statusId] = $workingDays;
+         }
+      }
+
+      return $counters;
+   }
+
+   public function calculateStatsByUser(array $events, int $year) {
+      $counters = [];
+      foreach($events as $event) {
+         $workCalendars = [];
+         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
+         $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
+         if ( !$event->getUsePreviousYearDays() ) {
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
+         } else {
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
+         }
+
+         $user = "{$event->getUser()->getUsername()}";
+         if ( array_key_exists($user, $counters) ) {
+               $counters[$user] = $counters[$user] + $workingDays;
+         } else {
+            $counters[$user] = $workingDays;
+         }
+      }
+
+      return $counters;
+   }
+
    
-   public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar)
-   {
+   public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar) {
        if (!$event->getHalfDay()) {
-           $holidaysBetween = count($this->em->getRepository(Holiday::class)->findHolidaysBetween($event->getStartDate(), $event->getEndDate()));
+           $holidaysBetween = $this->calculateHolidaysOnWorkingDays($this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate()));
            $workingDays = $event->getDays();
            // Subtract two weekend days for every week in between
            $weeks = floor($workingDays / 7);
            $workingDays -= $weeks * 2;
            // Handle special cases
-           $startDay = intVal(date('w', strtotime(($event->getStartDate())->format('Y-m-d'))));
-           $endDay = intVal(date('w', strtotime(($event->getEndDate())->format('Y-m-d'))));
+           $startDay = $this->getWeekday($event->getStartDate()->format('Y-m-d'));
+           $endDay = $this->getWeekday($event->getEndDate()->format('Y-m-d'));
            // Remove weekend not previously removed.   
            if ($startDay - $endDay > 1) {
                $workingDays -= 2;
@@ -112,5 +164,20 @@ class StatsService
            return $workingDays = $event->getHours() / $workCalendar->getWorkingHours();
        }
    }
+
+   private function calculateHolidaysOnWorkingDays($holidays) {
+      $holidaysOnWorkingDays = 0;
+      foreach ($holidays as $holiday) {
+         if ($this->getWeekday($holiday->getDate()->format('Y-m-d')) !== 0 && $this->getWeekday($holiday->getDate()->format('Y-m-d')) !== 6 ) {
+            $holidaysOnWorkingDays += 1;
+         }
+      }
+      return $holidaysOnWorkingDays;
+   }
+
+   private function getWeekday($date) {
+      return intval(date('w', strtotime($date)));
+  }
+  
 
 }
