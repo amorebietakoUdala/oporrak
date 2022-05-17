@@ -203,3 +203,4 @@ message.partitionableDaysOneByOne: "Los días fraccionados se deben pedir de uno
 message.selectOneCriteria: "Debe seleccionar al menos un criterio"
 message.notAuthorizedToApprove: "No está autorizado para aprobar las vacaciones de este usuario"
 message.notAuthorizedToDeny: "No está autorizado para denegar las vacaciones de este usuario"
+message.eventNotFound: "No puede aprobar el periodo indicado porque se ha borrado"

@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Department;
 use App\Entity\Event;
+use App\Entity\EventType;
 use App\Entity\Status;
 use App\Entity\User;
 use DateTime;
@@ -74,7 +75,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findEffectiveUserEventsOfTheYear(User $user, int $year)
+    public function findEffectiveUserEventsOfTheYear(User $user, int $year, EventType $eventType = null, $includeNotApproved = true)
     {
         $thisYearStart = new DateTime("${year}-01-01");
         $thisYearEnd = new DateTime("${year}-12-31");
@@ -95,6 +96,14 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('true', true)
             ->andWhere('e.user = :user')
             ->setParameter('user', $user);
+        if (null !== $eventType) {
+            $qb->andWhere('e.type = :type')
+            ->setParameter('type', $eventType);
+        }
+        if (!$includeNotApproved) {
+            $qb->andWhere('e.status != :status')
+            ->setParameter('status', Status::NOT_APPROVED);
+        }
         $qb->orderBy('e.id', 'ASC');
         return $qb->getQuery()->getResult();
     }

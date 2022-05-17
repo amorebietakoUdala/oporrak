@@ -22,8 +22,10 @@ class StatsService
    {
        $totalWorkingDays = 0;
        foreach ($events as $event) {
-           $workingDays = $this->calculateWorkingDays($event, $workCalendar);
-           $totalWorkingDays += $workingDays;
+         if ($event->getStatus()->getId() !== Status::NOT_APPROVED) {
+            $workingDays = $this->calculateWorkingDays($event, $workCalendar);
+            $totalWorkingDays += $workingDays;
+         }
        }
        return $totalWorkingDays;
    }

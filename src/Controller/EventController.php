@@ -54,7 +54,7 @@ class EventController extends AbstractController
      * @Route("/{event}/approve", name="event_approve", methods={"GET"}, options = { "expose" = true })
      * @IsGranted("ROLE_BOSS")
      */
-    public function approve(Event $event, Request $request, EntityManagerInterface $em): Response
+    public function approve(Request $request, EntityManagerInterface $em, Event $event = null): Response
     {
         if (null !== $event) {
             if ($event->getStatus()->getId() === Status::APPROVED) {
@@ -76,7 +76,7 @@ class EventController extends AbstractController
                 $this->sendEmail($user->getEmail(), $subject, $html, true);
             }
         } else {
-            $this->addFlash('error', 'event.notFound');
+            $this->addFlash('error', 'message.eventNotFound');
         }
         $return = $request->get('return');
         if (null !== $return) {
@@ -90,7 +90,7 @@ class EventController extends AbstractController
      * @Route("/{event}/deny", name="event_deny", methods={"GET"}, options = { "expose" = true })
      * @IsGranted("ROLE_BOSS")
      */
-    public function deny(Event $event, Request $request, EntityManagerInterface $em): Response
+    public function deny(Request $request, EntityManagerInterface $em, Event $event = null): Response
     {
         if (null !== $event) {
             if ($event->getStatus()->getId() === Status::NOT_APPROVED) {
@@ -112,7 +112,7 @@ class EventController extends AbstractController
                 $this->sendEmail($user->getEmail(), $subject, $html, false);
             }
         } else {
-            $this->addFlash('error', 'event.notFound');
+            $this->addFlash('error', 'message.eventNotFound');
         }
         $return = $request->get('return');
         if (null !== $return) {
@@ -354,7 +354,6 @@ class EventController extends AbstractController
             $antiquity = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
             $maxDays = $antiquity->getVacationDays();
         }
-
         $valid = $this->checkDoesNotExcessMaximumDays($event, $maxDays, $year, $workCalendar);
         return $valid;
     }
@@ -384,7 +383,7 @@ class EventController extends AbstractController
     {
         if (null !== $maxDays) {
             $user = $this->getUser();
-            $eventsThisYear = $this->eventRepo->findUserEventsCurrentYearAndType($user, $year, $event->getType());
+            $eventsThisYear = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year, $event->getType(),false);
             $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
             if ($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) > $maxDays) {
                 $this->addFlash(

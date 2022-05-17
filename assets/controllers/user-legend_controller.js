@@ -22,11 +22,11 @@ export default class extends Controller {
          year: event.detail.year,
          users: Object.keys(colorArray).toString(),
      });
-     const response = await fetch(`${this.statsUrlValue}?${params.toString()}`)
+     this.headerRowTarget.innerHTML='';
+     let response = await fetch(`${this.statsUrlValue}?${params.toString()}`)
          .then(result => result.json())
          .then(result => {
-            console.log(result);
-            if (colorArray) {
+            if (colorArray && Object.entries(result).length) {
                let content = '';
                for (var [key, value] of Object.entries(colorArray)) {
                   content += '<tr>';

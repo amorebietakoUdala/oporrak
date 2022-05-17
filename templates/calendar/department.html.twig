@@ -18,8 +18,11 @@
          'user-legend': {
             statsUrl: path('api_get_user_stats')
          },
+         'overlaps': {
+            serviceUrl: path('app_department_overlaps', {'department': app.user.department.id})
+         },
          }) }} 
-         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails department-calendar:loaded->user-legend#load" 
+         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails department-calendar:loaded->user-legend#load department-calendar:loaded->overlaps#load" 
    >
 		<div class="container-fluid"
          {{ stimulus_controller('department-calendar', { 
@@ -36,10 +39,7 @@
 			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">
 				{{ include('calendar/_userLegend.html.twig') }}
-            {{ include('calendar/_reservedEvents.html.twig', { 
-               'reservedEvents': reservedEvents,
-               'overlaps': overlaps,
-            }) }}
+            <div class="col-4" data-overlaps-target="card"></div>
             {{ include('calendar/_day-details.html.twig') }}
 			</div>
 			<div id="context-menu"></div>

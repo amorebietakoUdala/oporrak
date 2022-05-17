@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Department;
 use App\Entity\Event;
 use App\Entity\Status;
 use App\Entity\User;
@@ -98,6 +99,35 @@ class CalendarController extends AbstractController
         return $this->renderCalendar($request, 'calendar/city-hall.html.twig', true);
     }
 
+    /**
+     * @Route("/{_locale}/department/{department}/overlaps", name="app_department_overlaps")
+     */
+    public function reservedEvents(Request $request, Department $department = null) {
+        $year = $request->get('year');
+        if (null === $year) {
+            $year = (new \DateTime())->format('Y');
+        }
+        $reservedEvents = [];
+        $overlaps = [];
+        if ( $department !== null) {
+            $reservedEvents = $this->eventRepo->findByDepartmentAndUsersAndStatusBeetweenDates(
+                $department, 
+                null, 
+                Status::RESERVED, 
+                date_create_from_format('Y-m-d',$year.'-01-01'), 
+                date_create_from_format('Y-m-d',(intval($year)+1).'-01-01')
+            );
+            $overlaps = [];
+            foreach ($reservedEvents as $event) {
+                $overlaps[$event->getId()] = $this->eventRepo->findOverlapingEventsNotOfCurrentUser($event);
+            }
+        }
+        return $this->render('calendar/_reservedEvents.html.twig',[
+            'reservedEvents' => $reservedEvents,
+            'overlaps' => $overlaps,
+        ]);
+    }
+
     private function renderCalendar(Request $request, $template, $showDepartment, $department = null): Response
     {
         $event = new Event();
@@ -114,15 +144,6 @@ class CalendarController extends AbstractController
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();
-        $reservedEvents = [];
-        $overlaps = [];
-        if ( $department !== null) {
-            $reservedEvents = $this->eventRepo->findByDepartmentAndUsersAndStatusBeetweenDates($department, null, Status::RESERVED, date_create_from_format('Y-m-d',$year.'-01-01'), date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'));
-            $overlaps = [];
-            foreach ($reservedEvents as $event) {
-                $overlaps[$event->getId()] = $this->eventRepo->findOverlapingEventsNotOfCurrentUser($event);
-            }
-        }
 
         return $this->render($template, [
             'form' => $form->createView(),
@@ -136,8 +157,6 @@ class CalendarController extends AbstractController
             'previousYearDaysColor' => $this->getParameter('previousYearsDaysColor'),
             'roles' => array_values($this->getUser()->getRoles()),
             'colorPalette' => $this->getParameter('colorPalette'),
-            'reservedEvents' => $reservedEvents,
-            'overlaps' => $overlaps,
         ]);
     }
 
