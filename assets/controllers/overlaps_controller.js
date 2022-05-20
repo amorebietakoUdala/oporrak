@@ -1,7 +1,4 @@
-import {
-   Controller
-} from 'stimulus';
-
+import { Controller } from 'stimulus';
 
 export default class extends Controller {
    static targets = ['card'];
@@ -9,15 +6,10 @@ export default class extends Controller {
       serviceUrl: String,
    };
 
-   connect() {
-      console.log('overlaps controller connected');
-   }
-
    async load(event) {
       let params = new URLSearchParams({
          year: event.detail.year,
      });
-     this.cardTarget.innerHTML='';
      const response = await fetch(`${this.serviceUrlValue}?${params.toString()}`);
      this.cardTarget.innerHTML=await response.text();
    }

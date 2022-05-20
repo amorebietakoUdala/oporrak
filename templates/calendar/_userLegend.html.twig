@@ -1,3 +1,4 @@
+{% if stats is defined and stats | length > 0 %}
 <div class="col-3 p-0 mr-1">
 	<table class="table table-sm table-bordered">
 	<thead>
@@ -8,8 +9,19 @@
 			<th title="{{'Remaining' | trans }}">{{'label.remaining' | trans }}</th>
 		</tr>
 	</thead>
-	<tbody data-user-legend-target="headerRow">
-
+	<tbody>
+		{% for key,value in stats %}
+			<tr>
+				<td><span style="background-color: {{ userColors[loop.index0] }}" title="{{ key }}">&nbsp;&nbsp;</span>&nbsp;<span>{{ key }}</span></td>
+					{% set approved = value[constant('App\\Entity\\Status::APPROVED')] is defined ? value[constant('App\\Entity\\Status::APPROVED')] : 0 %}
+					{% set reserved = value[constant('App\\Entity\\Status::RESERVED')] is defined ? value[constant('App\\Entity\\Status::RESERVED')] : 0 %}
+					{% set total = value.total is defined ? value.total : 0 %}
+					<td style="background-color: {{ statuses[constant('App\\Entity\\Status::APPROVED')] }}" class="text-center" title="{{ 'Approved' | trans }}">{{ approved }}</td>
+					<td style="background-color: {{ statuses[constant('App\\Entity\\Status::RESERVED')] }}" class="text-center" title="{{ 'Reserved' | trans }}">{{ reserved }}</td>
+					<td style="background-color: aqua" class="text-center" title="{{ 'Remaining' | trans }}">{{ total - approved - reserved }}</td>
+			</tr>
+		{% endfor %}
 	</tbody>
 	</table>
 </div>
+{% endif %}

@@ -10,6 +10,11 @@
 					<span class="text-danger">{{ form_errors(form.username) }}</span>
 					{{ form_widget(form.username, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
+				<div class="col-2 form-group">
+					{{ form_label(form.idNumber) }}
+					<span class="text-danger">{{ form_errors(form.idNumber) }}</span>
+					{{ form_widget(form.idNumber, {'attr': {'class': 'form-control form-control-sm'}}) }}
+				</div>
 				<div class="col-3 form-group">
 					{{ form_label(form.firstName) }}
 					<span class="text-danger">{{ form_errors(form.firstName) }}</span>
@@ -20,11 +25,11 @@
 					<span class="text-danger">{{ form_errors(form.email) }}</span>
 					{{ form_widget(form.email, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-                <div class="col-2 form-group form-check form-check-inline align-items-end">
-                  {{ form_label(form.activated) }}
-                  <span class="text-danger">{{ form_errors(form.activated) }}</span>
-                  {{ form_widget(form.activated, {'attr': {'class': 'form-check-input'}}) }}
-                </div>                
+				<div class="col-2 form-group form-check form-check-inline align-items-end">
+					{{ form_label(form.activated) }}
+					<span class="text-danger">{{ form_errors(form.activated) }}</span>
+					{{ form_widget(form.activated, {'attr': {'class': 'form-check-input'}}) }}
+				</div>                
 			</div>
 			<div class="form-row">
 				{% if not readonly and password_change %}

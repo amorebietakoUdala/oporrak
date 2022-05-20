@@ -153,6 +153,10 @@ class WorkCalendar
         return $this;
     }
 
+    public function getBaseDays(): int {
+        return $this->getVacationDays() + $this->getParticularBusinessLeave() + $this->getOvertimeDays();
+    }
+
     public function fill(WorkCalendar $data): self
     {
         $this->id = $data->getId();
