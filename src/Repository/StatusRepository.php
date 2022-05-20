@@ -18,4 +18,20 @@ class StatusRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Status::class);
     }
+
+    /**
+     * @return [] Returns an array ids and colors
+     */
+    public function getArrayOfColors()
+    {
+        $statuses = $this->createQueryBuilder('s')
+            ->getQuery()
+            ->getResult();
+        $colorArray = [];
+        foreach ($statuses as $status) {
+            $colorArray[$status->getId()] = $status->getColor();
+        }
+        return $colorArray;
+    }
+
 }

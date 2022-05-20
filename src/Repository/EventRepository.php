@@ -73,9 +73,16 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find all the effective events of the year for the users, including next year events with previous year days.
+     * 
+     * @param $users --------------- Users to look for his/her events
+     * @param $year --------------- Effective year of the events. 
+     * @param $eventType ---------- Filter for EventType.
+     * @param $includeNotApproved - Include not approved events.
+     * 
      * @return Event[] Returns an array of Event objects
      */
-    public function findEffectiveUserEventsOfTheYear(User $user, int $year, EventType $eventType = null, $includeNotApproved = true)
+    public function findEffectiveEventsOfTheYearForUsers(array $users, int $year, EventType $eventType = null, $includeNotApproved = true)
     {
         $thisYearStart = new DateTime("${year}-01-01");
         $thisYearEnd = new DateTime("${year}-12-31");
@@ -83,29 +90,47 @@ class EventRepository extends ServiceEntityRepository
         $nextYearStart = new DateTime("${nextYear}-01-01");
         $nextYearEnd = new DateTime("${nextYear}-12-31");
         $condition = "(
-            (e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL )) 
-            OR (e.startDate >= :nextYearStartDate AND e.endDate < :nextYearEndDate AND e.usePreviousYearDays = :true)
+            ( e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
+            OR ( e.startDate >= :nextYearStartDate AND e.endDate < :nextYearEndDate AND e.usePreviousYearDays = :true )
             )";
         $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
             ->andWhere($condition)
             ->setParameter('startDate', $thisYearStart)
             ->setParameter('endDate', $thisYearEnd)
             ->setParameter('false', false)
             ->setParameter('nextYearStartDate', $nextYearStart)
             ->setParameter('nextYearEndDate', $nextYearEnd)
-            ->setParameter('true', true)
-            ->andWhere('e.user = :user')
-            ->setParameter('user', $user);
-        if (null !== $eventType) {
-            $qb->andWhere('e.type = :type')
-            ->setParameter('type', $eventType);
-        }
-        if (!$includeNotApproved) {
-            $qb->andWhere('e.status != :status')
-            ->setParameter('status', Status::NOT_APPROVED);
-        }
-        $qb->orderBy('e.id', 'ASC');
+            ->setParameter('true', true);
+            if (null !== $users) {
+                $qb->andWhere('e.user in (:users)')
+                    ->setParameter('users', $users);
+            }
+            if (null !== $eventType) {
+                $qb->andWhere('e.type = :type')
+                ->setParameter('type', $eventType);
+            }
+            if (!$includeNotApproved) {
+                $qb->andWhere('e.status != :status')
+                ->setParameter('status', Status::NOT_APPROVED);
+            }
+            $qb->orderBy('e.id', 'ASC');
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Find all the effective events of the year for the user, including next year events with previous year days.
+     * 
+     * @param $user --------------- User to look for his/her events
+     * @param $year --------------- Effective year of the events. 
+     * @param $eventType ---------- Filter for EventType.
+     * @param $includeNotApproved - Include not approved events.
+     * 
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findEffectiveUserEventsOfTheYear(User $user, int $year, EventType $eventType = null, $includeNotApproved = true)
+    {
+        return $this->findEffectiveEventsOfTheYearForUsers([$user],$year,$eventType,$includeNotApproved);
     }
 
     /**
@@ -290,4 +315,25 @@ class EventRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Find all the events of the usernames of that year including next year events with previous year days.
+     * 
+     * @param array $usernames Array of usernames to look for their events
+     * @param $year Effective year of the events. 
+     * 
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findEffectiveEventsOfTheYearByUsernames($year, array $usernames) {
+        if (count($usernames) === 0) {
+            return [];
+        }
+        $events = $this->findByUsernamesAndBeetweenDates($usernames,new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
+        $nextYear = intval($year)+1;
+        $eventsNextYearWithPreviousYearDays = $this->findByUsernamesAndBeetweenDates($usernames,new \DateTime("${nextYear}-01-01"), new \DateTime("${nextYear}-12-31"), true);
+        $events = array_merge($events, $eventsNextYearWithPreviousYearDays);
+
+        return $events;
+    }
+
 }

@@ -1,6 +1,4 @@
-import {
-    Controller
-} from 'stimulus';
+import { Controller } from 'stimulus';
 import $ from 'jquery';
 
 const routes = require('../../public/js/fos_js_routes.json');
@@ -21,6 +19,10 @@ export default class extends Controller {
         Routing.setRoutingData(routes);
         Translator.fromJSON(translations);
         Translator.locale = global.locale;
+        $(this.contentTarget).hide();
+    }
+
+    hideDetails(event) {
         $(this.contentTarget).hide();
     }
 

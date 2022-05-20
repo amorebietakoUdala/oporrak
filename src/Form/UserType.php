@@ -51,6 +51,7 @@ class UserType extends BaseUserType
             'data_class' => User::class,
             'password_change' => false,
             'readonly' => false,
+            'new' => false,
         ]);
     }
 }

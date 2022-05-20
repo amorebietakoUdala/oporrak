@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Entity\AntiquityDays;
 use App\Entity\Event;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
+use App\Repository\AntiquityDaysRepository;
 use App\Repository\HolidayRepository;
 use App\Repository\WorkCalendarRepository;
 
@@ -12,10 +14,12 @@ class StatsService
 {
    private WorkCalendarRepository $wcRepo;
    private HolidayRepository $holidayRepo;
+   private AntiquityDaysRepository $adRepo;
 
-   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo) {
+   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo, AntiquityDaysRepository $adRepo) {
       $this->wcRepo = $wcRepo;
       $this->holidayRepo = $holidayRepo;
+      $this->adRepo = $adRepo;
    }
 
    public function calculateTotalWorkingDays(array $events, $workCalendar)
@@ -32,7 +36,6 @@ class StatsService
 
    public function calculateStatsByUserAndEventType(array $events) {
       $counters = [];
-
       foreach($events as $event) {
          $year = $event->getStartDate()->format('Y');
          $workCalendars = [];
@@ -46,7 +49,6 @@ class StatsService
 
          $userId = "{$event->getUser()->getUsername()}";
          $typeId = "{$event->getType()->getId()}";
-
          if ($event->getStatus()->getId() !== Status::NOT_APPROVED ) {
             if ( array_key_exists($userId, $counters) ) {
                if ( array_key_exists($typeId, $counters[$userId]) ) {
@@ -75,7 +77,6 @@ class StatsService
          }
 
          $statusId = "{$event->getStatus()->getId()}";
-
          if ( array_key_exists($statusId, $counters) ) {
             $counters[$statusId] = $counters[$statusId] + $workingDays;
          } else {
@@ -100,6 +101,7 @@ class StatsService
 
          $statusId = "{$event->getStatus()->getId()}";
          $user = "{$event->getUser()->getUsername()}";
+         $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($event->getUser()->getYearsWorked());
          if ( array_key_exists($user, $counters) ) {
             if ( array_key_exists($statusId, $counters[$user]) ) {
                $counters[$user][$statusId] = $counters[$user][$statusId] + $workingDays;
@@ -107,6 +109,11 @@ class StatsService
                $counters[$user][$statusId] = $workingDays;
             }
          } else {
+            if ( null !== $antiquityDays ) {
+               $counters[$user]['total'] = $workCalendars[$year]->getBaseDays() + $antiquityDays->getVacationDays();
+            } else {
+               $counters[$user]['total'] = $workCalendars[$year]->getBaseDays();
+            }
             $counters[$user][$statusId] = $workingDays;
          }
       }
@@ -137,7 +144,6 @@ class StatsService
       return $counters;
    }
 
-   
    public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar) {
        if (!$event->getHalfDay()) {
            $holidaysBetween = $this->calculateHolidaysOnWorkingDays($this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate()));

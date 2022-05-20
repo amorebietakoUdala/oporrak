@@ -10,7 +10,7 @@ use App\Entity\WorkCalendar;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\HolidayRepository;
-use App\Repository\UserRepository;
+use App\Repository\StatusRepository;
 use App\Repository\WorkCalendarRepository;
 use App\Services\StatsService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,18 +31,17 @@ class ApiController extends AbstractController
    private EventRepository $eventRepo;
    private HolidayRepository $hollidayRepo;
    private WorkCalendarRepository $wcRepo;
-   private UserRepository $userRepo;
    private StatsService $statsService;
+   private StatusRepository $statusRepo;
 
-   public function __construct(AntiquityDaysRepository $adRepo, EventRepository $eventRepo, HolidayRepository $hollidayRepo, WorkCalendarRepository $wcRepo, UserRepository $userRepo, StatsService $statsService)
+   public function __construct(AntiquityDaysRepository $adRepo, EventRepository $eventRepo, HolidayRepository $hollidayRepo, WorkCalendarRepository $wcRepo, StatsService $statsService, StatusRepository $statusRepo)
    {
       $this->adRepo = $adRepo;
       $this->eventRepo = $eventRepo;
       $this->hollidayRepo = $hollidayRepo;
       $this->wcRepo = $wcRepo;
-      $this->userRepo = $userRepo;
       $this->statsService = $statsService;
-      
+      $this->statusRepo = $statusRepo;
    }
 
    /**
@@ -74,32 +73,26 @@ class ApiController extends AbstractController
     */
     public function getMyRemainigDays(Request $request): Response
     {
-       $year = $request->get('year');
-       if (null === $year) {
-          $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
-       }
-       /** @var User $user */
-       $user = $this->getUser();
-       $totals = $this->totalDaysForEachType($user,$year);
-       $events = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year, false);
-       $nextYear = intval($year)+1;
-       $eventsNextYearWithLastYearDays = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $nextYear, true);
-       $events = array_merge($events, $eventsNextYearWithLastYearDays);
-       $counters = $this->statsService->calculateStatsByUserAndEventType($events);
+      $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
+      /** @var User $user */
+      $user = $this->getUser();
+      $totals = $this->totalDaysForEachType($user,$year);
+      $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
+      $counters = $this->statsService->calculateStatsByUserAndEventType($events);
 
-       if (count($counters)) {
+      if (count($counters)) {
          $statsByEventType = $counters[$user->getUsername()];
          foreach ($totals as $key => $value) {
             if (array_key_exists($key, $statsByEventType)) {
-              $remaining[$key] = $totals[$key] - $statsByEventType[$key];
+            $remaining[$key] = $totals[$key] - $statsByEventType[$key];
             } else {
-              $remaining[$key] = $totals[$key];
+            $remaining[$key] = $totals[$key];
             }
          }
-       } else {
+      } else {
          $remaining = $totals;
-       }
-       return $this->json($remaining);
+      }
+      return $this->json($remaining);
     }
 
     private function totalDaysForEachType($user, $year) {
@@ -129,7 +122,6 @@ class ApiController extends AbstractController
       }
       /** @var User $user */
       $user = $this->getUser();
-      //      $nextYear = intVal($year) + 1;
       $items = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year, false);
       $eventsWithLastYearDays = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year, true);
       $color = $this->getParameter('previousYearsDaysColor');
@@ -154,7 +146,6 @@ class ApiController extends AbstractController
     */
    public function getDepartmentDates(Request $request, EventRepository $repo): Response
    {
-      $year = $request->get('year');
       $usersParam = $request->get('user');
       $users = null;
       if ($usersParam !== null && $usersParam !== '') {
@@ -163,9 +154,7 @@ class ApiController extends AbstractController
       $status = $request->get('status') === null ? null : intval($request->get('status'));
       /** @var User $me */
       $me = $this->getUser();
-      if (null === $year) {
-         $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
-      }
+      $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       $nextYear = intVal($year) + 1;
       if ($request->get('department') !== null && (in_array('ROLE_ADMIN', $me->getRoles()) || in_array('ROLE_HHRR', $me->getRoles()))) {
          $department = $request->get('department');
@@ -203,59 +192,57 @@ class ApiController extends AbstractController
       return $this->json($users, 200, [], ['groups' => ['list']]);
    }
 
-     /**
-     * @Route("/user/stats", name="api_get_user_stats", methods="GET")
-     */
-    public function getUserStats(Request $request) {
-      $users = $request->get('users');
-      if (null === $users) {
-          $users = [];
-      } else {
-          $users = explode(",",$users);
-      }
-      $year = $request->get('year');
-      if (null === $year) {
-          $year = (new \DateTime())->format('Y');
-      }
-      $events = $this->eventRepo->findByUsernamesAndBeetweenDates($users,new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
-      // Add next year days using this year days
-      $nextYear = intval($year)+1;
-      $eventsNextYearWithPreviousYearDays = $this->eventRepo->findByUsernamesAndBeetweenDates($users,new \DateTime("${nextYear}-01-01"), new \DateTime("${nextYear}-12-31"), true);
-      $events = array_merge($events, $eventsNextYearWithPreviousYearDays);
+   /**
+    * @Route("/{_locale}/user/stats", name="api_get_user_stats", methods="GET")
+    */
+   public function getUserStats(Request $request) {
+      $users = (null === $request->get('users') || $request->get('users') === '') ? [] : explode(",",$request->get('users'));
+      $colors = (null === $request->get('colors') || $request->get('colors') === '') ? [] : explode(",",$request->get('colors'));
+      $json = (null === $request->get('json') || $request->get('json') === '') ? false : boolval($request->get('json'));
+      $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
+      $events = $this->eventRepo->findEffectiveEventsOfTheYearByUsernames($year,$users);
       $stats = $this->statsService->calculateStatsByUserAndStatus($events, $year);
-      $usersVacationDays = $this->adaptStats($stats, $year);
-      return $this->json($usersVacationDays, 200, [], ['groups' => ['event']]);
-   }
-
-   private function adaptStats($stats, $year) {
-      $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-      $baseDays = $workCalendar->getVacationDays() + $workCalendar->getParticularBusinessLeave() + $workCalendar->getOvertimeDays();
-      $usersVacationDays = [];
-      foreach ($stats as $key => $value) {
-         $user = $this->userRepo->findOneBy(['username' => $key]);
-         $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
-         if ( null !== $antiquityDays ) {
-            $usersVacationDays[$key]['total'] = $baseDays + $antiquityDays->getVacationDays();
-            foreach ($value as $key2 => $value2) {
-               if ($key2 === Status::APPROVED) {
-                     $usersVacationDays[$key]['approved'] = $value2;
-               } elseif ( $key2 === Status::RESERVED ) {
-                     $usersVacationDays[$key]['reserved'] = $value2;
-               }
-            }
-         } else {
-            $usersVacationDays[$key]['total'] = $baseDays;
-            foreach ($value as $key2 => $value2) {
-                  if ($key2 === Status::APPROVED) {
-                  $usersVacationDays[$key]['approved'] = $value2;
-                  } elseif ( $key2 === Status::RESERVED ) {
-                        $usersVacationDays[$key]['reserved'] = $value2;
-                  }
-               }
-         }
+      $statuses = $this->statusRepo->getArrayOfColors();
+      if ($json) {
+         return $this->json($stats, 200, [], ['groups' => ['event']]);
       }
-      return $usersVacationDays;
+      return $this->render('calendar/_userLegend.html.twig',[
+         'stats' => $stats,
+         'userColors' => $colors,
+         'statuses' => $statuses,
+      ]);      
    }
 
-
+    /**
+     * @Route("/{_locale}/department/{department}/overlaps", name="api_department_overlaps", methods="GET")
+     */
+    public function reservedEvents(Request $request, Department $department = null) {
+      $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
+      $json = (null === $request->get('json') || $request->get('json') === '') ? false : boolval($request->get('json'));
+      $reservedEvents = [];
+      $overlaps = [];
+      if ( $department !== null) {
+          $reservedEvents = $this->eventRepo->findByDepartmentAndUsersAndStatusBeetweenDates(
+              $department, 
+              null, 
+              Status::RESERVED, 
+              date_create_from_format('Y-m-d',$year.'-01-01'), 
+              date_create_from_format('Y-m-d',(intval($year)+1).'-01-01')
+          );
+          $overlaps = [];
+          foreach ($reservedEvents as $event) {
+              $overlaps[$event->getId()] = $this->eventRepo->findOverlapingEventsNotOfCurrentUser($event);
+          }
+      }
+      if ($json) {
+         return $this->json([
+            'reservedEvents' => $reservedEvents,
+            'overlaps' => $overlaps,
+        ], 200, [], ['groups' => ['event']]);
+      }
+      return $this->render('calendar/_reservedEvents.html.twig',[
+          'reservedEvents' => $reservedEvents,
+          'overlaps' => $overlaps,
+      ]);
+  }
 }
