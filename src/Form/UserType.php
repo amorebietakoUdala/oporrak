@@ -42,7 +42,7 @@ class UserType extends BaseUserType
                     new PositiveOrZero()
                 ]
             ]);
-            ;
+        ;
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -11,6 +11,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ReportsFilterFormType extends AbstractType
 {
@@ -25,6 +26,9 @@ class ReportsFilterFormType extends AbstractType
             'format' => 'yyyy-MM-dd',
             'attr' => ['class' => 'js-datepicker'],
             'label' => 'event.startDate',
+            'constraints' => [
+                new NotBlank(),
+            ],
         ])
         ->add('endDate', DateType::class, [
             'widget' => 'single_text',
@@ -32,6 +36,9 @@ class ReportsFilterFormType extends AbstractType
             'format' => 'yyyy-MM-dd',
             'attr' => ['class' => 'js-datepicker'],
             'label' => 'event.endDate',
+            'constraints' => [
+                new NotBlank(),
+            ],
         ])
         ->add('user', EntityType::class, [
             'class' => User::class,

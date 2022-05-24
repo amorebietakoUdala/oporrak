@@ -233,6 +233,37 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
+    public function findByBossAndStatusBeetweenDates($boss = null, $excludedDepartment, $status = null, $startDate, $endDate = null)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
+            ->andWhere('e.startDate >= :startDate')
+            ->setParameter('startDate', $startDate);
+        if (null !== $endDate) {
+            $qb->andWhere('e.endDate < :endDate')
+                ->setParameter('endDate', $endDate);
+        }
+        if (null !== $status) {
+            $qb->andWhere('e.status = :status')
+                ->setParameter('status', $status);
+        }
+        if (null !== $excludedDepartment) {
+            $qb->andWhere('u.department != :department')
+                ->setParameter('department', $excludedDepartment);
+        }
+        if (null !== $boss) {
+            $qb->andWhere('u.boss = :boss')
+                ->setParameter('boss', $boss);
+        }
+        $qb->orderBy('e.id', 'ASC')
+            //            ->setMaxResults(10)
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
     public function findAllByStatusBeetweenDates($status, $startDate, $endDate = null)
     {
         $qb = $this->createQueryBuilder('e')

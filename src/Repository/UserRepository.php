@@ -36,4 +36,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    public function findUsersByDepartmentOrBossQB($department, $boss) {
+        $qb = $this->createQueryBuilder('u');
+        if ($department !== null) {
+            $condition = "
+                u.department = :department OR ( u.department != :department2 AND ( u.boss = :boss ) )
+                ";
+            $qb->andWhere($condition)
+                ->setParameter('department', $department)
+                ->setParameter('department2', $department)
+                ->setParameter('boss', $boss);
+        }
+        $qb->orderBy('u.username', 'ASC');
+        return $qb;
+
+    }
+
 }

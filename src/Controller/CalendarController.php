@@ -108,10 +108,9 @@ class CalendarController extends AbstractController
         }
         $form = $this->createForm(EventFormType::class, $event);
         $userFilterForm = $this->createForm(UserFilterType::class, [
-            'roles' => $this->getUser()->getRoles(),
             'locale' => $request->getLocale(),
             'showDepartment' => $showDepartment,
-            'department' => $department
+            'department' => $department,
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();

@@ -165,6 +165,11 @@ class ApiController extends AbstractController
       }
 
       $items = $repo->findByDepartmentAndUsersAndStatusBeetweenDates($department, $users, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+      /** If he/she has role boss, adds his/her workers events to the list */
+      if (in_array('ROLE_BOSS', $me->getRoles())) {
+         $workers = $repo->findByBossAndStatusBeetweenDates($me, $department, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+         $items = array_merge($items, $workers);
+      }
       $dates = [
          'total_count' => $items === null ? 0 : count($items),
          'items' => $items === null ? [] : $items
