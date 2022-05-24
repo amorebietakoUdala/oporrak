@@ -145,6 +145,7 @@ export default class extends Controller {
             .then(result => {
                 if (result.items) {
                     colorArray = this.assignColor(result.items);
+                    console.log(colorArray);
                     return result.items.map(r => ({
                         id: r.id,
                         startDate: new Date(r.startDate),
