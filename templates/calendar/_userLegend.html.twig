@@ -24,9 +24,22 @@
 				{% set approved = stat[constant('App\\Entity\\Status::APPROVED')] is defined ? stat[constant('App\\Entity\\Status::APPROVED')] : 0 %}
 				{% set reserved = stat[constant('App\\Entity\\Status::RESERVED')] is defined ? stat[constant('App\\Entity\\Status::RESERVED')] : 0 %}
 				{% set total = stat.total is defined ? stat.total : 0 %}
+				{% set remaining = total - approved - reserved %}
+				{% if reserved | length > 2 %}
+					{% set reserved = reserved | number_format(2,',','.') %}
+				{% endif %}
+				{% if approved | length > 2 %}
+					{% set approved = approved | number_format(2,',','.') %}
+				{% endif %}
+				{% if total | length > 2 %}
+					{% set total = total | number_format(2,',','.') %}
+				{% endif %}
+				{% if remaining | length > 2 %}
+					{% set remaining = remaining | number_format(2,',','.') %}
+				{% endif %}
 				<td style="background-color: {{ statuses[constant('App\\Entity\\Status::APPROVED')] }}" class="text-center" title="{{ 'Approved' | trans }}">{{ approved }}</td>
 				<td style="background-color: {{ statuses[constant('App\\Entity\\Status::RESERVED')] }}" class="text-center" title="{{ 'Reserved' | trans }}">{{ reserved }}</td>
-				<td style="background-color: aqua" class="text-center" title="{{ 'Remaining' | trans }}">{{ total - approved - reserved }}</td>
+				<td style="background-color: aqua" class="text-center" title="{{ 'Remaining' | trans }}">{{ remaining }}</td>
 			</tr>
 		{% endfor %}
 	</tbody>
