@@ -8,7 +8,6 @@ export default class extends Controller {
 
    async load(event) {
       let colorArray = event.detail.colorArray;
-      console.log(colorArray);
       let params = new URLSearchParams({
          year: event.detail.year,
          users: Object.keys(colorArray).toString(),

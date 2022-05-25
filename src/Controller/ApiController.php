@@ -205,6 +205,7 @@ class ApiController extends AbstractController
       $colors = (null === $request->get('colors') || $request->get('colors') === '') ? [] : explode(",",$request->get('colors'));
       $json = (null === $request->get('json') || $request->get('json') === '') ? false : boolval($request->get('json'));
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
+      $userColors = $this->createArray($users, $colors);
       $events = $this->eventRepo->findEffectiveEventsOfTheYearByUsernames($year,$users);
       $stats = $this->statsService->calculateStatsByUserAndStatus($events, $year);
       $statuses = $this->statusRepo->getArrayOfColors();
@@ -213,9 +214,17 @@ class ApiController extends AbstractController
       }
       return $this->render('calendar/_userLegend.html.twig',[
          'stats' => $stats,
-         'userColors' => $colors,
+         'userColors' => $userColors,
          'statuses' => $statuses,
-      ]);      
+      ]);
+   }
+
+   private function createArray(array $users, array $colors) {
+      $userColors = [];
+      foreach ($users as $key => $value) {
+         $userColors[$value] = $colors[$key];
+      }
+      return $userColors;
    }
 
     /**

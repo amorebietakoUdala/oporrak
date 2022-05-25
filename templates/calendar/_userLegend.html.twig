@@ -12,7 +12,7 @@
 	<tbody>
 		{% for key,value in stats %}
 			<tr>
-				<td><span style="background-color: {{ userColors[loop.index0] }}" title="{{ key }}">&nbsp;&nbsp;</span>&nbsp;<span>{{ key }}</span></td>
+				<td><span style="background-color: {{ userColors[key] }}" title="{{ key }}">&nbsp;&nbsp;</span>&nbsp;<span>{{ key }}</span></td>
 					{% set approved = value[constant('App\\Entity\\Status::APPROVED')] is defined ? value[constant('App\\Entity\\Status::APPROVED')] : 0 %}
 					{% set reserved = value[constant('App\\Entity\\Status::RESERVED')] is defined ? value[constant('App\\Entity\\Status::RESERVED')] : 0 %}
 					{% set total = value.total is defined ? value.total : 0 %}
