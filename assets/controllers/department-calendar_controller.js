@@ -130,14 +130,17 @@ export default class extends Controller {
                 }
             });
         if ( user.length > 0) {
-            params.user = user;
+            params.users = user;
         }
         if ( null !== department && '' !== department ) {
             params.department = department;
         }
         if (null !== status && '' !== status) {
             params.status = status;
-        } 
+        }
+        if (null !== this.typeValue && this.typeValue === 'city-hall') {
+            params.calendar = this.typeValue;
+        }
         urlParams = new URLSearchParams(params);
         let colorArray = null;
         let dates = await fetch(`${this.departmentDatesUrlValue}?${urlParams.toString()}`)
@@ -145,7 +148,6 @@ export default class extends Controller {
             .then(result => {
                 if (result.items) {
                     colorArray = this.assignColor(result.items);
-                    console.log(colorArray);
                     return result.items.map(r => ({
                         id: r.id,
                         startDate: new Date(r.startDate),

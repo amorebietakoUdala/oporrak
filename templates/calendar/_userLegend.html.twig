@@ -10,18 +10,28 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for key,value in stats %}
+		{% for key,value in userColors %}
 			<tr>
 				<td><span style="background-color: {{ userColors[key] }}" title="{{ key }}">&nbsp;&nbsp;</span>&nbsp;<span>{{ key }}</span></td>
-					{% set approved = value[constant('App\\Entity\\Status::APPROVED')] is defined ? value[constant('App\\Entity\\Status::APPROVED')] : 0 %}
-					{% set reserved = value[constant('App\\Entity\\Status::RESERVED')] is defined ? value[constant('App\\Entity\\Status::RESERVED')] : 0 %}
-					{% set total = value.total is defined ? value.total : 0 %}
-					<td style="background-color: {{ statuses[constant('App\\Entity\\Status::APPROVED')] }}" class="text-center" title="{{ 'Approved' | trans }}">{{ approved }}</td>
-					<td style="background-color: {{ statuses[constant('App\\Entity\\Status::RESERVED')] }}" class="text-center" title="{{ 'Reserved' | trans }}">{{ reserved }}</td>
-					<td style="background-color: aqua" class="text-center" title="{{ 'Remaining' | trans }}">{{ total - approved - reserved }}</td>
+				{% if stats[key] is defined %}
+					{% set stat = stats[key] %}
+				{% else %}
+					{# If there is a user with events but with previous year days, it's not coming in stats but it must appear a line in the user legend with it's color.
+						So we fake the stats filling everything with 0. So we avoid to do 2 loops.
+					#}
+					{% set stat = { 1: 0, 2: 0, 3: 0, 'total' : 0,} %}
+				{% endif %}
+				{% set approved = stat[constant('App\\Entity\\Status::APPROVED')] is defined ? stat[constant('App\\Entity\\Status::APPROVED')] : 0 %}
+				{% set reserved = stat[constant('App\\Entity\\Status::RESERVED')] is defined ? stat[constant('App\\Entity\\Status::RESERVED')] : 0 %}
+				{% set total = stat.total is defined ? stat.total : 0 %}
+				<td style="background-color: {{ statuses[constant('App\\Entity\\Status::APPROVED')] }}" class="text-center" title="{{ 'Approved' | trans }}">{{ approved }}</td>
+				<td style="background-color: {{ statuses[constant('App\\Entity\\Status::RESERVED')] }}" class="text-center" title="{{ 'Reserved' | trans }}">{{ reserved }}</td>
+				<td style="background-color: aqua" class="text-center" title="{{ 'Remaining' | trans }}">{{ total - approved - reserved }}</td>
 			</tr>
 		{% endfor %}
 	</tbody>
 	</table>
 </div>
 {% endif %}
+
+

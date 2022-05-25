@@ -146,7 +146,8 @@ class ApiController extends AbstractController
     */
    public function getDepartmentDates(Request $request, EventRepository $repo): Response
    {
-      $usersParam = $request->get('user');
+      $usersParam = $request->get('users');
+      $calendar = $request->get('calendar') !== null ? $request->get('calendar') : 'department';
       $users = null;
       if ($usersParam !== null && $usersParam !== '') {
          $users = explode(',', $usersParam);
@@ -163,10 +164,9 @@ class ApiController extends AbstractController
       } else {
          $department = null;
       }
-
       $items = $repo->findByDepartmentAndUsersAndStatusBeetweenDates($department, $users, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
-      /** If he/she has role boss, adds his/her workers events to the list */
-      if (in_array('ROLE_BOSS', $me->getRoles())) {
+      /** If he/she has role boss and it's department calendar, adds his/her workers events to the list */
+      if (in_array('ROLE_BOSS', $me->getRoles()) && $calendar === 'department' && $usersParam === null ) {
          $workers = $repo->findByBossAndStatusBeetweenDates($me, $department, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
          $items = array_merge($items, $workers);
       }

@@ -22,8 +22,9 @@
           'department-dates-url': path('api_get_dates'), 
           'year' : year,
           'department' : null, 
-          'status': constant('App\\Entity\\Status::APPROVED') } ) }}
-          'type': 'city-hall'>
+          'status': constant('App\\Entity\\Status::APPROVED'),
+          'type': 'city-hall' } ) }}
+      >
          {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : true }) }}
 			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">
