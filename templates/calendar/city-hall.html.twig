@@ -14,7 +14,7 @@
                'previousYearDaysColor': previousYearDaysColor,
             }
          }) }} 
-         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails">
+         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:clickDay->day-details#showDetails department-calendar:loaded->day-details#hideDetails">
 		<div class="container-fluid" {{ stimulus_controller('department-calendar', {
           'locale': app.request.locale|split('_')[0], 
           'holidays-url': path('api_getHolidays'), 
