@@ -8,7 +8,7 @@ parameters:
   previousYearsDaysColor: "#33a2ff"
   mailerFrom: "%env(MAILER_FROM)%"
   mailHHRR: "%env(MAILER_HH_RR_MAIL)%"
-  days: 5
+  days: 7
   sendDeletionEmails: "%env(bool:MAILER_SEND_DELETION_EMAILS)%"
   colorPalette:
     [
