@@ -6,6 +6,7 @@ use App\Entity\AntiquityDays;
 use App\Entity\Event;
 use App\Entity\EventType;
 use App\Entity\Status;
+use App\Entity\User;
 use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
 use App\Repository\AntiquityDaysRepository;
@@ -223,9 +224,23 @@ class EventController extends AbstractController
      */
     private function checkDoesNotExcessLimitations(Event $event, WorkCalendar $workCalendar)
     {
+        /** @var User $user */
+        $user = $this->getUser();
+        if ( $event->getStartDate() > $user->getEndDate() || $event->getEndDate() > $user->getEndDate() ) {
+            $this->addFlash('error', new TranslatableMessage('message.endOfContract', [
+                'endDate' => $user->getEndDate()->format('Y/m/d')
+            ], 'messages'));
+            return false;
+        }
+
+        if ( $event->getStartDate() < $user->getStartDate() ) {
+            $this->addFlash('error', new TranslatableMessage('message.startOfContract', [
+                'startDate' => $user->getStartDate()->format('Y/m/d')
+            ], 'messages'));
+            return false;
+        }
 
         /* Check overlap with my own events */
-        $user = $this->getUser();
         $myEvents = $this->eventRepo->findUserEventsBeetweenDates($user, new \DateTime($event->getStartDate()->format('Y') . '-01-01'));
         if ($this->checkOverlap($myEvents, $event)) {
             $this->addFlash('error', new TranslatableMessage('message.overlapingDates', [
@@ -274,7 +289,7 @@ class EventController extends AbstractController
                 return false;
             }
         }
-        if (!$this->checkDoesNotExcessMaximumDaysForType($event, $workCalendar)) {
+        if (!$this->checkDoesNotExcessMaximumDaysForType($user, $event, $workCalendar)) {
             return false;
         }
         return true;
@@ -331,29 +346,14 @@ class EventController extends AbstractController
     }
 
     /**
-     * Returns true it it daesn't excess the maximum days
+     * Returns true if it doesn't excess the maximum days, for that type and work calendar
      */
-    private function checkDoesNotExcessMaximumDaysForType(Event $event, WorkCalendar $workCalendar)
+    private function checkDoesNotExcessMaximumDaysForType(User $user, Event $event, WorkCalendar $workCalendar)
     {
         $year = $event->getStartDate()->format('Y');
+        $totals = $user->getTotals($workCalendar, $this->adRepo);
         $valid = true;
-        $maxDays = null;
-        if ($event->getType()->getId() === EventType::VACATION) {
-            $maxDays = $workCalendar->getVacationDays();
-        }
-        if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE) {
-            $maxDays = $workCalendar->getParticularBusinessLeave();
-        }
-        if ($event->getType()->getId() === EventType::OVERTIME) {
-            $maxDays = $workCalendar->getOvertimeDays();
-        }
-        if ($event->getType()->getId() === EventType::ANTIQUITY_DAYS) {
-            /** @var User $user */  
-            $user = $this->getUser();
-            /** @var AntiquityDays $antiquity */
-            $antiquity = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
-            $maxDays = $antiquity->getVacationDays();
-        }
+        $maxDays = $totals[$event->getType()->getId()];
         $valid = $this->checkDoesNotExcessMaximumDays($event, $maxDays, $year, $workCalendar);
         return $valid;
     }

@@ -95,19 +95,9 @@ class ApiController extends AbstractController
       return $this->json($remaining);
     }
 
-    private function totalDaysForEachType($user, $year) {
-      $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
-      $totalAntiquityDays = $antiquityDays !== null ? $antiquityDays->getVacationDays() : 0;
+    private function totalDaysForEachType(User $user, $year) {
       $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-      $totalVacationDays = $workCalendar->getVacationDays();
-      $totalParticularBussinessLeaveDays = $workCalendar->getParticularBusinessLeave();
-      $totalOvertimeDays = $workCalendar->getOvertimeDays();
-      $totals = [
-         EventType::VACATION => $totalVacationDays,
-         EventType::PARTICULAR_BUSSINESS_LEAVE => $totalParticularBussinessLeaveDays,
-         EventType::OVERTIME => $totalOvertimeDays,
-         EventType::ANTIQUITY_DAYS => $totalAntiquityDays,
-      ];
+      $totals = $user->getTotals($workCalendar,$this->adRepo);
       return $totals;
     }
 

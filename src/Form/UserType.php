@@ -6,6 +6,7 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use AMREU\UserBundle\Form\UserType as BaseUserType;
 use App\Entity\Department;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,6 +42,21 @@ class UserType extends BaseUserType
                 'constraints' => [
                     new PositiveOrZero()
                 ]
+            ])
+            ->add('startDate', DateType::class,[
+                'label' => 'user.startDate',
+                'widget' => 'single_text',
+                'html5' => true,
+                'format' => 'yyyy-MM-dd',
+                'attr' => ['class' => 'js-datepicker'],
+
+            ])
+            ->add('endDate', DateType::class,[
+                'label' => 'user.endDate',
+                'widget' => 'single_text',
+                'html5' => true,
+                'format' => 'yyyy-MM-dd',
+                'attr' => ['class' => 'js-datepicker'],
             ]);
         ;
     }

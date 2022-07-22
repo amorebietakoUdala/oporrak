@@ -8,5 +8,8 @@ $(function() {
         document.user.submit();
     });
 
+    $('#user_password_first').val('');
+    $('#user_password_second').val('');
+
     $('.js-select2').select2();
 });

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Entity\AntiquityDays;
 use App\Entity\Event;
 use App\Entity\Status;
+use App\Entity\User;
 use App\Entity\WorkCalendar;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\HolidayRepository;
@@ -90,6 +91,7 @@ class StatsService
    public function calculateStatsByUserAndStatus(array $events, int $year) {
       $counters = [];
       foreach($events as $event) {
+         /** @var Event $event */
          $workCalendars = [];
          $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
          $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
@@ -100,21 +102,22 @@ class StatsService
          }
 
          $statusId = "{$event->getStatus()->getId()}";
-         $user = "{$event->getUser()->getUsername()}";
+         $username = "{$event->getUser()->getUsername()}";
          $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($event->getUser()->getYearsWorked());
-         if ( array_key_exists($user, $counters) ) {
-            if ( array_key_exists($statusId, $counters[$user]) ) {
-               $counters[$user][$statusId] = $counters[$user][$statusId] + $workingDays;
+         if ( array_key_exists($username, $counters) ) {
+            if ( array_key_exists($statusId, $counters[$username]) ) {
+               $counters[$username][$statusId] = $counters[$username][$statusId] + $workingDays;
             } else {
-               $counters[$user][$statusId] = $workingDays;
+               $counters[$username][$statusId] = $workingDays;
             }
          } else {
+            $user = $event->getUser();
             if ( null !== $antiquityDays ) {
-               $counters[$user]['total'] = $workCalendars[$year]->getBaseDays() + $antiquityDays->getVacationDays();
+               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendars[$year]) + $antiquityDays->getVacationDays();
             } else {
-               $counters[$user]['total'] = $workCalendars[$year]->getBaseDays();
+               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendars[$year]);
             }
-            $counters[$user][$statusId] = $workingDays;
+            $counters[$username][$statusId] = $workingDays;
          }
       }
 
@@ -185,7 +188,5 @@ class StatsService
 
    private function getWeekday($date) {
       return intval(date('w', strtotime($date)));
-  }
-  
-
+   }
 }

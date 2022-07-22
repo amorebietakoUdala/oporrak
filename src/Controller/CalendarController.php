@@ -48,6 +48,16 @@ class CalendarController extends AbstractController
     }
 
     /**
+     * @Route("/test", name="app_test")
+     */
+
+    public function test() {
+        /** @var User */
+        $user = $this->getUser();
+        dd($user->isWorkingAllYear());
+    }
+
+    /**
      * @Route("/", name="app_home")
      */
     public function home(Request $request): Response

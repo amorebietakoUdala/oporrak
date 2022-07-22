@@ -4,5 +4,7 @@ ROLE_BOSS: "Sailburua"
 ROLE_USER: "Erabiltzailea"
 
 user.yearsWorked: "Lan egindako urteak"
+user.startDate: "Alta data"
+user.endDate: "Baja data"
 
 security.login.remember_me: "Oroitu"
