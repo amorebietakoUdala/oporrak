@@ -254,4 +254,29 @@ class Event
 
         return $this;
     }
+
+    /**
+     * @Groups({"event"})
+     */
+    public function isBetweenYears(): bool {
+        if ( $this->startDate->format('Y') !== $this->endDate->format('Y') ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getDaysFirstYear(): int {
+        $startDate = $this->getStartDate();
+        $year = $this->getStartDate()->format('Y');
+        $nextYear = intval($year) + 1;
+        $nextYearStartDate = new \DateTime("${nextYear}-01-01");
+        return $nextYearStartDate->diff($startDate)->format("%a");
+    }
+
+    public function getDaysSecondYear(): int {
+        $year = $this->getEndDate()->format('Y');
+        $endYearStartDate = new \DateTime("${year}-01-01");
+        return $this->endDate->diff($endYearStartDate)->format("%a") + 1;
+    }
 }

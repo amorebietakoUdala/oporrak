@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use AMREU\UserBundle\Model\UserInterface as AMREUserInterface;
 use AMREU\UserBundle\Model\User as BaseUser;
+use App\Repository\AntiquityDaysRepository;
+use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
@@ -83,6 +85,16 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
      * @ORM\Column(type="integer", nullable=true)
      */
     private $yearsWorked;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $startDate;
+
+    /**
+     * @ORM\Column(type="date", nullable=true)
+     */
+    private $endDate;
 
     public function __construct()
     {
@@ -191,4 +203,119 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return $this;
     }
 
+    public function getStartDate(): ?\DateTimeInterface
+    {
+        return $this->startDate;
+    }
+
+    public function setStartDate(?\DateTimeInterface $startDate): self
+    {
+        $this->startDate = $startDate;
+
+        return $this;
+    }
+
+    public function getEndDate(): ?\DateTimeInterface
+    {
+        return $this->endDate;
+    }
+
+    public function setEndDate(?\DateTimeInterface $endDate): self
+    {
+        $this->endDate = $endDate;
+
+        return $this;
+    }
+
+    public function getWorkDaysCurrentYear(): int {
+        $interval = date_diff($this->endDate, $this->startDate);
+   
+        return $interval->days;        
+    }
+
+    public function isFirstYear(): bool {
+        $year = date('Y');
+        $startYear = $this->startDate->format('Y');
+        if ($startYear === $year) {
+            return true;
+        }
+        return false;
+    }
+
+    public function isLastYear(): bool {
+        $year = date('Y');
+        $endYear = $this->endDate->format('Y');
+        if ($endYear === $year) {
+            return true;
+        }
+        return false;
+    }
+
+    public function isWorkingAllYear(): bool {
+        if ( null === $this->endDate ) {
+            return true;
+        }
+        if ( $this->isFirstYear() || $this->isLastYear() ) {
+            return false;
+        }
+        return true;
+    }
+
+    public function calculateCurrentYearBaseDays(WorkCalendar $workCalendar): int  {
+        $baseDays = $workCalendar->getBaseDays();
+        if ( !$this->isWorkingAllYear() ) {
+            $baseDays = round($this->calculateHasToWorkDaysThisYear() * $baseDays / 365);
+        }
+        return $baseDays;
+    }
+
+    public function calculateHasToWorkDaysThisYear(): int {
+        if ( $this->isLastYear() && $this->isFirstYear()) {
+            $currentYear = $this->endDate->format('Y');
+            $interval = date_diff($this->endDate, $this->startDate);
+            $hasToWork =  $interval->days + 1;
+            return $hasToWork;
+        }
+        if ( $this->isLastYear() ) {
+            $currentYear = $this->endDate->format('Y');
+            $firstDayOfTheYear = date_create_from_format('Y/m/d',$currentYear.'/01/01');
+            $interval = date_diff($this->endDate, $firstDayOfTheYear);
+            $hasToWork =  $interval->days + 1;
+            return $hasToWork;
+        }
+        if ( $this->isFirstYear() ) {
+            $nextYear = $this->startDate->format('Y') + 1;
+            $firstDayNextYear = date_create_from_format('Y/m/d',$nextYear.'/01/01');
+            $interval = date_diff($firstDayNextYear, $this->startDate);
+            $hasToWork =  $interval->days;
+            return $hasToWork;
+        }
+        return 365;
+    }
+
+    public function isLimitedTimeWorker(): bool {
+        if ( $this->endDate !== null ) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo ): array {
+        if ( $this->isWorkingAllYear() ) {
+            $totals = [
+                EventType::VACATION => $workCalendar->getVacationDays(),
+                EventType::PARTICULAR_BUSSINESS_LEAVE => $workCalendar->getParticularBusinessLeave(),
+                EventType::OVERTIME => $workCalendar->getOvertimeDays(),
+                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked),
+             ];
+        } else {
+            $totals = [
+                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar),
+                EventType::PARTICULAR_BUSSINESS_LEAVE => 0,
+                EventType::OVERTIME => 0,
+                EventType::ANTIQUITY_DAYS => 0,
+             ];
+        }
+        return $totals;
+    }
 }

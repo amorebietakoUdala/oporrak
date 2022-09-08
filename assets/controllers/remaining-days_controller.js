@@ -32,16 +32,16 @@ export default class extends Controller {
         this.yearTarget.innerHTML = this.year
     };
     if (this.hasVacationDaysTarget) {
-        this.vacationDaysTarget.innerHTML = this.remainingDays[1];
+        this.vacationDaysTarget.innerHTML = this.remainingDays[1] !== null ? this.remainingDays[1] : 0;
     }
     if (this.hasParticularBusinessLeaveTarget) {
-        this.particularBusinessLeaveTarget.innerHTML = this.remainingDays[2];    
+        this.particularBusinessLeaveTarget.innerHTML = this.remainingDays[2] !== null ? this.remainingDays[2] : 0;    
     }
     if (this.hasOvertimeDaysTarget) {
-        this.overtimeDaysTarget.innerHTML = this.remainingDays[3];
+        this.overtimeDaysTarget.innerHTML = this.remainingDays[3] !== null ? this.remainingDays[3] : 0;
     }
     if (this.hasAntiquityDaysTarget) {
-        this.antiquityDaysTarget.innerHTML = this.remainingDays[4];
+        this.antiquityDaysTarget.innerHTML = this.remainingDays[4] !== null ? this.remainingDays[4] : 0;
     }
     return this;
   }
