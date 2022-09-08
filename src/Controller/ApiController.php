@@ -154,7 +154,7 @@ class ApiController extends AbstractController
       } else {
          $department = null;
       }
-      $items = $repo->findByDepartmentAndUsersAndStatusBeetweenDates($department, $users, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+      $items = $repo->findByDepartmentAndUsersAndStatusBeetweenDates(new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"), $department, $users, $status);
       /** If he/she has role boss and it's department calendar, adds his/her workers events to the list */
       if (in_array('ROLE_BOSS', $me->getRoles()) && $calendar === 'department' && $usersParam === null ) {
          $workers = $repo->findByBossAndStatusBeetweenDates($me, $department, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
@@ -227,11 +227,11 @@ class ApiController extends AbstractController
       $overlaps = [];
       if ( $department !== null) {
           $reservedEvents = $this->eventRepo->findByDepartmentAndUsersAndStatusBeetweenDates(
-              $department, 
+            date_create_from_format('Y-m-d',$year.'-01-01'), 
+            date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'),
+            $department, 
               null, 
-              Status::RESERVED, 
-              date_create_from_format('Y-m-d',$year.'-01-01'), 
-              date_create_from_format('Y-m-d',(intval($year)+1).'-01-01')
+              Status::RESERVED 
           );
           $overlaps = [];
           foreach ($reservedEvents as $event) {

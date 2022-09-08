@@ -25,14 +25,47 @@ class StatsService
 
    public function calculateTotalWorkingDays(array $events, $workCalendar)
    {
-       $totalWorkingDays = 0;
-       foreach ($events as $event) {
+      $totalWorkingDays = 0;
+      foreach ($events as $event) {
          if ($event->getStatus()->getId() !== Status::NOT_APPROVED) {
-            $workingDays = $this->calculateWorkingDays($event, $workCalendar);
+            if ( !$event->isBetweenYears() ) {
+               $workingDays = $this->calculateWorkingDays($event, $workCalendar);               
+            } else {
+               $year = $workCalendar->getYear();
+               $nextYear = $year + 1;
+               $eventStartYear = intval($event->getStartDate()->format('Y'));
+               $thisYearEndDate = new \DateTime("${year}-12-31");
+               $thisYearStartDate = new \DateTime("${year}-01-01");
+               $nextYearStartDate = new \DateTime("${nextYear}-01-01");
+               // dump($year);
+               // dd($eventStartYear);
+               if ( $year === $eventStartYear ) {
+                  $dummyEvent = new Event();
+                  $dummyEvent->setStartDate($event->getStartDate());
+                  $dummyEvent->setEndDate($thisYearEndDate);
+               } else {
+                  $dummyEvent = new Event();
+                  $dummyEvent->setStartDate($thisYearStartDate);
+                  $dummyEvent->setEndDate($event->getEndDate());
+               }
+//               dump($dummyEvent, $event, $workCalendar);
+               $workingDays = $this->calculateWorkingDays($dummyEvent, $workCalendar);
+//               dd($workingDays);        
+            }
             $totalWorkingDays += $workingDays;
          }
-       }
-       return $totalWorkingDays;
+      }
+      return $totalWorkingDays;
+   }
+
+   private function calculateTotalWorkingDaysOnYear(Event $event, $year) {
+      $startDate = $event->getStartDate();
+      $year = $event->getStartDate()->format('Y');
+      $nextYear = intval($event->getStartDate()->format('Y')) + 1;
+      $nextYearStartDate = new \DateTime("${nextYear}-01-01");
+
+      $endDate = $event->getEndDate();
+
    }
 
    public function calculateStatsByUserAndEventType(array $events) {
@@ -84,7 +117,6 @@ class StatsService
             $counters[$statusId] = $workingDays;
          }
       }
-
       return $counters;
    }
 
@@ -149,7 +181,9 @@ class StatsService
 
    public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar) {
        if (!$event->getHalfDay()) {
-           $holidaysBetween = $this->calculateHolidaysOnWorkingDays($this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate()));
+           $hollydays = $this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate());
+           // Only in working days Saturdays and Sundays don't count.
+           $holidaysBetween = $this->calculateHolidaysOnWorkingDays( $hollydays );
            $workingDays = $event->getDays();
            // Subtract two weekend days for every week in between
            $weeks = floor($workingDays / 7);
@@ -157,16 +191,17 @@ class StatsService
            // Handle special cases
            $startDay = $this->getWeekday($event->getStartDate()->format('Y-m-d'));
            $endDay = $this->getWeekday($event->getEndDate()->format('Y-m-d'));
+//           dump($workingDays, $startDay, $endDay);
            // Remove weekend not previously removed.   
            if ($startDay - $endDay > 1) {
                $workingDays -= 2;
            }
            // Remove start day if span starts on Sunday but ends before Saturday
-           if ($startDay == 7 && $endDay != 6) {
+           if ($startDay == 0 && $endDay < 6) {
                $workingDays--;
            }
            // Remove end day if span ends on Saturday but starts after Sunday
-           if ($endDay == 7 && $startDay != 1) {
+           if ($endDay == 0 && $startDay >= 1) {
                $workingDays--;
            }
            $workingDays -= $holidaysBetween;
