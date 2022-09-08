@@ -79,7 +79,6 @@ class ApiController extends AbstractController
       $totals = $this->totalDaysForEachType($user,$year);
       $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
       $counters = $this->statsService->calculateStatsByUserAndEventType($events);
-
       if (count($counters)) {
          $statsByEventType = $counters[$user->getUsername()];
          foreach ($totals as $key => $value) {

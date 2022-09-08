@@ -80,13 +80,12 @@ class StatsService
          } else {
             $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
          }
-
          $userId = "{$event->getUser()->getUsername()}";
          $typeId = "{$event->getType()->getId()}";
          if ($event->getStatus()->getId() !== Status::NOT_APPROVED ) {
             if ( array_key_exists($userId, $counters) ) {
                if ( array_key_exists($typeId, $counters[$userId]) ) {
-                  $counters[$userId][$typeId] = $counters[$userId][$typeId] + $workingDays;
+                  $counters[$userId][$typeId] += $workingDays;
                } else {
                   $counters[$userId][$typeId] = $workingDays;
                }

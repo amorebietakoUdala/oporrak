@@ -306,7 +306,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
                 EventType::VACATION => $workCalendar->getVacationDays(),
                 EventType::PARTICULAR_BUSSINESS_LEAVE => $workCalendar->getParticularBusinessLeave(),
                 EventType::OVERTIME => $workCalendar->getOvertimeDays(),
-                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked),
+                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
              ];
         } else {
             $totals = [
