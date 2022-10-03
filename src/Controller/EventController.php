@@ -302,7 +302,7 @@ class EventController extends AbstractController
             ->to($to)
             ->subject($subject)
             ->html($html);
-        $addresses = [$this->getParameter('mailerFrom')];
+        $addresses = [];
         if ($sendToHHRR) {
             $addresses[] = $this->getParameter('mailHHRR');
         }
