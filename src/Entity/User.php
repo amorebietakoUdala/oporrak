@@ -84,7 +84,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $yearsWorked;
+    private $yearsWorked = 0;
 
     /**
      * @ORM\Column(type="date", nullable=true)

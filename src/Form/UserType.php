@@ -41,7 +41,8 @@ class UserType extends BaseUserType
                 'label' => 'user.yearsWorked',
                 'constraints' => [
                     new PositiveOrZero()
-                ]
+                ],
+                'empty_data' => 0,
             ])
             ->add('startDate', DateType::class,[
                 'label' => 'user.startDate',

@@ -37,8 +37,6 @@ class StatsService
                $thisYearEndDate = new \DateTime("${year}-12-31");
                $thisYearStartDate = new \DateTime("${year}-01-01");
                $nextYearStartDate = new \DateTime("${nextYear}-01-01");
-               // dump($year);
-               // dd($eventStartYear);
                if ( $year === $eventStartYear ) {
                   $dummyEvent = new Event();
                   $dummyEvent->setStartDate($event->getStartDate());
@@ -48,9 +46,7 @@ class StatsService
                   $dummyEvent->setStartDate($thisYearStartDate);
                   $dummyEvent->setEndDate($event->getEndDate());
                }
-//               dump($dummyEvent, $event, $workCalendar);
                $workingDays = $this->calculateWorkingDays($dummyEvent, $workCalendar);
-//               dd($workingDays);        
             }
             $totalWorkingDays += $workingDays;
          }
@@ -190,7 +186,6 @@ class StatsService
            // Handle special cases
            $startDay = $this->getWeekday($event->getStartDate()->format('Y-m-d'));
            $endDay = $this->getWeekday($event->getEndDate()->format('Y-m-d'));
-//           dump($workingDays, $startDay, $endDay);
            // Remove weekend not previously removed.   
            if ($startDay - $endDay > 1) {
                $workingDays -= 2;

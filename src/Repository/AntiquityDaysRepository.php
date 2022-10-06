@@ -24,7 +24,10 @@ class AntiquityDaysRepository extends ServiceEntityRepository
      * 
      * @return AntiquityDays Returns an AntiquityDays object for the yearsWorked parameter
      */
-    public function findAntiquityDaysForYearsWorked(int $yearWorked) {
+    public function findAntiquityDaysForYearsWorked(?int $yearWorked) {
+        if ( $yearWorked === null ) {
+            return null;
+        }
         $qb = $this->createQueryBuilder('a')
             ->andWhere('a.yearsWorked <= :yearsWorked')
             ->setParameter('yearsWorked', $yearWorked)
