@@ -156,14 +156,11 @@ class CalendarController extends AbstractController
         $workingDaysWithPreviousYearDays = $this->statsService->calculateTotalWorkingDays($eventsWithLastYearDays, $workCalendar);
         $statuses = $this->statusRepo->findAll();
         $holidays = $this->holidayRepo->findHolidaysBetween(new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
-
         $stats = $this->initializeCounters($statuses);
         foreach ($counters as $key => $value) {
             $stats[$key]['count'] = $value;
         }
-
         $stats['eventsWithLastYearDays']['count'] = $workingDaysWithPreviousYearDays;
-
         $stats['holidays'] = [
             'description' => 'label.holidays',
             'count' => count($holidays),

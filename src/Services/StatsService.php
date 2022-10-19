@@ -170,15 +170,14 @@ class StatsService
             $counters[$user] = $workingDays;
          }
       }
-
       return $counters;
    }
 
    public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar) {
        if (!$event->getHalfDay()) {
-           $hollydays = $this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate());
+           $holidays = $this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate());
            // Only in working days Saturdays and Sundays don't count.
-           $holidaysBetween = $this->calculateHolidaysOnWorkingDays( $hollydays );
+           $holidaysBetween = $this->calculateHolidaysOnWorkingDays( $holidays );
            $workingDays = $event->getDays();
            // Subtract two weekend days for every week in between
            $weeks = floor($workingDays / 7);
@@ -195,7 +194,7 @@ class StatsService
                $workingDays--;
            }
            // Remove end day if span ends on Saturday but starts after Sunday
-           if ($endDay == 0 && $startDay >= 1) {
+           if ($endDay == 6 && $startDay > 0) {
                $workingDays--;
            }
            $workingDays -= $holidaysBetween;
