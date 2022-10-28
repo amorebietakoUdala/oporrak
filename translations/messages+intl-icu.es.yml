@@ -209,3 +209,4 @@ message.notAuthorizedToDeny: "No está autorizado para denegar las vacaciones de
 message.eventNotFound: "No puede aprobar el periodo indicado porque se ha borrado"
 message.endOfContract: "Su contrato finaliza el { endDate } y el periodo que solicita es posterior a dicha fecha"
 message.startOfContract: "Su contrato comienza el { startDate } y el periodo que solicita es anterior a dicha fecha"
+message.betweenYears: "El periodo no puede empezar un año y terminar el siguiente año. Pida 2 periodos distintos."

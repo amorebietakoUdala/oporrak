@@ -206,3 +206,4 @@ message.notAuthorizedToDeny: "Ez dago erabiltzaile honentzako oporrak ukatzeko b
 message.eventNotFound: "Epe hori ezabatu egin da, ezin da onartu"
 message.endOfContract: "Zure kontratua { endDate }-an bukatzen da eta eskatzen ari zaren epe hori baino beranduagokoa da"
 message.startOfContract: "Zure kontratua { startDate }-an hasten da eta eskatzen ari zaren epea hori baino lehenagokoa da"
+message.betweenYears: "Epea ezin urte batean hasi eta hurrengoan bukatu. Mesedez, eskatu itzazu bi epe ezberdin, bata urte batean eta beste bestean."

@@ -226,6 +226,11 @@ class EventController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
+        if ( $event->getStartDate()->format('Y') !== $event->getEndDate()->format('Y') ) {
+            $this->addFlash('error', new TranslatableMessage('message.betweenYears', [], 'messages'));
+            return false;
+        }
+
         if ( $user->getEndDate() !== null && ( $event->getStartDate() > $user->getEndDate() || $event->getEndDate() > $user->getEndDate() ) ) {
             $this->addFlash('error', new TranslatableMessage('message.endOfContract', [
                 'endDate' => $user->getEndDate()->format('Y/m/d')

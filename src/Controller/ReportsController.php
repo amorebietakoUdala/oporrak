@@ -53,6 +53,7 @@ class ReportsController extends AbstractController
                 $data->getUser(), 
                 $data->getDepartment()
             );
+
             $counters = $this->statsService->calculateStatsByUserAndEventType($events);
             
             return $this->renderForm('reports/index.html.twig', [
