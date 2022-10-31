@@ -36,7 +36,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
-    public function findUsersByDepartmentOrBossQB($department, $boss) {
+    public function findUsersByDepartmentOrBossQB($department, $boss, bool $activated = true) {
         $qb = $this->createQueryBuilder('u');
         if ($department !== null) {
             $condition = "
@@ -47,7 +47,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 ->setParameter('department2', $department)
                 ->setParameter('boss', $boss);
         }
-        $qb->orderBy('u.username', 'ASC');
+        $qb->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
+            ->orderBy('u.username', 'ASC');
         return $qb;
 
     }
