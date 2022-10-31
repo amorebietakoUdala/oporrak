@@ -27,7 +27,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findUserEventsCurrentYearAndType(User $user, int $year, $type = null, $onlyHalfDays = false)
+    public function findUserEventsCurrentYearAndType(User $user, int $year, $type = null, $onlyHalfDays = false, bool $activated = true)
     {
         $startDate = new \DateTime($year . '-01-01');
         $endDate = new \DateTime($year + 1 . '-01-01');
@@ -47,6 +47,8 @@ class EventRepository extends ServiceEntityRepository
                 ->setParameter('type', $type);
         }
         $qb->orderBy('e.id', 'ASC')
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
             //            ->setMaxResults(10)
         ;
         return $qb->getQuery()->getResult();
@@ -55,7 +57,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findUserEventsBeetweenDates($user, $startDate, $endDate = null)
+    public function findUserEventsBeetweenDates($user, $startDate, $endDate = null, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->andWhere('e.user = :user')
@@ -67,6 +69,8 @@ class EventRepository extends ServiceEntityRepository
                 ->setParameter('endDate', $endDate);
         }
         $qb->orderBy('e.id', 'ASC')
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
             //            ->setMaxResults(10)
         ;
         return $qb->getQuery()->getResult();
@@ -79,10 +83,11 @@ class EventRepository extends ServiceEntityRepository
      * @param $year --------------- Effective year of the events. 
      * @param $eventType ---------- Filter for EventType.
      * @param $includeNotApproved - Include not approved events.
+     * @param $activated - Show activated or not activated.
      * 
      * @return Event[] Returns an array of Event objects
      */
-    public function findEffectiveEventsOfTheYearForUsers(array $users, int $year, EventType $eventType = null, $includeNotApproved = true)
+    public function findEffectiveEventsOfTheYearForUsers(array $users, int $year, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
     {
         $thisYearStart = new DateTime("${year}-01-01");
         $thisYearEnd = new DateTime("${year}-12-31");
@@ -115,7 +120,10 @@ class EventRepository extends ServiceEntityRepository
                 $qb->andWhere('e.status != :status')
                     ->setParameter('status', Status::NOT_APPROVED);
             }
-            $qb->orderBy('e.id', 'ASC');
+            $qb->orderBy('e.id', 'ASC')
+                ->andWhere('u.activated = :activated')
+                ->setParameter('activated', $activated)
+            ;
         return $qb->getQuery()->getResult();
     }
 
@@ -137,13 +145,14 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findUserEventsOfTheYearWithPreviousYearDays(User $user, int $year, bool $previousYearDays = false)
+    public function findUserEventsOfTheYearWithPreviousYearDays(User $user, int $year, bool $previousYearDays = false, bool $activated = true)
     {
         $thisYearStart = new DateTime("${year}-01-01");
         $nextYear = $year+1;
         $nextYearStart = new DateTime("{$nextYear}-01-01");
         $thisYearEnd = new DateTime("${year}-12-31");
-        $qb = $this->createQueryBuilder('e');
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
         if ($previousYearDays) {
             $condition = "
                 e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :true  ) 
@@ -165,14 +174,17 @@ class EventRepository extends ServiceEntityRepository
             ->andWhere('e.user = :user')
             ->setParameter('user', $user);
             
-        $qb->orderBy('e.id', 'ASC');
+        $qb->orderBy('e.id', 'ASC')
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
+        ;
         return $qb->getQuery()->getResult();
     }
 
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findByUsernamesAndBeetweenDates(array $usernames = null, $startDate, $endDate = null, bool $previousYearDays = false)
+    public function findByUsernamesAndBeetweenDates(array $usernames = null, $startDate, $endDate = null, bool $previousYearDays = false, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
@@ -201,6 +213,8 @@ class EventRepository extends ServiceEntityRepository
                 ->setParameter('usernames', $usernames);
         }
         $qb->orderBy('e.id', 'ASC')
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
             //            ->setMaxResults(10)
         ;
         return $qb->getQuery()->getResult();
@@ -209,7 +223,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findByDepartmentAndUsersAndStatusBeetweenDates($startDate, $endDate, $department = null, array $users = null, $status = null)
+    public function findByDepartmentAndUsersAndStatusBeetweenDates($startDate, $endDate, $department = null, array $users = null, $status = null, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
@@ -236,6 +250,8 @@ class EventRepository extends ServiceEntityRepository
                 ->setParameter('department', $department);
         }
         $qb->orderBy('e.id', 'ASC')
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
         ;
         return $qb->getQuery()->getResult();
     }
@@ -243,12 +259,15 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findByBossAndStatusBeetweenDates($boss = null, $excludedDepartment, $status = null, $startDate, $endDate = null)
+    public function findByBossAndStatusBeetweenDates($boss = null, $excludedDepartment, $status = null, $startDate, $endDate = null, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
             ->andWhere('e.startDate >= :startDate')
-            ->setParameter('startDate', $startDate);
+            ->setParameter('startDate', $startDate)
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
+        ;
         if (null !== $endDate) {
             $qb->andWhere('e.endDate < :endDate')
                 ->setParameter('endDate', $endDate);
@@ -274,14 +293,16 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findAllByStatusBeetweenDates($status, $startDate, $endDate = null)
+    public function findAllByStatusBeetweenDates($status, $startDate, $endDate = null, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
             ->andWhere('e.startDate >= :startDate')
             ->setParameter('startDate', $startDate)
             ->andWhere('e.status = :status')
-            ->setParameter('status', $status);
+            ->setParameter('status', $status)
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated);
         if (null !== $endDate) {
             $qb->andWhere('e.endDate < :endDate')
                 ->setParameter('endDate', $endDate);
@@ -303,7 +324,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findOverlapingEventsNotOfCurrentUser(Event $event): array
+    public function findOverlapingEventsNotOfCurrentUser(Event $event, bool $activated = true): array
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
@@ -312,7 +333,9 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('department', $event->getUser()->getDepartment())
             // Exclude self events
             ->andWhere('e.user <> :user')
-            ->setParameter('user', $event->getUser());
+            ->setParameter('user', $event->getUser())
+            ->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated);
 
         $where = '(' .
             '(e.startDate >= :d2s and e.endDate <= :d2e ) or ' .
@@ -329,7 +352,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findApprovedEventsByDateUserAndDepartment(\Datetime $startDate = null, \DateTime $endDate = null, User $user = null, Department $department = null): array
+    public function findApprovedEventsByDateUserAndDepartment(\Datetime $startDate = null, \DateTime $endDate = null, User $user = null, Department $department = null, bool $activated=true): array
     {
         $qb = $this->createQueryBuilder('e');
         if ( null !== $user ) {
@@ -351,7 +374,10 @@ class EventRepository extends ServiceEntityRepository
                 ->setParameter('endDate', $endDate);
         }
         $qb->andWhere('e.status = :status')
-           ->setParameter('status', Status::APPROVED );
+           ->setParameter('status', Status::APPROVED )
+           ->andWhere('u.activated = :activated')
+           ->setParameter('activated', $activated);
+
         $qb->orderBy('e.id', 'ASC');
 
         return $qb->getQuery()->getResult();
