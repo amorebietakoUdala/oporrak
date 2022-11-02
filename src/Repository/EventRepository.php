@@ -32,6 +32,7 @@ class EventRepository extends ServiceEntityRepository
         $startDate = new \DateTime($year . '-01-01');
         $endDate = new \DateTime($year + 1 . '-01-01');
         $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
             ->andWhere('e.user = :user')
             ->setParameter('user', $user)
             ->andWhere('e.startDate >= :startDate')
@@ -60,6 +61,7 @@ class EventRepository extends ServiceEntityRepository
     public function findUserEventsBeetweenDates($user, $startDate, $endDate = null, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
             ->andWhere('e.user = :user')
             ->setParameter('user', $user)
             ->andWhere('e.startDate >= :startDate')
