@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { Controller } from 'stimulus';
+import { Controller } from '@hotwired/stimulus';
 import { Modal } from 'bootstrap';
 import { useDispatch } from 'stimulus-use';
 

@@ -1,6 +1,4 @@
-import {
-    Controller
-} from 'stimulus';
+import { Controller } from '@hotwired/stimulus';
 import $ from 'jquery';
 import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
