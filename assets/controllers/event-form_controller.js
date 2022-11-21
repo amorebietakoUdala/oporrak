@@ -1,6 +1,4 @@
-import {
-    Controller
-} from 'stimulus';
+import { Controller } from '@hotwired/stimulus';
 import $ from 'jquery';
 import 'bootstrap-datepicker';
 import 'bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js';

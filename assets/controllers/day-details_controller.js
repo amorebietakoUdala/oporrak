@@ -1,4 +1,4 @@
-import { Controller } from 'stimulus';
+import { Controller } from '@hotwired/stimulus';
 import $ from 'jquery';
 
 const routes = require('../../public/js/fos_js_routes.json');

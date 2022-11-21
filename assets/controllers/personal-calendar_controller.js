@@ -1,6 +1,5 @@
-import {
-    Controller
-} from 'stimulus';
+import { Controller } from '@hotwired/stimulus';
+
 import $, { type } from 'jquery';
 import {
     Modal
