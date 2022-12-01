@@ -12,7 +12,6 @@ import './styles/app.css';
 import './bootstrap';
 
 import 'bootstrap';
-import 'popper.js';
 
 global.app_base = '/oporrak';
 

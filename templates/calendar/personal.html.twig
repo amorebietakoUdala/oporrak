@@ -27,10 +27,16 @@
 
 			<div id="calendar" data-personal-calendar-target="content"></div>
 			<div class="row d-flex justify-content-between m-1">
-				{{ include('calendar/_summary.html.twig') }}
-            {{ include('calendar/_remainingDays.html.twig') }}
+            <div class="col-4">
+				   {{ include('calendar/_summary.html.twig') }}
+            </div>
+            <div class="col-4">
+               {{ include('calendar/_remainingDays.html.twig') }}
+            </div>
 				{# {{ include('calendar/_status.html.twig') }} #}
-				{{ include('calendar/_legend.html.twig') }}
+            <div class="col-4" data-legend-target="stats">
+				   {{ include('calendar/_legend.html.twig') }}
+            </div>
 			</div>
 			<div id="context-menu"></div>
 			{{ include('event/_modal.html.twig', {

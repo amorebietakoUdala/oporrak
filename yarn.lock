@@ -1463,6 +1463,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@popperjs/core@npm:*":
+  version: 2.11.6
+  resolution: "@popperjs/core@npm:2.11.6"
+  checksum: 47fb328cec1924559d759b48235c78574f2d71a8a6c4c03edb6de5d7074078371633b91e39bbf3f901b32aa8af9b9d8f82834856d2f5737a23475036b16817f0
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:^0.24.1":
   version: 0.24.51
   resolution: "@sinclair/typebox@npm:0.24.51"
@@ -2517,13 +2524,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap@npm:^4.6.0":
-  version: 4.6.2
-  resolution: "bootstrap@npm:4.6.2"
+"bootstrap@npm:^5.1.3, bootstrap@npm:^5.2.3":
+  version: 5.2.3
+  resolution: "bootstrap@npm:5.2.3"
   peerDependencies:
-    jquery: 1.9.1 - 3
-    popper.js: ^1.16.1
-  checksum: 3f4e7768ff7d618c49d4bf4f02aa54a9bfb679d4eecb0f3854fa4af1a17b9114b147009c435946432cdd1572efffc71d88ec385c55943a12fa66253cde0876b0
+    "@popperjs/core": ^2.11.6
+  checksum: 0211805dec6a190c0911d142966df30fdb4b4139a04cc6c23dd83c6045ea3cb0a966b360ab2e701e7b3ad96ff01e05fdc0914be97b41bd876b11e457a8bdc6a3
   languageName: node
   linkType: hard
 
@@ -3905,7 +3911,7 @@ __metadata:
 
 "fsevents@patch:fsevents@~2.3.1#~builtin<compat/fsevents>, fsevents@patch:fsevents@~2.3.2#~builtin<compat/fsevents>":
   version: 2.3.2
-  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=18f3a7"
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"
   dependencies:
     node-gyp: latest
   conditions: os=darwin
@@ -4750,7 +4756,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jquery@npm:>=1.7.1 <4.0.0, jquery@npm:>=3.2.1, jquery@npm:^3.6.0":
+"jquery@npm:3.6.1":
   version: 3.6.1
   resolution: "jquery@npm:3.6.1"
   checksum: 6177d866a74f1137cad800f142c7cdbd5ab19cd4282546f8bdb4890c9f933b1d542ab96f2aa15d007e43c98de7315b0513e849ec5359d3ac5640f720892fe547
@@ -5714,13 +5720,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"popper.js@npm:^1.16.1":
-  version: 1.16.1
-  resolution: "popper.js@npm:1.16.1"
-  checksum: c56ae5001ec50a77ee297a8061a0221d99d25c7348d2e6bcd3e45a0d0f32a1fd81bca29d46cb0d4bdf13efb77685bd6a0ce93f9eb3c608311a461f945fffedbe
-  languageName: node
-  linkType: hard
-
 "postcss-calc@npm:^8.2.3":
   version: 8.2.4
   resolution: "postcss-calc@npm:8.2.4"
@@ -6408,7 +6407,7 @@ __metadata:
 
 "resolve@patch:resolve@^1.14.2#~builtin<compat/resolve>, resolve@patch:resolve@^1.9.0#~builtin<compat/resolve>":
   version: 1.22.1
-  resolution: "resolve@patch:resolve@npm%3A1.22.1#~builtin<compat/resolve>::version=1.22.1&hash=07638b"
+  resolution: "resolve@patch:resolve@npm%3A1.22.1#~builtin<compat/resolve>::version=1.22.1&hash=c3c19d"
   dependencies:
     is-core-module: ^2.9.0
     path-parse: ^1.0.7
@@ -6477,10 +6476,11 @@ __metadata:
     "@babel/preset-env": ^7.20.2
     "@fortawesome/fontawesome-free": ^5.15.3
     "@hotwired/stimulus": ^3.1.1
+    "@popperjs/core": "*"
     "@symfony/stimulus-bridge": ^3.2.1
     "@symfony/webpack-encore": ^4.1.1
     bazinga-translator: ^4.0.1
-    bootstrap: ^4.6.0
+    bootstrap: ^5.2.3
     bootstrap-datepicker: ^1.9.0
     bootstrap-table: ^1.20.2
     core-js: ^3.0.0
@@ -6489,11 +6489,11 @@ __metadata:
     jquery: ^3.6.0
     js-year-calendar: ^2.0.0
     loader-utils: ^2.0.4
-    popper.js: ^1.16.1
     regenerator-runtime: ^0.13.2
     sass: ^1.34.0
     sass-loader: ^13.2.0
-    select2: ^4.1.0-rc.0
+    select2: ^4.0.7
+    select2-bootstrap-5-theme: ^1.3.0
     stimulus-use: ^0.51.0
     sweetalert2: ^11.0.11
     tableexport.jquery.plugin: 1.25.0
@@ -6619,10 +6619,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"select2@npm:^4.1.0-rc.0":
-  version: 4.1.0-rc.0
-  resolution: "select2@npm:4.1.0-rc.0"
-  checksum: c27cefc3967d2082b2887869e8379f6e8e0ec2e02a268b7abbaec87fbda20abe4d62ac008b87a14f17bfa46dd27aa0b33ee793ed30142e3bc30ba408e208ad20
+"select2-bootstrap-5-theme@npm:^1.3.0":
+  version: 1.3.0
+  resolution: "select2-bootstrap-5-theme@npm:1.3.0"
+  dependencies:
+    bootstrap: ^5.1.3
+  checksum: 248a8698352109c33c462d4f08d1f6afd31d633a36c854a89b37719b6927d07b14f0909214db780ad779ae461bb6e48587fdb74f71f0ee6731981fb9aa668364
+  languageName: node
+  linkType: hard
+
+"select2@npm:^4.0.7":
+  version: 4.0.13
+  resolution: "select2@npm:4.0.13"
+  checksum: f0e657861e0d135437d763dcfc0e1581ea55d08f4057212b1baf9da2d59406849cb54d6dca9853b5551abe2b5aa06ba2b1712dcadd1f5a42eca053658d13358e
   languageName: node
   linkType: hard
 

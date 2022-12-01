@@ -2,7 +2,7 @@
 
 	<nav class="navbar navbar-expand navbar-dark bg-dark mb-1">
 		<a class="navbar-brand" href="#">&nbsp;</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
@@ -25,7 +25,7 @@
                   {% if (    app.request.attributes.get('_route') == 'reportsIndex' ) %}
                      {{' active '}}
                   {% endif %}
-               " href="#" id="navbarReports" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               " href="#" id="navbarReports" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						{{ 'navitem.reports' | trans | capitalize }}
 					</a>
 					<div id="js-menu-reports" class="dropdown-menu" aria-labelledby="navbarReports">
@@ -46,7 +46,7 @@
                   %}
                      {{' active '}}
                   {% endif %}
-               " href="#" id="navbarAdministration" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               " href="#" id="navbarAdministration" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						{{ 'navitem.administration' | trans | capitalize }}
 					</a>
 					<div id="js-menu-administration" class="dropdown-menu" aria-labelledby="navbarAdministration">

@@ -28,8 +28,12 @@
          {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : true }) }}
 			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">
-				{{ include('calendar/_summary.html.twig') }}
-				{{ include('calendar/_day-details.html.twig') }}
+            <div class="col-lg-4">
+				   {{ include('calendar/_summary.html.twig') }}
+            </div>
+            <div class="col-lg">
+   				{{ include('calendar/_day-details.html.twig') }}
+            </div>
 			</div>
 			<div id="context-menu"></div>
 		</div>

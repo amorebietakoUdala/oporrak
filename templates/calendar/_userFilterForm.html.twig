@@ -3,16 +3,20 @@
      'department' : app.user.department.id,
   }) }}>
       {{ form_start(userFilterForm) }}
-         <div class="row">
-            <span class="btn">{{ form_label(userFilterForm.user) }}</span>
-            <span class="col-2">{{ form_widget(userFilterForm.user, {
-               'attr': { 'data-user-filter-target' : 'userSelect', 'data-department-calendar-target' : 'userSelect'}
-            }) }}</span>
+         <div class="row align-items-center">
+            <div class="col-lg-auto">
+               {{ form_label(userFilterForm.user) }}
+               {{ form_widget(userFilterForm.user, {
+                  'attr': { 'data-user-filter-target' : 'userSelect', 'data-department-calendar-target' : 'userSelect'}
+               }) }}
+            </div>
             {% if showDepartment and ( is_granted('ROLE_ADMIN') or is_granted('ROLE_HHRR') ) %}
-            <span class="btn">{{ form_label(userFilterForm.department) }}</span>
-            <span class="col-2">{{ form_widget(userFilterForm.department, {
-               'attr': {'data-user-filter-target' : 'departmentSelect', 'data-department-calendar-target' : 'departmentSelect', 'data-action': "change->user-filter#refreshUsers"}
-            }) }}</span>
+            <div class="col-lg-auto">
+               {{ form_label(userFilterForm.department) }}
+               {{ form_widget(userFilterForm.department, {
+                  'attr': {'data-user-filter-target' : 'departmentSelect', 'data-department-calendar-target' : 'departmentSelect', 'data-action': "change->user-filter#refreshUsers"}
+               }) }}
+            </div>
             {% endif %}
             <div class="col-2">
                <button type="button" class="btn btn-primary" data-action="user-filter#search">{{ button_label|default('btn.search')|trans }}</button>
@@ -20,5 +24,5 @@
             </div>
          </div>
       {{ form_end(userFilterForm) }}
-  </div>
+   </div>
 </div>

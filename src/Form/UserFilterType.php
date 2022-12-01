@@ -36,7 +36,8 @@ class UserFilterType extends AbstractType
                     return $ur->findUsersByDepartmentOrBossQB($department,$this->user);
                 },
                 'label' => 'label.user',
-                'multiple' => 'multiple',
+                'multiple' => true,
+//                'expanded' => false,
             ]);
         if (null !== $roles && $showDepartment && (in_array('ROLE_HHRR', $roles) || in_array('ROLE_ADMIN', $roles))) {
             $builder->add('department', EntityType::class, [
@@ -46,7 +47,7 @@ class UserFilterType extends AbstractType
                     return ($locale === 'es') ? $department->getNameEs() : $department->getNameEu();
                 },
                 'label' => 'label.department',
-                'multiple' => false
+                'multiple' => false,
             ]);
         }
     }
