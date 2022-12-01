@@ -1,10 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import $ from 'jquery';
 
-import {
-   useDispatch
-} from 'stimulus-use';
-
 const routes = require('../../public/js/fos_js_routes.json');
 import Routing from '../../public/js/router.min.js';
 
@@ -18,17 +14,24 @@ export default class extends Controller {
 
    connect() {
       Routing.setRoutingData(routes);
-      useDispatch(this);
-      $(this.userSelectTarget).select2({
+      let options = {
+         theme: "bootstrap-5",
+         language: this.localeValue,
          maximumSelectionLength: 10,
-         placeholder: "",
-      });
+         placeholder: ""
+      };
+      $(this.userSelectTarget).select2(options);
       if ( this.hasDepartmentSelectTarget ) {
          $(this.departmentSelectTarget).append($('<option>', {
             value: '',
             text: ''
         }));
-         $(this.departmentSelectTarget).select2();
+      options = {
+         theme: "bootstrap-5",
+         language: this.localeValue,
+         placeholder: "",
+       };
+         $(this.departmentSelectTarget).select2(options);
          $(this.departmentSelectTarget).on('select2:select', function(e) {
             let event = new Event('change', { bubbles: true })
             e.currentTarget.dispatchEvent(event);

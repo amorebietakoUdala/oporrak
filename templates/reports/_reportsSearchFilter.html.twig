@@ -2,25 +2,25 @@
    <div {{ stimulus_controller('user-filter',{ 'locale': app.request.locale|split('_')[0], } ) }}>
       {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
          <div class="row">
-            <div class="col form-group">
+            <div class="col">
                {{ form_label(form.startDate) }}
                {{ form_widget(form.startDate, { 'attr' : { 'class' : 'js-datepicker' } } ) }}
             </div>
-            <div class="col form-group">
+            <div class="col">
                {{ form_label(form.endDate) }}
                {{ form_widget(form.endDate, { 'attr' : { 'class' : 'js-datepicker' } } ) }}
             </div>
-            <div class="col form-group">
-               <span>{{ form_label(form.user) }}</span>
-               <span class="col-2">{{ form_widget(form.user, {
+            <div class="col">
+               {{ form_label(form.user) }}
+               {{ form_widget(form.user, {
                   'attr': { 'data-user-filter-target' : 'userSelect' }
-               }) }}</span>
+               }) }}
             </div>
-            <div class="col form-group">
-               <span>{{ form_label(form.department) }}</span>
-               <span class="col-2">{{ form_widget(form.department, {
-                  'attr': {'data-user-filter-target' : 'departmentSelect', 'data-action': "change->user-filter#refreshUsers"}
-               }) }}</span>
+            <div class="col-2">
+               {{ form_label(form.department) }}
+               {{ form_widget(form.department, {
+                  'attr': { 'data-user-filter-target' : 'departmentSelect', 'data-action': "change->user-filter#refreshUsers" }
+               }) }}
             </div>
             <div class="col p-2">
                <button class="btn btn-primary">{{ 'btn.search' | trans | capitalize }}</button>

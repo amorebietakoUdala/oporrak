@@ -1,6 +1,5 @@
 @import '~bootstrap';
 @import '~js-year-calendar/dist/js-year-calendar.css';
-@import '~bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css';
 
 /* @import '~font-awesome'; */
 
@@ -104,6 +103,16 @@ main {
 
 #overtimeDaysSummaryRow {
     display: block;
+}
+
+.fixed-bottom-right {
+    position: fixed;
+    right: 20px;
+    bottom: 50px;
+}
+
+a {
+    text-decoration: none;
 }
 
 @media (max-width: 767px) {
