@@ -1,16 +1,10 @@
 import { Controller } from '@hotwired/stimulus';
 
 import $, { type } from 'jquery';
-import {
-    Modal
-} from 'bootstrap';
+import { Modal } from 'bootstrap';
 import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
 import 'js-year-calendar/locales/js-year-calendar.eu';
-
-import {
-    useDispatch
-} from 'stimulus-use';
 
 import 'bootstrap-datepicker';
 const routes = require('../../public/js/fos_js_routes.json');
@@ -41,7 +35,6 @@ export default class extends Controller {
         Routing.setRoutingData(routes);
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
-        useDispatch(this);
         this.modal = new Modal(this.modalTarget);
         this.calendar = new Calendar('#calendar', {
             enableContextMenu: true,
@@ -122,7 +115,7 @@ export default class extends Controller {
                 // It makes a year changed on init, so it doesn't need another load after this.
                 let year = event.currentYear;
                 this.load(event.currentYear);
-                this.dispatch('yearChanged', { year });
+                this.dispatch('yearChanged', { detail: { year }});
             },
         });
     }
@@ -185,7 +178,7 @@ export default class extends Controller {
                         var dataSource = this.calendar.getDataSource();
                         this.calendar.setDataSource(dataSource.filter(item => item.id != event.id));
                         let year = this.calendar.getYear();
-                        this.dispatch('update', { year });
+                        this.dispatch('update', { detail:{ year }});
                     }).catch((err) => {
                         Swal.default.fire({
                             template: '#error',
@@ -206,7 +199,7 @@ export default class extends Controller {
                 data: $form.serialize()
             }).then(() => {
                 let year = this.calendar.getYear();
-                this.dispatch('update', { year });
+                this.dispatch('update', { detail: { year }});
                 this.refreshCalendar();
                 this.modal.hide();
             });

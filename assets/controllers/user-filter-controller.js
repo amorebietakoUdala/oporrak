@@ -57,15 +57,15 @@ export default class extends Controller {
    }
 
   search(event) {
-     let user = $(this.userSelectTarget).val();
-     let department = this.departmentValue;
-     if ( this.hasDepartmentSelectTarget ) {
+      let users = $(this.userSelectTarget).val();
+      let department = this.departmentValue;
+      if ( this.hasDepartmentSelectTarget ) {
          department = $(this.departmentSelectTarget).val();
-     }
-     this.dispatch('search',{
-        user : user,
-        department: department
-     });
+      }
+      this.dispatch('search',{ detail: {
+         user : users,
+         department: department
+      }});
    }
 
    clean(event) {

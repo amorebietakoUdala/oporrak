@@ -4,10 +4,6 @@ import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
 import 'js-year-calendar/locales/js-year-calendar.eu';
 
-import {
-    useDispatch
-} from 'stimulus-use';
-
 import Translator, { defaultDomain } from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 import '@fortawesome/fontawesome-free/js/all.js';
@@ -37,7 +33,6 @@ export default class extends Controller {
 
     connect() {
         Routing.setRoutingData(routes);
-        useDispatch(this);
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
         this.calendar = new Calendar('#calendar', {
@@ -90,7 +85,7 @@ export default class extends Controller {
                 }
             },
             clickDay: (e) => {
-                this.dispatch('clickDay', { date: e.date, events: e.events });
+                this.dispatch('clickDay', { detail:{ date: e.date, events: e.events }});
             },
             dayContextMenu: function(e) {
                 $(e.element).popover('hide');
@@ -104,7 +99,7 @@ export default class extends Controller {
                     department = $(this.departmentSelectTarget).val();
                 }
                 this.load(event.currentYear, user, department, this.statusValue);
-                this.dispatch('yearChanged', { year });
+                this.dispatch('yearChanged', { detail: { year }});
             },
         });
     }
@@ -165,7 +160,7 @@ export default class extends Controller {
                 this.dates = dates;
                 this.addDates(this.holidays);
                 this.calendar.setDataSource(this.dates);
-                this.dispatch('loaded', { colorArray, year });
+                this.dispatch('loaded', { detail: { colorArray, year }});
             });
     }
 
@@ -210,7 +205,7 @@ export default class extends Controller {
                       var dataSource = this.calendar.getDataSource();
                       this.calendar.setDataSource(dataSource.filter(item => item.id != id));
                       let year = this.calendar.getYear();
-                      this.dispatch('update', { year });
+                      this.dispatch('update', { detail: { year }});
                   }).catch((err) => {
                       Swal.default.fire({
                           template: '#error',
