@@ -164,7 +164,7 @@ class EventRepository extends ServiceEntityRepository
                 ->setParameter('true', true);
         } else {
             $condition = " 
-                ( e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
+                ( e.startDate >= :startDate AND e.endDate <= :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
                 OR ( e.startDate <= :endDate AND e.endDate >= :nextYearStart )
                 ";
             $qb->andWhere($condition)
