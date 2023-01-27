@@ -232,6 +232,8 @@ class ApiController extends AbstractController
               null, 
               Status::RESERVED 
           );
+          $reservedEventsFromMyMinions = $this->eventRepo->findByBossAndStatusBeetweenDates($this->getUser(),$department,Status::RESERVED, date_create_from_format('Y-m-d',$year.'-01-01'), date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'));
+          $reservedEvents = array_merge($reservedEvents, $reservedEventsFromMyMinions);
           $overlaps = [];
           foreach ($reservedEvents as $event) {
               $overlaps[$event->getId()] = $this->eventRepo->findOverlapingEventsNotOfCurrentUser($event);

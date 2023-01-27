@@ -10,7 +10,7 @@
          'day-details': {
             'roles': roles,
             'user': app.user.username,
-            'boss': app.user.boss.username,
+            'boss': app.user.boss != null ? app.user.boss.username: null,
             'previousYearDaysColor': previousYearDaysColor,
          },
          'user-legend': {
