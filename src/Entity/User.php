@@ -84,7 +84,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     /**
      * @ORM\Column(type="integer", nullable=true)
      */
-    private $yearsWorked = 0;
+    private $yearsWorked;
 
     /**
      * @ORM\Column(type="date", nullable=true)
@@ -96,10 +96,17 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
      */
     private $endDate;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $extraDays;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
         $this->events = new ArrayCollection();
+        $this->yearsWorked = 0;
+        $this->extraDays = 0;
     }
 
     public function getBoss(): ?self
@@ -227,6 +234,18 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return $this;
     }
 
+    public function getExtraDays(): ?int
+    {
+        return $this->extraDays;
+    }
+
+    public function setExtraDays(?int $extraDays): self
+    {
+        $this->extraDays = $extraDays;
+
+        return $this;
+    }
+
     public function getWorkDaysCurrentYear(): int {
         $interval = date_diff($this->endDate, $this->startDate);
    
@@ -262,7 +281,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     }
 
     public function calculateCurrentYearBaseDays(WorkCalendar $workCalendar): int  {
-        $baseDays = $workCalendar->getBaseDays();
+        $baseDays = $workCalendar->getBaseDays() + $this->getExtraDays();
         if ( !$this->isWorkingAllYear() ) {
             $baseDays = round($this->calculateHasToWorkDaysThisYear() * $baseDays / 365);
         }
@@ -305,7 +324,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
             $totals = [
                 EventType::VACATION => $workCalendar->getVacationDays(),
                 EventType::PARTICULAR_BUSSINESS_LEAVE => $workCalendar->getParticularBusinessLeave(),
-                EventType::OVERTIME => $workCalendar->getOvertimeDays(),
+                EventType::OVERTIME => $workCalendar->getOvertimeDays() + $this->getExtraDays(),
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
              ];
         } else {

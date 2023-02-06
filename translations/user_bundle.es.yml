@@ -6,5 +6,6 @@ ROLE_USER: "Usuario"
 user.yearsWorked: "Años trabajados"
 user.startDate: "Fecha de alta"
 user.endDate: "Fecha de baja"
+user.extraDays: "Días extra"
 
 security.login.remember_me: "Recordarme"

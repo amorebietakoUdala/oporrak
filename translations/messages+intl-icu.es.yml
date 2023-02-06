@@ -24,6 +24,7 @@ user.repeat_new_password: "Repetir nueva contraseña"
 user.yearsWorked: "años trabajados"
 user.startDate: "fecha de alta"
 user.endDate: "fecha de baja"
+user.extraDays: "Días extra"
 
 
 messages.confirmacion: "Confirmación"
@@ -210,3 +211,5 @@ message.eventNotFound: "No puede aprobar el periodo indicado porque se ha borrad
 message.endOfContract: "Su contrato finaliza el { endDate } y el periodo que solicita es posterior a dicha fecha"
 message.startOfContract: "Su contrato comienza el { startDate } y el periodo que solicita es anterior a dicha fecha"
 message.betweenYears: "El periodo no puede empezar un año y terminar el siguiente año. Pida 2 periodos distintos."
+message.particularBussinesLeaveDaysOnlyCurrentYear: "Los días asuntos particulares sólo se pueden solicitar en el año en curso."
+message.particularBussinesLeaveDaysNotWithPreviousYearDays: "Los días de asuntos propios no se pueden solicitar con días del año pasado."

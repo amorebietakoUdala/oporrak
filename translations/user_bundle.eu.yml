@@ -6,5 +6,6 @@ ROLE_USER: "Erabiltzailea"
 user.yearsWorked: "Lan egindako urteak"
 user.startDate: "Alta data"
 user.endDate: "Baja data"
+user.extraDays: "Egun gehigarriak"
 
 security.login.remember_me: "Oroitu"
