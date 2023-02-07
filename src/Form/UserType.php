@@ -28,6 +28,7 @@ class UserType extends BaseUserType
                 'class' => User::class,
                 'label' => 'user.boss',
                 'placeholder' => 'placeholder.choose',
+                'disabled' => $options['readonly'],
             ])
             ->add('department', EntityType::class, [
                 'class' => Department::class,
@@ -35,7 +36,8 @@ class UserType extends BaseUserType
                 'placeholder' => 'placeholder.choose',
                 'constraints' => [
                     new NotBlank()
-                ]
+                ],
+                'disabled' => $options['readonly'],
             ])
             ->add('yearsWorked', IntegerType::class,[
                 'label' => 'user.yearsWorked',
@@ -43,6 +45,7 @@ class UserType extends BaseUserType
                     new PositiveOrZero()
                 ],
                 'empty_data' => 0,
+                'disabled' => $options['readonly'],
             ])
             ->add('startDate', DateType::class,[
                 'label' => 'user.startDate',
@@ -50,7 +53,11 @@ class UserType extends BaseUserType
                 'html5' => true,
                 'format' => 'yyyy-MM-dd',
                 'attr' => ['class' => 'js-datepicker'],
-
+                'constraints' => [
+                    new NotBlank()
+                ],
+                'required' => true,
+                'disabled' => $options['readonly'],
             ])
             ->add('endDate', DateType::class,[
                 'label' => 'user.endDate',
@@ -58,7 +65,17 @@ class UserType extends BaseUserType
                 'html5' => true,
                 'format' => 'yyyy-MM-dd',
                 'attr' => ['class' => 'js-datepicker'],
-            ]);
+                'required' => false,
+                'disabled' => $options['readonly'],
+            ])
+            ->add('extraDays', IntegerType::class,[
+                'label' => 'user.extraDays',
+                'constraints' => [
+                    new PositiveOrZero()
+                ],
+                'empty_data' => '0',
+                'disabled' => $options['readonly'],
+            ])
         ;
     }
 

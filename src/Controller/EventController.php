@@ -275,6 +275,17 @@ class EventController extends AbstractController
             ]));
             return false;
         }
+        if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && 
+            intval(($event->getStartDate())->format('Y')) > intval((new DateTime())->format('Y')) || 
+            intval(($event->getEndDate())->format('Y')) > intval((new DateTime())->format('Y')) ) 
+        {
+            $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysOnlyCurrentYear'));            
+            return false;
+        }
+        if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getUsePreviousYearDays() ) {
+            $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysNotWithPreviousYearDays'));            
+            return false;
+        }
         if ($event->getStartDate() > $workCalendar->getDeadlineNextYear()) {
             $this->addFlash('error', $this->translator->trans('message.deadLineNextYearExceeded', [
                 'deadline' => $workCalendar->getDeadlineNextYear()->format('Y-m-d'),
@@ -288,7 +299,6 @@ class EventController extends AbstractController
             ]));
             return false;
         }
-
         if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
             if (!$this->checkDoesNotExcessMaximumPartionableHours($event, $event->getStartDate()->format('Y'), $workCalendar)) {
                 return false;
