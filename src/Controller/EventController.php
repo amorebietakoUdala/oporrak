@@ -183,11 +183,11 @@ class EventController extends AbstractController
             $event = $form->getData();
             /** @var User $user */
             $user = $this->getUser();
+            if ($event->getStartDate() > $event->getEndDate()) {
+                $this->addFlash('error', 'message.startDateGreaterThanEndDate');
+                return $this->renderError($form, $request->isXmlHttpRequest());
+            }
             if (null === $event->getId()) {
-                if ($event->getStartDate() > $event->getEndDate()) {
-                    $this->addFlash('error', 'message.startDateGreaterThanEndDate');
-                    $valid = false;
-                }
                 if ($event->getUsePreviousYearDays()) {
                     $year = intval($event->getStartDate()->format('Y')) - 1;
                 } else {
