@@ -283,7 +283,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     public function calculateCurrentYearBaseDays(WorkCalendar $workCalendar): int  {
         $baseDays = $workCalendar->getBaseDays() + $this->getExtraDays();
         if ( !$this->isWorkingAllYear() ) {
-            $baseDays = round($this->calculateHasToWorkDaysThisYear() * $baseDays / 365);
+            $baseDays = ceil($this->calculateHasToWorkDaysThisYear() * $baseDays / 365);
         }
         return $baseDays;
     }
@@ -332,7 +332,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
                 EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar),
                 EventType::PARTICULAR_BUSSINESS_LEAVE => 0,
                 EventType::OVERTIME => 0,
-                EventType::ANTIQUITY_DAYS => 0,
+                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
              ];
         }
         return $totals;
