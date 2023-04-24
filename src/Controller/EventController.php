@@ -275,9 +275,11 @@ class EventController extends AbstractController
             ]));
             return false;
         }
-        if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && 
-            intval(($event->getStartDate())->format('Y')) > intval((new DateTime())->format('Y')) || 
-            intval(($event->getEndDate())->format('Y')) > intval((new DateTime())->format('Y')) ) 
+        if (
+            $event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && 
+            ( intval(($event->getStartDate())->format('Y')) > intval((new DateTime())->format('Y')) ||  
+              intval(($event->getEndDate())->format('Y')) > intval((new DateTime())->format('Y'))
+            ) ) 
         {
             $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysOnlyCurrentYear'));            
             return false;
