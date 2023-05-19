@@ -97,8 +97,8 @@ class EventRepository extends ServiceEntityRepository
         $nextYearStart = new DateTime("${nextYear}-01-01");
         $nextYearEnd = new DateTime("${nextYear}-12-31");
         $condition = "(
-            ( e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
-            OR ( e.startDate >= :nextYearStartDate AND e.endDate < :nextYearEndDate AND e.usePreviousYearDays = :true )
+            ( e.startDate >= :startDate AND e.endDate <= :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
+            OR ( e.startDate >= :nextYearStartDate AND e.endDate <= :nextYearEndDate AND e.usePreviousYearDays = :true )
             OR ( e.startDate < :nextYearStartDate AND e.endDate >= :nextYearStartDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) )
             )";
             $qb = $this->createQueryBuilder('e')
