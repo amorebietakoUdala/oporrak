@@ -196,7 +196,7 @@ class ApiController extends AbstractController
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       $userColors = $this->createArray($users, $colors);
       $events = $this->eventRepo->findEffectiveEventsOfTheYearByUsernames($year,$users);
-      $stats = $this->statsService->calculateStatsByUserAndStatus($events, $year);
+      $stats = $this->statsService->calculateStatsByUserAndStatus($events, $year, $users);
       $statuses = $this->statusRepo->getArrayOfColors();
       if ($json) {
          return $this->json($stats, 200, [], ['groups' => ['event']]);

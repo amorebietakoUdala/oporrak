@@ -253,29 +253,33 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     }
 
     public function isFirstYear(): bool {
-        $year = date('Y');
-        $startYear = $this->startDate->format('Y');
-        if ($startYear === $year) {
-            return true;
+        $year = (new DateTime())->format('Y');
+        if ($this->startDate !== null) {
+            $startYear = $this->startDate->format('Y');
+            if ($startYear === $year) {
+                return true;
+            }
         }
         return false;
     }
 
     public function isLastYear(): bool {
-        $year = date('Y');
-        $endYear = $this->endDate->format('Y');
-        if ($endYear === $year) {
-            return true;
+        $year = (new DateTime())->format('Y');
+        if ($this->endDate !== null) {
+            $endYear = $this->endDate->format('Y');
+            if ($endYear === $year) {
+                return true;
+            }
         }
         return false;
     }
 
     public function isWorkingAllYear(): bool {
-        if ( null === $this->endDate ) {
-            return true;
-        }
         if ( $this->isFirstYear() || $this->isLastYear() ) {
             return false;
+        }
+        if ( null === $this->endDate ) {
+            return true;
         }
         return true;
     }

@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\WorkCalendar;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\HolidayRepository;
+use App\Repository\UserRepository;
 use App\Repository\WorkCalendarRepository;
 
 class StatsService
@@ -16,11 +17,13 @@ class StatsService
    private WorkCalendarRepository $wcRepo;
    private HolidayRepository $holidayRepo;
    private AntiquityDaysRepository $adRepo;
+   private UserRepository $userRepo;
 
-   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo, AntiquityDaysRepository $adRepo) {
+   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo, AntiquityDaysRepository $adRepo, UserRepository $userRepo) {
       $this->wcRepo = $wcRepo;
       $this->holidayRepo = $holidayRepo;
       $this->adRepo = $adRepo;
+      $this->userRepo = $userRepo;
    }
 
    public function calculateTotalWorkingDays(array $events, $workCalendar)
@@ -115,10 +118,30 @@ class StatsService
       return $counters;
    }
 
-   public function calculateStatsByUserAndStatus(array $events, int $year) {
+   /**
+    * @return array
+    */
+   private function calculateTotalsForUsernamesAndYear(array $usernames, int $year) {
       $counters = [];
+      $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+      foreach($usernames as $username) {
+         $user = $this->userRepo->findOneBy(['username' => $username]);
+         if ($user !== null) {
+            $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
+            if ( null !== $antiquityDays ) {
+               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar) + $antiquityDays->getVacationDays();
+            } else {
+               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar);
+            }
+         }
+      }
+      return $counters;
+
+   }
+
+   public function calculateStatsByUserAndStatus(array $events, int $year, array $usernames) {
+      $counters = $this->calculateTotalsForUsernamesAndYear($usernames,$year);
       foreach($events as $event) {
-         /** @var Event $event */
          $workCalendars = [];
          $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
          $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
@@ -127,10 +150,8 @@ class StatsService
          } else {
             $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
          }
-
          $statusId = "{$event->getStatus()->getId()}";
          $username = "{$event->getUser()->getUsername()}";
-         $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($event->getUser()->getYearsWorked());
          if ( array_key_exists($username, $counters) ) {
             if ( array_key_exists($statusId, $counters[$username]) ) {
                $counters[$username][$statusId] = $counters[$username][$statusId] + $workingDays;
@@ -138,16 +159,9 @@ class StatsService
                $counters[$username][$statusId] = $workingDays;
             }
          } else {
-            $user = $event->getUser();
-            if ( null !== $antiquityDays ) {
-               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendars[$year]) + $antiquityDays->getVacationDays();
-            } else {
-               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendars[$year]);
-            }
             $counters[$username][$statusId] = $workingDays;
          }
       }
-
       return $counters;
    }
 
