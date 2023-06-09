@@ -86,7 +86,16 @@
 			<div>{{ 'event.period' | trans}}:&nbsp;{{event.startDate | date('Y-m-d')}}
 				-
 				{{event.endDate | date('Y-m-d')}}</div>
-			<div>{{ 'event.name' | trans}}:&nbsp;{{event.name}}</div>
+			<div>{{ 'event.name' | trans}}:&nbsp;
+				{% if app.request.locale == 'es' %}
+					{{event.type.descriptionEs}}
+				{% else %}
+					{{event.type.descriptionEu}}
+				{% endif %}
+				{% if event.halfday %}
+					&nbsp;({{ event.hours | number_format(2, ',', '.') }}&nbsp;{{ 'mail.hours' | trans }})
+				{% endif %}
+			</div>
          {% if overlaps | length > 0 %}
          <div id="overlapingEvents">
             <div><b>{{ 'message.overlapingWith' | trans }}</b></div>
