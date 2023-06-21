@@ -333,8 +333,9 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
              ];
         } else {
             $totals = [
-                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar),
-                EventType::PARTICULAR_BUSSINESS_LEAVE => 0,
+                /* If is not working all year, we leave 2 days for particular bussiness days, to allow taking half days */
+                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar) - 2,
+                EventType::PARTICULAR_BUSSINESS_LEAVE => 2,
                 EventType::OVERTIME => 0,
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
              ];
