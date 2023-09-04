@@ -19,12 +19,18 @@
           'locale': app.request.locale|split('_')[0], 
           'holidays-url': path('api_getHolidays'), 
           'holidays-color': holidaysColor, 
-          'department-dates-url': path('api_get_dates'), 
+          'department-dates-url': path('api_get_dates'),
+          'formUrl' : path('event_save'), 
           'year' : year,
           'department' : null, 
           'status': constant('App\\Entity\\Status::APPROVED'),
-          'type': 'city-hall' } ) }}
+          'type': 'city-hall',
+          'enableRangeSelection': false,
+           } ) }}
       >
+         {% if is_granted("ROLE_HHRR") %}
+            <div><button class="btn btn-primary rounded-circle fixed-bottom-right" data-action="click->department-calendar#addEvent"><i class="fa fa-plus" title='{{ "btn.new" | trans | capitalize }}'></i></button></div>
+         {% endif %}
          {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : true }) }}
 			<div id="calendar"></div>
 			<div class="row d-flex justify-content-around">
@@ -36,6 +42,10 @@
             </div>
 			</div>
 			<div id="context-menu"></div>
+  			{{ include('event/_modal.html.twig', {
+            modalTitle: 'modal.title.event' | trans,
+            form: form
+         }) }}
 		</div>
 	</div>
    {{ include('common/_alert.html.twig') }}

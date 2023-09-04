@@ -54,4 +54,12 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     }
 
+    public function findByActivedQB(bool $activated) {
+        $qb = $this->createQueryBuilder('u');
+        $qb->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated)
+            ->orderBy('u.username', 'ASC');
+        return $qb;
+    }
+
 }

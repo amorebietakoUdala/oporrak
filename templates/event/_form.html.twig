@@ -4,7 +4,20 @@
 
 <div {{ stimulus_controller('event-form',{ 'locale': app.request.locale|split('_')[0], } ) }}>
 	{{ form_start(form) }}
-	{{ form_widget(form) }}
+		{% if is_granted("ROLE_HHRR") and hhrr %}
+        <div class="row align-items-center mb-1">
+            <div class="col-lg-6 col-md-auto col-sm-auto">
+                {{ form_row(form.user, { 'attr': 
+                    { 'class' : 'form-select form-select-md', 'data-event-form-target': 'userInput' }
+                }) }}
+            </div>
+				<div class="col-lg-6 col-md-auto col-sm-auto">
+					{{ form_row(form.status, { 'attr': 
+						{ 'class' : 'form-select form-select-md' }
+					}) }}
+				</div>
+        </div>
+		{% endif %}
 	<button class="btn btn-primary">{{ button_label|default('btn.save') }}</button>
 	{{ form_end(form) }}
 </div>

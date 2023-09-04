@@ -5,6 +5,8 @@ namespace App\Form;
 use App\Entity\Event;
 use App\Entity\EventType;
 use App\Entity\Status;
+use App\Entity\User;
+use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -14,6 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use App\Validator\DateAfter;
 use App\Validator\Prueba;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -24,6 +27,8 @@ class EventFormType extends AbstractType
     {
         $days = $options['days'];
         $locale = $options['locale'];
+        $hhrr = $options['hhrr'] ?? false;
+        $edit = $options['edit'] ?? false;
         $builder
             ->add('id', HiddenType::class)
             ->add('type', EntityType::class, [
@@ -36,18 +41,25 @@ class EventFormType extends AbstractType
                         return $type->getDescriptionEu();
                     }
                 },
-            ])
+            ]);
+        if (!$edit) {
+            $constraints = [
+                new NotBlank(),
+                new DateAfter(['days' => $days])
+            ];
+        } else {
+            $constraints = [
+                new NotBlank(),
+            ];
+        }
+        $builder
             ->add('startDate', DateType::class, [
                 'widget' => 'single_text',
                 'html5' => false,
                 'format' => 'yyyy-MM-dd',
                 'attr' => ['class' => 'js-datepicker'],
                 'label' => 'event.startDate',
-                'constraints' => [
-                    new NotBlank(),
-                    new DateAfter(['days' => $days])
-
-                ]
+                'constraints' => $constraints,
             ])
             ->add('endDate', DateType::class, [
                 'widget' => 'single_text',
@@ -55,16 +67,9 @@ class EventFormType extends AbstractType
                 'format' => 'yyyy-MM-dd',
                 'attr' => ['class' => 'js-datepicker'],
                 'label' => 'event.endDate',
-                'constraints' => [
-                    new NotBlank(),
-                    new DateAfter(['days' => $days])
-                ]
-            ])
-            ->add('status', EntityType::class, [
-                'attr' => ['class' => 'd-none'],
-                'class' => Status::class,
-                'label' => 'event.status',
-            ])
+                'constraints' => $constraints
+                ]);
+        $builder
             ->add('halfday', CheckboxType::class, [
                 'label' => 'event.halfday',
                 'attr' => ['class' => 'js-halfDay'],
@@ -81,6 +86,29 @@ class EventFormType extends AbstractType
                 'label' => 'event.usePreviousYearDays',
                 'required' => false,
             ]);
+            if ($hhrr) {
+                $builder
+                    ->add('user', EntityType::class, [
+                        'class' => User::class,
+                        'label' => 'event.user',
+                        'query_builder' => function (UserRepository $er): QueryBuilder {
+                            return $er->findByActivedQB(true);
+                        },                        
+                    ])
+                    ->add('status', EntityType::class, [
+                        'class' => Status::class,
+                        'label' => 'event.status',
+                        'choice_label' => function ($status) use ($locale) {
+                            return $status->getDescription($locale);
+                        },
+                    ]);
+            } else {
+                $builder->add('status', EntityType::class, [
+                    'attr' => ['class' => 'd-none'],
+                    'class' => Status::class,
+                    'label' => false,
+                ]);
+            }
     }
 
     public function configureOptions(OptionsResolver $resolver)
@@ -89,6 +117,8 @@ class EventFormType extends AbstractType
             'data_class' => Event::class,
             'days' => 5,
             'locale' => 'eu',
+            'hhrr' => false,
+            'edit' => false,
         ]);
     }
 }

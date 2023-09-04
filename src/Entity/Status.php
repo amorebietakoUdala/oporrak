@@ -28,7 +28,13 @@ class Status
      * @Groups({"event"})
      * @ORM\Column(type="string", length=255)
      */
-    private $description;
+    private $descriptionEs;
+
+    /**
+     * @Groups({"event"})
+     * @ORM\Column(type="string", length=255)
+     */
+    private $descriptionEu;
 
     /**
      * @Groups({"event"})
@@ -51,14 +57,26 @@ class Status
         return $this->id;
     }
 
-    public function getDescription(): ?string
+    public function getDescriptionEs(): ?string
     {
-        return $this->description;
+        return $this->descriptionEs;
     }
 
-    public function setDescription(string $description): self
+    public function setDescriptionEs(string $descriptionEs): self
     {
-        $this->description = $description;
+        $this->descriptionEs = $descriptionEs;
+
+        return $this;
+    }
+
+    public function getDescriptionEu(): ?string
+    {
+        return $this->descriptionEu;
+    }
+
+    public function setDescriptionEu(string $descriptionEu): self
+    {
+        $this->descriptionEu = $descriptionEu;
 
         return $this;
     }
@@ -85,14 +103,23 @@ class Status
 
     public function __toString()
     {
-        return $this->description;
+        return $this->descriptionEs;
     }
 
     public function copy(Status $status): self
     {
         $this->id = $status->getId();
-        $this->description = $status->getDescription();
+        $this->descriptionEs = $status->getDescriptionEs();
+        $this->descriptionEu = $status->getDescriptionEu();
         $this->color = $status->getColor();
         return $this;
+    }
+
+    public function getDescription($locale) {
+        if ( $locale === 'es' ) {
+            return $this->getDescriptionEs();
+        } else {
+            return $this->getDescriptionEu();
+        }
     }
 }

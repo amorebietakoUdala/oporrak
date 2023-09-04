@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import $ from 'jquery';
+import { Modal } from 'bootstrap';
 import Calendar from 'js-year-calendar';
 import 'js-year-calendar/locales/js-year-calendar.es';
 import 'js-year-calendar/locales/js-year-calendar.eu';
@@ -11,18 +12,20 @@ const routes = require('../../public/js/fos_js_routes.json');
 import Routing from '../../public/js/router.min.js';
 
 export default class extends Controller {
-    static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect'];
+    static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect','modal', 'modalBody'];
     static values = {
         locale: String,
         holidaysUrl: String,
         holidaysColor: String,
         departmentDatesUrl: String,
         departmentUsersUrl: String,
+        formUrl: String,
         year: String,
         status: String,
         department: String,
         colorPalette: Array,
         type: String,
+        enableRangeSelection: Boolean,
     };
 
     calendar = null;
@@ -35,16 +38,16 @@ export default class extends Controller {
         Routing.setRoutingData(routes);
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
+        this.modal = new Modal(this.modalTarget);
         this.calendar = new Calendar('#calendar', {
-            enableContextMenu: true,
-            enableRangeSelection: false,
+            enableRangeSelection: this.enableRangeSelectionValue == true,
             language: this.localeValue,
             startYear: this.yearValue,
             disabledWeekDays: [0, 6],
             style: 'border',
             selectRange: (event) => {
-                this.openModal();
-                this.editEvent({
+                //this.openModal(event);
+                this.addEvent({
                     startDate: event.startDate,
                     endDate: event.endDate,
                 });
@@ -90,18 +93,30 @@ export default class extends Controller {
             dayContextMenu: function(e) {
                 $(e.element).popover('hide');
             },
-            yearChanged: (event) => {
-                // It makes a year changed on init, so it doesn't need another load after this.
-                let year = event.currentYear;
-                let user = $(this.userSelectTarget).val();
-                let department = this.departmentValue;
-                if ( this.hasDepartmentSelectTarget ) {
-                    department = $(this.departmentSelectTarget).val();
-                }
-                this.load(event.currentYear, user, department, this.statusValue);
-                this.dispatch('yearChanged', { detail: { year }});
-            },
+            yearChanged: (event) => {        
+                this.refreshYear(event.currentYear);
+            }
         });
+    }
+
+    refreshYear(year) {
+        // It makes a year changed on init, so it doesn't need another load after this.
+        let user = $(this.userSelectTarget).val();
+        let department = this.departmentValue;
+        if ( this.hasDepartmentSelectTarget ) {
+            department = $(this.departmentSelectTarget).val();
+        }
+        this.load(year, user, department, this.statusValue);
+        this.dispatch('yearChanged', { detail: { year }});
+    }
+
+    hasHoliday(events) {
+        for (var [key, value] of Object.entries(events)) {
+            if (value.type === 'holiday') {
+                return true;
+            }
+        }
+        return false;
     }
 
     async load(year, user, department, status) {
@@ -147,7 +162,7 @@ export default class extends Controller {
                         endDate: new Date(r.endDate),
 //                        name: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                         statusId: r.status.id,
-                        status: Translator.trans(r.status.description, {}, 'messages'),
+                        status: this.localeValue == 'es' ? r.status.descriptionEs : r.status.descriptionEu,
                         color: this.typeValue == 'department' ? colorArray[r.user.username] : r.status.color,
                         startHalfDay: r.halfDay,
                         hours: r.hours,
@@ -187,6 +202,81 @@ export default class extends Controller {
             }
         });
         return colorArray;
+    }
+
+    async openModal(event) {
+        let $alert = $(this.modalBodyTarget).find('.alert');
+        $alert.remove();
+        await $.ajax({
+            url: this.formUrlValue,
+            method: 'GET'
+        }).then((response) => {
+            this.modalBodyTarget.innerHTML = response;
+            const options = {
+                format: "yyyy-mm-dd",
+                language: this.localeValue,
+                weekStart: 1
+            }
+            $('#event_form_startDate').datepicker(options);
+            $('#event_form_endDate').datepicker(options);
+            $('#event_form_startDate').datepicker('update', event ? event.startDate : '');
+            $('#event_form_endDate').datepicker('update', event ? event.endDate : '');
+            this.modal.show();
+        }).catch((err) => {
+            import ('sweetalert2').then(async(Swal) => {
+                Swal.default.fire('There was an error!!!');
+            });
+        });
+
+    }
+
+    addEvent(event) {
+        this.fillEvent(event);
+        this.openModal(event);
+    }
+
+    fillEvent(event) {
+        $('#event_form_id').val(event ? event.id : '');
+        $('#event_form_name').val(event ? event.name : '');
+        $('#event_form_startDate').datepicker('update', event ? event.startDate : '');
+        $('#event_form_endDate').datepicker('update', event ? event.endDate : '');
+        $('#event_form_status').val(event ? event.statusId : '');
+        $('#event_form_halfDay').val(event ? event.halfDay : '');
+        $('#event_form_hours').val(event ? event.hours : '');
+    }
+
+    async editEvent(event) {
+        try {
+            event.preventDefault();
+            const id = event.currentTarget.dataset.eventid;
+            let url = app_base + Routing.generate('event_edit', { _locale: global.locale, event: id });
+            await $.ajax({
+                url: url,
+            }).then((response) => {
+                this.modalBodyTarget.innerHTML = response;
+                this.modal.show();
+                });
+            } catch (e) {
+                this.modalBodyTarget.innerHTML = e.responseText;
+            }
+    }
+        
+    async submitForm(event) {
+        const $form = $(this.modalBodyTarget).find('form');
+        try {
+            await $.ajax({
+                url: this.formUrlValue,
+                method: $form.prop('method'),
+                data: $form.serialize()
+            }).then(() => {
+                let year = this.calendar.getYear();
+                this.dispatch('update', { detail: { year }});
+                this.refreshYear(year);
+                this.modal.hide();
+            });
+        } catch (e) {
+            this.modalBodyTarget.innerHTML = e.responseText;
+        }
     }
 
     async deleteEvent(event) {
