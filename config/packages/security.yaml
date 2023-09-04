@@ -1,8 +1,8 @@
 security:
     role_hierarchy:
-        ROLE_ADMIN: [ROLE_USER, ROLE_BOSS, ROLE_HHRR]
         ROLE_BOSS: [ROLE_USER]
         ROLE_HHRR: [ROLE_USER, ROLE_BOSS]
+        ROLE_ADMIN: [ROLE_USER, ROLE_BOSS, ROLE_HHRR]
 
     # https://symfony.com/doc/current/security/authenticator_manager.html
     enable_authenticator_manager: true

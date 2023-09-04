@@ -196,6 +196,10 @@ class Event
 
     public function checkOverlap($event): bool
     {
+        // Exclude self from overlapping
+        if ( $this->id !== null && $this->id === $event->getId() ) {
+            return false;
+        }
         if (
             $this->startDate >= $event->getStartDate() && $this->startDate <= $event->getEndDate()
             || $this->endDate >= $event->getStartDate() && $this->endDate <= $event->getEndDate()

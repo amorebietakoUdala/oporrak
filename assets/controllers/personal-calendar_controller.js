@@ -61,7 +61,6 @@ export default class extends Controller {
                 }
             ],
             selectRange: (event) => {
-                this.openModal(event);
                 this.editEvent({
                     startDate: event.startDate,
                     endDate: event.endDate,

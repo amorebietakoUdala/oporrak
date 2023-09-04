@@ -3,13 +3,27 @@ import $ from 'jquery';
 import 'bootstrap-datepicker';
 import 'bootstrap-datepicker/js/locales/bootstrap-datepicker.es.js';
 import 'bootstrap-datepicker/js/locales/bootstrap-datepicker.eu.js';
+import 'select2';
 
 export default class extends Controller {
+    static targets = [ 'userInput' ];
     static values = {
         locale: String,
     }
 
     connect() {
+        const select2Options = {
+            theme: "bootstrap-5",
+            language: this.localeValue,
+            placeholder: "fsdfsdfdsf",
+            allowClear: false,
+            debug: true,
+            // We add this to Avoid problems on modals. Do not remove.
+            dropdownParent: $('#modal'),
+        }
+        if ( this.hasUserInputTarget ) {
+            $(this.userInputTarget).select2(select2Options);
+         }
         const options = {
             format: "yyyy-mm-dd",
             language: this.localeValue,

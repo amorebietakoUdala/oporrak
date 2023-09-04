@@ -97,9 +97,13 @@ main {
     display: none;
 }
 
-.modal-body label[for="event_form_status"] {
+.modal-body .col-form-label {
     display: none;
 }
+
+/* .modal-body label[for="event_form_status"] {
+    display: none;
+} */
 
 #overtimeDaysSummaryRow {
     display: block;

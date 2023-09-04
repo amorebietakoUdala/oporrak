@@ -127,6 +127,7 @@ class CalendarController extends AbstractController
             'previousYearDaysColor' => $this->getParameter('previousYearsDaysColor'),
             'roles' => array_values($this->getUser()->getRoles()),
             'colorPalette' => $this->getParameter('colorPalette'),
+            'hhrr' => $this->isGranted("ROLE_HHRR"),
         ]);
     }
 
@@ -136,16 +137,17 @@ class CalendarController extends AbstractController
     public function getMyStats(Request $request): Response
     {
         $year = $request->get('year');
+        $locale = $request->getLocale();
         if (null === $year) {
             $year = (new \DateTime())->format('Y');
         }
-        $stats = $this->calculateStats($year);
+        $stats = $this->calculateStats($year, $locale);
         return $this->render('calendar/_legend.html.twig', [
             'stats' => $stats,
         ]);
     }
 
-    private function calculateStats(int $year)
+    private function calculateStats(int $year, $locale)
     {
         $user = $this->getUser();
 
@@ -156,7 +158,7 @@ class CalendarController extends AbstractController
         $workingDaysWithPreviousYearDays = $this->statsService->calculateTotalWorkingDays($eventsWithLastYearDays, $workCalendar);
         $statuses = $this->statusRepo->findAll();
         $holidays = $this->holidayRepo->findHolidaysBetween(new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
-        $stats = $this->initializeCounters($statuses);
+        $stats = $this->initializeCounters($statuses, $locale);
         foreach ($counters as $key => $value) {
             $stats[$key]['count'] = $value;
         }
@@ -169,12 +171,12 @@ class CalendarController extends AbstractController
         return $stats;
     }
 
-    private function initializeCounters($statuses)
+    private function initializeCounters($statuses, $locale)
     {
         $stats = [];
         foreach ($statuses as $status) {
             $stats[$status->getId()] = [
-                'description' => $status->getDescription(),
+                'description' => $locale === 'es' ? $status->getDescriptionEs() : $status->getDescriptionEu(),
                 'count' => 0,
                 'color' => $status->getColor(),
             ];
