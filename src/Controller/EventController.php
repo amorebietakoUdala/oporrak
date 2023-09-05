@@ -127,10 +127,11 @@ class EventController extends AbstractController
 
     /**
      * @IsGranted("ROLE_HHRR")
-     * @Route("/{event}/edit", name="event_edit", methods={"GET"}, options = { "expose" = true })
+     * @Route("/{event}/edit", name="event_edit", methods={"GET","POST"}, options = { "expose" = true })
      */
     public function edit(Event $event, Request $request): Response
     {
+        $isCityHallReferer = $this->isRefererCityHallCalendar($request);
         $form = $this->createForm(EventFormType::class, $event, [
             'locale' => $request->getLocale(),
             'hhrr' => $this->isGranted('ROLE_HHRR'),
@@ -140,18 +141,34 @@ class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var Event $event */
             $event = $form->getData();
+            if ($event->getStartDate() > $event->getEndDate()) {
+                $this->addFlash('error', 'message.startDateGreaterThanEndDate');
+                return $this->renderForm('event/edit.html.twig', [
+                    'form' => $form,
+                    'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer, 
+                ]);
+            }
+            $user = $this->getEffectiveUser($event);
+            $year = $this->getEffectiveYear($event);
+            /** @var WorkCalendar $workCalendar */
+            $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+            // If any limitations exceeded it return the error directly
+            $valid = $this->checkDoesNotExcessLimitations($event, $workCalendar, $user);
+            if (!$valid) {
+                return $this->renderForm('event/edit.html.twig', [
+                    'form' => $form,
+                    'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer, 
+                ]);
+            }
             $this->em->persist($event);
             $this->em->flush();
         }
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
         return $this->render('event/' . $template, [
-            'event' => $form->getData(),
             'form' => $form->createView(),
             'hhrr' => $this->isGranted('ROLE_HHRR'),
-        ], new Response(
-            null,
-            $form->isSubmitted() && !$form->isValid() ? 422 : 200,
-        ));
+            ], new Response(null,$form->isSubmitted() && !$form->isValid() ? 422 : 200,)
+        );
     }
 
     /**
@@ -198,84 +215,64 @@ class EventController extends AbstractController
         return $this->save($request);
     }
 
-
-    private function isRefererCityHallCalendar($request): bool {
-        $referer = $request->headers->get('referer');
-        $refererPathInfo = Request::create($referer)->getPathInfo();
-        return $this->generateUrl('cityHallCalendar') === $refererPathInfo;
-    }
-
     /**
+     * Saves the received event. Could be new or a change on and existing one.
+     * 
+     * When HTTP method is get serves and empty form.
+     * 
      * @Route("/save", name="event_save", methods={"GET","POST"})
      */
     public function save(Request $request): Response
     {
         $isCityHallReferer = $this->isRefererCityHallCalendar($request);
-        $event = new Event();
-        $form = $this->createForm(EventFormType::class, $event, [
+        //$event = new Event();
+        $form = $this->createForm(EventFormType::class, null, [
             'days' => $this->getParameter('days'),
             'locale' => $request->getLocale(),
             'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer,
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $sendMail = true;
+            // When user has HHRR role and referer page is City Hall Calendar page, we don't send mails.
+            $sendMail = $this->isGranted('ROLE_HHRR') && $isCityHallReferer ? false : true;
             /** @var Event $event */
             $event = $form->getData();
             if ($event->getId() !== null) {
                 $event = $this->eventRepo->find($event->getId());
                 $event->fill($form->getData());
-                $sendMail = false;
             }
-            if ($event->getUser() === null) {
-                /** @var User $user */
-                $user = $this->getUser();
-            } else {
-                $user = $event->getUser();
-            }
-            
             if ($event->getStartDate() > $event->getEndDate()) {
                 $this->addFlash('error', 'message.startDateGreaterThanEndDate');
-                return $this->renderError($form, $request->isXmlHttpRequest());
+                return $this->renderError($form, $request->isXmlHttpRequest(), $isCityHallReferer);
             }
-            // if (null === $event->getId()) {
-                if ($event->getUsePreviousYearDays()) {
-                    $year = intval($event->getStartDate()->format('Y')) - 1;
-                } else {
-                    $year = intval($event->getStartDate()->format('Y'));
+            $user = $this->getEffectiveUser($event);
+            $year = $this->getEffectiveYear($event);
+            /** @var WorkCalendar $workCalendar */
+            $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+            // If any limitations exceeded it return the error directly
+            $valid = $this->checkDoesNotExcessLimitations($event, $workCalendar, $user);
+            if (!$valid) {
+                return $this->renderError($form, $request->isXmlHttpRequest(), $isCityHallReferer);
+            } else {
+                if (!$this->isGranted('ROLE_HHRR') || !$isCityHallReferer ) {
+                    $event->setStatus($this->statusRepo->find(Status::RESERVED));
                 }
-                /** @var WorkCalendar $workCalendar */
-                $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-                // If any limitations exceeded it return the error directly
-                $valid = $this->checkDoesNotExcessLimitations($event, $workCalendar, $user);
-                if ($valid) {
-                    if (!$this->isGranted('ROLE_HHRR') ) {
-                        $event->setStatus($this->statusRepo->find(Status::RESERVED));
-                    }
-                    $event->setUser($user);
-                    $event->setAskedAt(new \DateTime());
-                    $boss = $user->getBoss();
-                    if ($this->isGranted("ROLE_HHRR") && $event->getUser() !== $this->getUser()) {
-                        $sendMail = false;
-                    }
-                    return $this->renderSuccess($event, $boss, $request->isXmlHttpRequest(), $sendMail);
-                } else {
-                    return $this->renderError($form, $request->isXmlHttpRequest(), $isCityHallReferer);
+                $event->setUser($user);
+                $event->setAskedAt(new \DateTime());
+                $boss = $user->getBoss();
+                if ($this->isGranted("ROLE_HHRR") && $event->getUser() !== $this->getUser()) {
+                    $sendMail = false;
                 }
-            // } else {
-            //     return $this->renderSuccess($event, $user->getBoss(), $request->isXmlHttpRequest(), false);
-            // }
+                return $this->renderSuccess($event, $boss, $request->isXmlHttpRequest(), $sendMail);
+            }
         }
 
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'new.html.twig';
         return $this->render('event/' . $template, [
-            'event' => $form->getData(),
             'form' => $form->createView(),
             'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer,
-        ], new Response(
-            null,
-            $form->isSubmitted() && !$form->isValid() ? 422 : 200,
-        ));
+            ],  new Response(null,$form->isSubmitted() && !$form->isValid() ? 422 : 200,)
+        );
     }
 
     /**
@@ -479,13 +476,64 @@ class EventController extends AbstractController
         return true;
     }
 
-    private function renderError($form, $ajax = false, $isCityHallReferer = false)
+    private function renderError($form, $ajax = false, $isCityHallReferer = false, $templateName = 'new.html.twig')
     {
-        $template = $ajax ? '_form.html.twig' : 'new.html.twig';
+        $template = $ajax ? '_form.html.twig' : $templateName;
         return $this->render('event/' . $template, [
-            'event' => $form->getData(),
             'form' => $form->createView(),
             'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer, 
         ], new Response(null, 422));
+    }
+
+    /**
+     * Returns true if the referer is City Hall calendar page.
+     * 
+     * @param Request $request
+     * 
+     * @return bool
+     */
+    private function isRefererCityHallCalendar($request): bool {
+        $referer = $request->headers->get('referer');
+        if ( $referer === null ) {
+            return false;
+        }
+        $refererPathInfo = Request::create($referer)->getPathInfo();
+        return $this->generateUrl('cityHallCalendar') === $refererPathInfo;
+    }
+
+    /**
+     * Returns the effective year of the event. If it uses previousYearDays, the effective year is the previous year.
+     * 
+     * @param Event $event
+     * 
+     * @return int
+     */
+    private function getEffectiveYear($event): int {
+        if ($event->getUsePreviousYearDays()) {
+            $year = intval($event->getStartDate()->format('Y')) - 1;
+        } else {
+            $year = intval($event->getStartDate()->format('Y'));
+        }
+        return $year;
+    }
+
+    /**
+     * Returns the effective user of the event. 
+     * 
+     * If event user is null we take authenticated user.
+     * This is only for the case of human resources role that can create events for other users
+     * 
+     * @param Event $event
+     * 
+     * @return User
+     */
+    private function getEffectiveUser ($event): User {
+        if ($event->getUser() === null) {
+            /** @var User $user */
+            $user = $this->getUser();
+        } else {
+            $user = $event->getUser();
+        }
+        return $user;
     }
 }

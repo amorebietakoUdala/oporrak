@@ -12,7 +12,7 @@ const routes = require('../../public/js/fos_js_routes.json');
 import Routing from '../../public/js/router.min.js';
 
 export default class extends Controller {
-    static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect','modal', 'modalBody'];
+    static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect','modal', 'modalBody', 'modalTitle'];
     static values = {
         locale: String,
         holidaysUrl: String,
@@ -248,6 +248,7 @@ export default class extends Controller {
     async editEvent(event) {
         try {
             event.preventDefault();
+            this.modalTitleTarget.innerHTML = Translator.trans('modal.title.event.edit');
             const id = event.currentTarget.dataset.eventid;
             let url = app_base + Routing.generate('event_edit', { _locale: global.locale, event: id });
             await $.ajax({

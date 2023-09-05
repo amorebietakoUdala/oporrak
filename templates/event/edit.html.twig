@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'title.event.edit' | trans | capitalize }}{% endblock %}
+
+{% block body %}
+    <h1>{{ 'title.event.edit' | trans | capitalize }}</h1>
+
+   <div class="container-fluid">
+      {{ include('event/_form.html.twig') }}
+   </div>
+{% endblock %}
