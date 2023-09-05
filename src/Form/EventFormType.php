@@ -42,7 +42,7 @@ class EventFormType extends AbstractType
                     }
                 },
             ]);
-        if (!$edit) {
+        if (!$edit && !$hhrr) {
             $constraints = [
                 new NotBlank(),
                 new DateAfter(['days' => $days])

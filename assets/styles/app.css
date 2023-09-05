@@ -1,8 +1,6 @@
 @import '~bootstrap';
 @import '~js-year-calendar/dist/js-year-calendar.css';
 
-/* @import '~font-awesome'; */
-
 body {
     padding: 0.1em 0.1em 0.1em 0.1em;
     line-height: 1;
@@ -97,13 +95,13 @@ main {
     display: none;
 }
 
-.modal-body .col-form-label {
+.modal-body input.btn {
     display: none;
 }
 
-/* .modal-body label[for="event_form_status"] {
+.modal-body .col-form-label {
     display: none;
-} */
+}
 
 #overtimeDaysSummaryRow {
     display: block;

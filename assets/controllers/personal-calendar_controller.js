@@ -129,27 +129,28 @@ export default class extends Controller {
     }
     
     async openModal(event) {
-        let $alert = $(this.modalBodyTarget).find('.alert');
-        $alert.remove();
-        await $.ajax({
-            url: this.formUrlValue,
-            method: 'GET'
-        }).then((response) => {
-            this.modalBodyTarget.innerHTML = response;
-            const options = {
-                format: "yyyy-mm-dd",
-                language: this.localeValue,
-                weekStart: 1
-            }
-            $('#event_form_startDate').datepicker(options);
-            $('#event_form_endDate').datepicker(options);
-            $('#event_form_startDate').datepicker('update', event ? event.startDate : '');
-            $('#event_form_endDate').datepicker('update', event ? event.endDate : '');
-            this.modal.show();
-        }).catch((err) => {
-            Swal.default.fire('There was an error!!!');
+        import ('sweetalert2').then(async(Swal) => {
+            let $alert = $(this.modalBodyTarget).find('.alert');
+            $alert.remove();
+            await $.ajax({
+                url: this.formUrlValue,
+                method: 'GET'
+            }).then((response) => {
+                this.modalBodyTarget.innerHTML = response;
+                const options = {
+                    format: "yyyy-mm-dd",
+                    language: this.localeValue,
+                    weekStart: 1
+                }
+                $('#event_form_startDate').datepicker(options);
+                $('#event_form_endDate').datepicker(options);
+                $('#event_form_startDate').datepicker('update', event ? event.startDate : '');
+                $('#event_form_endDate').datepicker('update', event ? event.endDate : '');
+                this.modal.show();
+            }).catch((err) => {
+                Swal.default.fire('There was an error!!!');
+            });
         });
-
     }
 
     editEvent(event) {

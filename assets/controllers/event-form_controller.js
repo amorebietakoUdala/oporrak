@@ -15,9 +15,7 @@ export default class extends Controller {
         const select2Options = {
             theme: "bootstrap-5",
             language: this.localeValue,
-            placeholder: "fsdfsdfdsf",
             allowClear: false,
-            debug: true,
             // We add this to Avoid problems on modals. Do not remove.
             dropdownParent: $('#modal'),
         }
