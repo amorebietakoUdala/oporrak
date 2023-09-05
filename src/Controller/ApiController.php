@@ -83,9 +83,9 @@ class ApiController extends AbstractController
          $statsByEventType = $counters[$user->getUsername()];
          foreach ($totals as $key => $value) {
             if (array_key_exists($key, $statsByEventType)) {
-            $remaining[$key] = $totals[$key] - $statsByEventType[$key];
+            $remaining[$key] = round($totals[$key] - $statsByEventType[$key], 2);
             } else {
-            $remaining[$key] = $totals[$key];
+            $remaining[$key] = round($totals[$key], 2);
             }
          }
       } else {
