@@ -38,7 +38,9 @@ export default class extends Controller {
         Routing.setRoutingData(routes);
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
-        this.modal = new Modal(this.modalTarget);
+        if ( this.hasModalTarget) {
+            this.modal = new Modal(this.modalTarget);
+        }
         this.calendar = new Calendar('#calendar', {
             enableRangeSelection: this.enableRangeSelectionValue == true,
             language: this.localeValue,

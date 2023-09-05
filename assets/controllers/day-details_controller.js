@@ -13,6 +13,7 @@ export default class extends Controller {
         user: String,
         boss: String, 
         previousYearDaysColor: String,
+        type: String,
     };
 
     connect() {
@@ -66,9 +67,10 @@ export default class extends Controller {
                             content += '&nbsp;&nbsp;&nbsp;<span><a href="' + urlApprove + '"><i class="fas fa-check"></i></a></span>&nbsp;' +
                                 '<span><a href="' + urlDeny + '"><i class="fas fa-times"></i></a></span>';
                     }
-                    if ( ( roles.includes("ROLE_HHRR") || roles.includes("ROLE_ADMIN") ) && element.user !== user ) {
+                    if ( ( roles.includes("ROLE_HHRR") || roles.includes("ROLE_ADMIN") ) && element.user !== user 
+                        && this.typeValue != null && this.typeValue == 'cityHall') {
                         content += '&nbsp;&nbsp;<span><a href="#" data-eventId="'+ element.id +'" title="'+ Translator.trans('btn.delete', null, 'messages', global.locale) +'" data-action="click->department-calendar#deleteEvent"><i class="fas fa-trash"></i></a></span>&nbsp;';
-                        content += '&nbsp;&nbsp;<span><a href="#" data-eventId="'+ element.id +'" title="'+ Translator.trans('btn.edit', null, 'messages', global.locale) +'" data-action="click->department-calendar#editEvent"><i class="fas fa-edit"></i></a></span>&nbsp;'
+                        content += '&nbsp;&nbsp;<span><a href="#" data-eventId="'+ element.id +'" title="'+ Translator.trans('btn.edit', null, 'messages', global.locale) +'" data-action="click->department-calendar#editEvent"><i class="fas fa-edit"></i></a></span>&nbsp;';
                     }
                 }
             } else {
