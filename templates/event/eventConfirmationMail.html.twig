@@ -21,7 +21,7 @@
 					&nbsp;({{ event.hours | number_format(2, ',', '.') }}&nbsp;{{ 'mail.hours' | trans }})
 				{% endif %}
 			</div>
-			<div style="color: {{ event.status.color }}">{{ event.status.description | trans}}</div>
+			<div style="color: {{ event.status.color }}">{{ event.status.description(app.request.locale) | trans}}</div>
 		</body>
 	</html>
 {% endblock %}
