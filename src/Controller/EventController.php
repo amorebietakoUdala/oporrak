@@ -361,7 +361,7 @@ class EventController extends AbstractController
             return false;
         }
         if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
-            if (!$this->checkDoesNotExcessMaximumPartionableHours($event, $event->getStartDate()->format('Y'), $workCalendar)) {
+            if (!$this->checkDoesNotExcessMaximumPartionableHours($user, $event, $event->getStartDate()->format('Y'), $workCalendar)) {
                 return false;
             }
         }
@@ -426,19 +426,18 @@ class EventController extends AbstractController
     /**
      * Returns true if it doesn't excess the maximum days, for that type and work calendar
      */
-    private function checkDoesNotExcessMaximumDaysForType(User $user, Event $event, WorkCalendar $workCalendar)
+    private function checkDoesNotExcessMaximumDaysForType(User $user, Event $event, WorkCalendar $workCalendar): bool
     {
         $year = $event->getStartDate()->format('Y');
         $totals = $user->getTotals($workCalendar, $this->adRepo);
         $valid = true;
         $maxDays = $totals[$event->getType()->getId()];
-        $valid = $this->checkDoesNotExcessMaximumDays($event, $maxDays, $year, $workCalendar);
+        $valid = $this->checkDoesNotExcessMaximumDays($user, $event, $maxDays, $year, $workCalendar);
         return $valid;
     }
 
-    private function checkDoesNotExcessMaximumPartionableHours(Event $event, $year, WorkCalendar $workCalendar)
+    private function checkDoesNotExcessMaximumPartionableHours(User $user, Event $event, $year, WorkCalendar $workCalendar): bool
     {
-        $user = $this->getUser();
         $totalHours = 0;
         $eventsThisYear = $this->eventRepo->findUserEventsCurrentYearAndType($user, $year, $event->getType(), true);
         foreach ($eventsThisYear as $event) {
@@ -457,10 +456,9 @@ class EventController extends AbstractController
         return true;
     }
 
-    private function checkDoesNotExcessMaximumDays(Event $event, $maxDays, $year, WorkCalendar $workCalendar)
+    private function checkDoesNotExcessMaximumDays(User $user, Event $event, $maxDays, $year, WorkCalendar $workCalendar): bool
     {
         if (null !== $maxDays) {
-            $user = $this->getUser();
             $eventsThisYear = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year, $event->getType(),false);
             $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
             if ($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) > $maxDays) {
