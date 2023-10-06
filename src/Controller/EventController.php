@@ -440,9 +440,9 @@ class EventController extends AbstractController
     {
         $totalHours = 0;
         $eventsThisYear = $this->eventRepo->findUserEventsCurrentYearAndType($user, $year, $event->getType(), true);
-        foreach ($eventsThisYear as $event) {
-            if (null !== $event->getHours()) {
-                $totalHours += $event->getHours();
+        foreach ($eventsThisYear as $element) {
+            if (null !== $element->getHours()) {
+                $totalHours += $element->getHours();
             }
         }
         if ($totalHours + $event->getHours() > $workCalendar->getPartitionableHours()) {
