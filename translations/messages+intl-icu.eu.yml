@@ -51,6 +51,7 @@ navitem.workcalendar: "Lan egutegia"
 navitem.eventTypes: "Opor motak"
 navitem.reports: "Txostenak"
 navitem.statistics: "Estatistikak"
+navitem.additionalVacationDays: "Opor egun gehigarriak"
 
 # Buttons
 btn.cancel: "Itzuli"
@@ -93,6 +94,7 @@ title.user.legend: "Erabiltzaileak"
 title.remaining_days: "Geratzen zaizkidan egunak"
 title.reserved-events: "Aprobatzeke"
 title.event.edit: "Editatu"
+title.addtionalVacationDaysIndex: "Opor egun gehigarriak"
 modal.title.holiday: "Jaiegun berria"
 modal.title.workcalendar: "Lan egutegi berria"
 modal.title.antiquityDays: "Sarrera berria"
@@ -100,6 +102,7 @@ modal.title.department: "Sail berria"
 modal.title.event: "Opor egun berria"
 modal.title.event.edit: "Xehetasunak aldatu"
 modal.title.eventType: "Opor mota berria"
+modal.title.additionalVacationDays: "Opor egun gehigarriak"
 
 # Labels
 label.eventsThisYear: "Oporrak aurten: "
@@ -134,6 +137,7 @@ Asuntos particulares/Norbere kontuetarako baimena: "Norbere kontuetarako baimena
 Exceso jornada/Gehiegizko lanaldia: "Gehiegizko lanaldia"
 Días antigüedad/Antzinatasun egunak: "Antzinatasun egunak"
 Otros/Besteren bat: "Besteren bat"
+label.additionalVacationDays: "Opor egun gehigarriak"
 
 #Placeholders
 placeholder.choose: "Hautatu aukeraren bat"
@@ -170,6 +174,8 @@ antiquityDays.vacationDays: "Opor egunak"
 antiquityDays.yearsWorked: "Lan egindako urteak"
 eventType.descriptionEs: "Deskripzioa (Es)"
 eventType.descriptionEu: "Deskripzioa (Eu)"
+additionalVacationDays.vacationDays: "Opor egunak"
+additionalVacationDays.yearsWorked: "Lan egindako urteak"
 
 
 Approved: "Onartuak"
@@ -192,7 +198,6 @@ message.alreadyNotApproved: "Epea ez onartua dago jadanik."
 message.alreadyApproved: "Epea onartua dago jadanik."
 message.approved: "Epea behar bezala onartu da."
 message.notApproved: "Epea behar bezala ukatu da."
-no records found: "Ez da emaitzarik aurkitu"
 message.maximum_1_days_exceeded: "Ezin da epe hori eskatu urteko opor kopurua { days } egunetan gainditzen delako."
 message.maximum_2_days_exceeded: "Ezin da epe hori eskatu urteko norbere kontuetarako egun kopurua { days } egunetan gainditzen delako."
 message.maximum_3_days_exceeded: "Ezin da epe hori eskatu urteko gehiegizko jardunaldiko egun kopurua { days } egunetan gainditzen delako."

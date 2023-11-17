@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\AntiquityDays;
+use App\Entity\AdditionalVacationDays;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
-class AntiquityDaysType extends AbstractType
+class AdditionalVacationDaysType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -19,7 +19,7 @@ class AntiquityDaysType extends AbstractType
         $builder
             ->add('id', HiddenType::class)
             ->add('yearsWorked', NumberType::class, [
-                'label' => 'antiquityDays.yearsWorked',
+                'label' => 'additionalVacationDays.yearsWorked',
                 'disabled' => $readonly,
                 'constraints' => [
                     new NotBlank(),
@@ -31,7 +31,7 @@ class AntiquityDaysType extends AbstractType
                 ]
             ])
             ->add('vacationDays', NumberType::class, [
-                'label' => 'antiquityDays.vacationDays',
+                'label' => 'additionalVacationDays.vacationDays',
                 'disabled' => $readonly,
                 'constraints' => [
                     new NotBlank(),
@@ -47,7 +47,7 @@ class AntiquityDaysType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => AntiquityDays::class,
+            'data_class' => AdditionalVacationDays::class,
             'readonly' => false,
         ]);
     }

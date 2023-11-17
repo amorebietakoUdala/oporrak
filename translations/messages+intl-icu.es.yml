@@ -54,6 +54,7 @@ navitem.workcalendar: "Calendario laboral"
 navitem.eventTypes: "Tipos de vacaciones"
 navitem.reports: "Informes"
 navitem.statistics: "Estadísticas"
+navitem.additionalVacationDays: "Vacaciones Adicionales"
 
 # Buttons
 btn.cancel: "Volver"
@@ -96,6 +97,7 @@ title.user.legend: "Usuarios"
 title.remaining_days: "Días restantes"
 title.reserved-events: "Pendientes de aprobar"
 title.event.edit: "Editar"
+title.addtionalVacationDaysIndex: "Vacaciones adicionales"
 modal.title.holiday: "Nuevo festivo"
 modal.title.workcalendar: "Nuevo calendario laboral"
 modal.title.antiquityDays: "Nuevo Registro"
@@ -103,6 +105,7 @@ modal.title.department: "Nuevo Departamento"
 modal.title.event: "Nuevo evento"
 modal.title.event.edit: "Editar evento"
 modal.title.eventType: "Tipo de evento"
+modal.title.additionalVacationDays: "Vacaciones addicionales"
 
 
 # Labels
@@ -138,6 +141,7 @@ Asuntos particulares/Norbere kontuetarako baimena: "Asuntos particulares"
 Exceso jornada/Gehiegizko lanaldia: "Exceso jornada"
 Días antigüedad/Antzinatasun egunak: "Días antigüedad"
 Otros/Besteren bat: "Otros"
+label.additionalVacationDays: "Vacaciones addicionales"
 
 #Placeholders
 placeholder.choose: "Elije una opción"
@@ -171,6 +175,8 @@ antiquityDays.vacationDays: "Días de vacaciones"
 antiquityDays.yearsWorked: "Años trabajados"
 eventType.descriptionEs: "Descripción (Es)"
 eventType.descriptionEu: "Descripción (Eu)"
+additionalVacationDays.vacationDays: "Días de vacaciones"
+additionalVacationDays.yearsWorked: "Años trabajados"
 
 
 
@@ -195,7 +201,6 @@ message.alreadyNotApproved: "El periodo ya está no aprobado."
 message.alreadyApproved: "Período ya aprobado."
 message.approved: "El período se ha aprobado correctamente."
 message.notApproved: "El período no se aprueba."
-no records found: "No se han encontrado resultados"
 message.maximum_1_days_exceeded: "No puede solicitar ese período porque excede el máximo número de vacaciones anuales en { days } días"
 message.maximum_2_days_exceeded: "No puede solicitar ese período porque excede el máximo número de días de asuntos particulares anuales en { days } días"
 message.maximum_3_days_exceeded: "No puede solicitar ese período porque excede el máximo número de días de exceso de jornada anuales en { days } días"

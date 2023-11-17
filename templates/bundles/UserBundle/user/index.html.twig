@@ -8,7 +8,12 @@
 {% endblock %}
 
 {% block user_content %}
-    <main class="container-fluid" >
-		{{ include ('@User/user/_form.html.twig', {'readonly': readonly, 'new': new , 'password_change': password_change}) }}
+    <main>
+		<div class="container-fluid">
+			{{ include('@User/user/_list.html.twig', {
+				'users': users,
+			})}}
+		</div>
+		{{ include('common/_alert.html.twig') }}
     </main>
 {% endblock user_content %}

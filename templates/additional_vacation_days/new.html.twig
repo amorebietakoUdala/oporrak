@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{'title.additionalVacationDays' | trans }}{% endblock %}
+
+{% block body %}
+    <h1><h1>{{'title.antiquityIndex' | trans }}</h1></h1>
+
+    {{ include('additional_vacation_days/_form.html.twig') }}
+
+    <a href="{{ path('additional_vacation_days_index') }}">back to list</a>
+{% endblock %}

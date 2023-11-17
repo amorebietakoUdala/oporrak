@@ -9,6 +9,7 @@ use App\Entity\Status;
 use App\Entity\User;
 use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
+use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\StatusRepository;
@@ -39,9 +40,10 @@ class EventController extends AbstractController
     private StatusRepository $statusRepo;
     private WorkCalendarRepository $wcRepo;
     private AntiquityDaysRepository $adRepo;
+    private AdditionalVacationDaysRepository $avdRepo;
     private EntityManagerInterface $em;
 
-    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService, EventRepository $eventRepo, StatusRepository $statusRepo, WorkCalendarRepository $wcRepo, AntiquityDaysRepository $adRepo, EntityManagerInterface $em)
+    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService, EventRepository $eventRepo, StatusRepository $statusRepo, WorkCalendarRepository $wcRepo, AntiquityDaysRepository $adRepo, EntityManagerInterface $em, AdditionalVacationDaysRepository $avdRepo)
     {
         $this->mailer = $mailer;
         $this->translator = $translator;
@@ -51,6 +53,7 @@ class EventController extends AbstractController
         $this->wcRepo = $wcRepo;
         $this->adRepo = $adRepo;
         $this->em = $em;
+        $this->avdRepo = $avdRepo;
     }
 
     /**
@@ -429,7 +432,7 @@ class EventController extends AbstractController
     private function checkDoesNotExcessMaximumDaysForType(User $user, Event $event, WorkCalendar $workCalendar): bool
     {
         $year = $event->getStartDate()->format('Y');
-        $totals = $user->getTotals($workCalendar, $this->adRepo);
+        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo);
         $valid = true;
         $maxDays = $totals[$event->getType()->getId()];
         $valid = $this->checkDoesNotExcessMaximumDays($user, $event, $maxDays, $year, $workCalendar);

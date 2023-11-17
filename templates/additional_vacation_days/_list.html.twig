@@ -1,0 +1,28 @@
+      <table id="taula" class="table">
+         <thead>
+               <tr>
+                  <th>Id</th>
+                  <th>{{ 'additionalVacationDays.yearsWorked' | trans}}</th>
+                  <th>{{ 'additionalVacationDays.vacationDays' | trans }}</th>
+                  <th>{{ 'label.options' | trans }}</th>
+               </tr>
+         </thead>
+         <tbody>
+         {% for additionalVacationDay in additional_vacation_days %}
+               <tr>
+                  <td>{{ additionalVacationDay.id }}</td>
+                  <td>{{ additionalVacationDay.yearsWorked }}</td>
+                  <td>{{ additionalVacationDay.vacationDays }}</td>
+                  <td>
+                     <a href="#" data-action="entity#edit" data-url="{{ path('additional_vacation_days_show', {'id': additionalVacationDay.id}) }}"><i class="fa fa-eye" title='{{ "btn.show" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#edit" data-url="{{ path('additional_vacation_days_edit', {'id': additionalVacationDay.id}) }}" data-allowEdit="true"><i class="fa fa-edit" title='{{ "btn.edit" | trans | capitalize }}'></i></a>&nbsp;
+                     <a href="#" data-action="entity#delete" data-url="{{ path('additional_vacation_days_delete', {'id': additionalVacationDay.id}) }}"><i class="fa fa-trash" title='{{ "btn.delete" | trans | capitalize }}'></i></a>&nbsp;
+                  </td>
+               </tr>
+         {% else %}
+               <tr>
+                  <td colspan="4">{{ 'messages.results0' | trans }}</td>
+               </tr>
+         {% endfor %}
+         </tbody>
+      </table>

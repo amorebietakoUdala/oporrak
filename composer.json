@@ -48,6 +48,7 @@
         "willdurand/js-translation-bundle": "^4.0"
     },
     "require-dev": {
+        "amorebietakoudala/stimulus-controller-bundle": "^1.0",
         "friendsofsymfony/jsrouting-bundle": "^2.7",
         "symfony/browser-kit": "^5.3",
         "symfony/css-selector": "^5.3",

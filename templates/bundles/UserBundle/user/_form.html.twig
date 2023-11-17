@@ -1,5 +1,4 @@
 {% trans_default_domain 'user_bundle' %}
-{# {{ form_start(form, {'attr': {'novalidate': 'novalidate'} }) }} #}
 {{ form_start(form) }}
 
 <div class="container-fluid m-0">
@@ -83,19 +82,21 @@
 		</div>
 	</div>
 </div>
-<div class="row justify-content-center mt-2">
-{% if not readonly and not new %}
-	<button class="btn btn-primary ml-2 js-save col-2" type="button" data-url="{{ path('admin_user_edit', {'id': form.vars.value.id}) }}">{{ "btn.user.save" | trans }}</button>&nbsp;
+
+<div class="row justify-content-center mt-2 mb-2">
+{% if not readonly %}
+	<div class="col-lg-auto">
+		<button class="btn btn-primary" type="submit">{{ "btn.user.save" | trans }}</button>
+	</div>
 {% endif %}
-{% if new %}
-	<button class="btn btn-primary ml-2 js-save col-2" type="submit">{{ "btn.user.save" | trans }}</button>&nbsp;
-{% endif %}
-	<button class="btn btn-primary ml-2 js-back col-2" type="button" data-url="{{ path('admin_user_list') }}">{{ "btn.user.cancel" | trans }}</button>
+	<div class="col-lg-auto">
+		<a href="{{ returnUrl is defined and not returnUrl is empty ? returnUrl : path('admin_user_index') }}" class="btn btn-secondary">{{ "btn.user.cancel" | trans }}</a>
+	</div>
 </div>
 
 <!-- Token CSRF -->
 {{ form_widget(form._token) }}
-{{ form_end(form, {'render_rest': true, 
+{{ form_end(form, {'render_rest': false, 
 				   'attr': {'class': '',
 			       } 
 }) }}

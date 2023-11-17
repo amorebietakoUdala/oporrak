@@ -13,12 +13,20 @@
 			<div id="overtimeDaysSummaryRow">
 				{{'label.overtimeDays' | trans }}<span data-summary-target="overtimeDays"></span>&nbsp;{{'label.days' | trans }}
 			</div>
-         <h6 class="mt-1">{{'label.antiquityDays'|trans}}:</h6>   
-         {% for antiquity in antiquityDays %}
-			<div>
-				<span>{{ antiquity.yearsWorked }}&nbsp;{{'label.years' | trans }}&nbsp;{{ antiquity.vacationDays }}</span>
+			<div class="d-flex justify-content-start">
+				<div class="col-lg-6">
+         		<h6 class="mt-1">{{'label.antiquityDays'|trans}}:</h6>
+					{% for antiquity in antiquityDays %}
+						<div class="col-lg-auto">{{ antiquity.yearsWorked }}&nbsp;{{'label.years' | trans }}&nbsp;{{ antiquity.vacationDays }}</div>
+					{% endfor %}
+				</div>
+				<div class="col-lg-6">
+					<h6 class="mt-1">{{'label.additionalVacationDays'|trans}}:</h6>
+					{% for additionalVacationDay in additionalVacationDays %}
+						<div class="col-lg-auto">{{ additionalVacationDay.yearsWorked }}&nbsp;{{'label.years' | trans }}&nbsp;{{ additionalVacationDay.vacationDays }}</div>
+					{% endfor %}
+				</div>
 			</div>
-         {% endfor %}
 		</div>
 	</div>
 </div>

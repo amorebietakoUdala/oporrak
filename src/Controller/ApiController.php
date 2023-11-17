@@ -7,6 +7,7 @@ use App\Entity\EventType;
 use App\Entity\User;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
+use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\HolidayRepository;
@@ -33,8 +34,9 @@ class ApiController extends AbstractController
    private WorkCalendarRepository $wcRepo;
    private StatsService $statsService;
    private StatusRepository $statusRepo;
+   private AdditionalVacationDaysRepository $avdRepo;
 
-   public function __construct(AntiquityDaysRepository $adRepo, EventRepository $eventRepo, HolidayRepository $hollidayRepo, WorkCalendarRepository $wcRepo, StatsService $statsService, StatusRepository $statusRepo)
+   public function __construct(AntiquityDaysRepository $adRepo, EventRepository $eventRepo, HolidayRepository $hollidayRepo, WorkCalendarRepository $wcRepo, StatsService $statsService, StatusRepository $statusRepo, AdditionalVacationDaysRepository $avdRepo)
    {
       $this->adRepo = $adRepo;
       $this->eventRepo = $eventRepo;
@@ -42,6 +44,7 @@ class ApiController extends AbstractController
       $this->wcRepo = $wcRepo;
       $this->statsService = $statsService;
       $this->statusRepo = $statusRepo;
+      $this->avdRepo = $avdRepo;
    }
 
    /**
@@ -96,7 +99,7 @@ class ApiController extends AbstractController
 
     private function totalDaysForEachType(User $user, $year) {
       $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-      $totals = $user->getTotals($workCalendar,$this->adRepo);
+      $totals = $user->getTotals($workCalendar,$this->adRepo, $this->avdRepo);
       return $totals;
     }
 
@@ -107,7 +110,7 @@ class ApiController extends AbstractController
    {
       $year = $request->get('year');
       if (null === $year) {
-         $year = \DateTime::createFromFormat('Y', new \DateTime())->format('Y');
+         $year = (new \DateTime())->format('Y');
       }
       /** @var User $user */
       $user = $this->getUser();

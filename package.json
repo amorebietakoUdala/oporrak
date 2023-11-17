@@ -1,5 +1,6 @@
 {
     "devDependencies": {
+        "@amorebietakoudala/stimulus-controller-bundle": "file:vendor/amorebietakoudala/stimulus-controller-bundle/assets",
         "@babel/core": "^7.20.2",
         "@babel/preset-env": "^7.20.2",
         "@fortawesome/fontawesome-free": "^5.15.3",

@@ -1,21 +1,12 @@
 {% extends "@User/layout.html.twig" %}
 {% trans_default_domain 'user_bundle' %}
 
-{% block title %}New User
-{% endblock %}
+{% block title %}New User{% endblock %}
 
 {% block menu %}
-	{{ include('common/_menu.html.twig') }}
+    {{ include('common/_menu.html.twig') }}
 {% endblock %}
 
 {% block user_content %}
 	{{ include ('@User/user/_form.html.twig', {}) }}
 {% endblock user_content %}
-
-{% block stylesheets %}
-	{{ parent() }}
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-{% endblock %}

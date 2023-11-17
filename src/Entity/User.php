@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use AMREU\UserBundle\Model\UserInterface as AMREUserInterface;
 use AMREU\UserBundle\Model\User as BaseUser;
+use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -141,7 +142,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
 
     public function removeEmployee(self $employee): self
     {
-        if ($this->users->removeElement($employee)) {
+        if ($this->employees->removeElement($employee)) {
             // set the owning side to null (unless already changed)
             if ($employee->getBoss() === $this) {
                 $employee->setBoss(null);
@@ -323,10 +324,11 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return false;
     }
 
-    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo ): array {
+    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo, AdditionalVacationDaysRepository $avdRepo ): array {
+        $additionalVacationDays = $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked) !== null ? $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0;
         if ( $this->isWorkingAllYear() ) {
             $totals = [
-                EventType::VACATION => $workCalendar->getVacationDays(),
+                EventType::VACATION => $workCalendar->getVacationDays() + $additionalVacationDays,
                 EventType::PARTICULAR_BUSSINESS_LEAVE => $workCalendar->getParticularBusinessLeave(),
                 EventType::OVERTIME => $workCalendar->getOvertimeDays() + $this->getExtraDays(),
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
@@ -334,7 +336,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         } else {
             $totals = [
                 /* If is not working all year, we leave 2 days for particular bussiness days, to allow taking half days */
-                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar) - 2,
+                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar) - 2 + $additionalVacationDays,
                 EventType::PARTICULAR_BUSSINESS_LEAVE => 2,
                 EventType::OVERTIME => 0,
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,

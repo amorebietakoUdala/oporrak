@@ -8,6 +8,7 @@ use App\Entity\Status;
 use App\Entity\User;
 use App\Form\EventFormType;
 use App\Form\UserFilterType;
+use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\HolidayRepository;
@@ -36,8 +37,9 @@ class CalendarController extends AbstractController
     private EventRepository $eventRepo;
     private HolidayRepository $holidayRepo;
     private UserRepository $userRepo;
+    private AdditionalVacationDaysRepository $avdRepo;
 
-    public function __construct (StatsService $statsService, StatusRepository $statusRepo, AntiquityDaysRepository $adRepo, WorkCalendarRepository $wcRepo, EventRepository $eventRepo, HolidayRepository $holidayRepo, UserRepository $userRepo) {
+    public function __construct (StatsService $statsService, StatusRepository $statusRepo, AntiquityDaysRepository $adRepo, WorkCalendarRepository $wcRepo, EventRepository $eventRepo, HolidayRepository $holidayRepo, UserRepository $userRepo, AdditionalVacationDaysRepository $avdRepo) {
         $this->statsService = $statsService;
         $this->statusRepo = $statusRepo;
         $this->adRepo = $adRepo;
@@ -45,6 +47,7 @@ class CalendarController extends AbstractController
         $this->eventRepo = $eventRepo;
         $this->holidayRepo = $holidayRepo;
         $this->userRepo = $userRepo;
+        $this->avdRepo = $avdRepo;
     }
 
     /**
@@ -71,6 +74,7 @@ class CalendarController extends AbstractController
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();
+        $additionalVacationDays = $this->avdRepo->findAll();
         return $this->render('calendar/personal.html.twig', [
             'form' => $form->createView(),
             'holidaysColor' => $this->getParameter('holidaysColor'),
@@ -78,6 +82,7 @@ class CalendarController extends AbstractController
             'statuses' => $statuses,
             'days' => $this->getParameter('days'),
             'antiquityDays' => $antiquityDays,
+            'additionalVacationDays' => $additionalVacationDays,
         ]);
     }
 
