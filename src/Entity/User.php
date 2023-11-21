@@ -328,18 +328,20 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         $additionalVacationDays = $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked) !== null ? $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0;
         if ( $this->isWorkingAllYear() ) {
             $totals = [
-                EventType::VACATION => $workCalendar->getVacationDays() + $additionalVacationDays,
+                EventType::VACATION => $workCalendar->getVacationDays(),
                 EventType::PARTICULAR_BUSSINESS_LEAVE => $workCalendar->getParticularBusinessLeave(),
                 EventType::OVERTIME => $workCalendar->getOvertimeDays() + $this->getExtraDays(),
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
+                EventType::ADDITONAL_VACATION_DAYS => $additionalVacationDays,
              ];
         } else {
             $totals = [
                 /* If is not working all year, we leave 2 days for particular bussiness days, to allow taking half days */
-                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar) - 2 + $additionalVacationDays,
+                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar) - 2,
                 EventType::PARTICULAR_BUSSINESS_LEAVE => 2,
                 EventType::OVERTIME => 0,
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
+                EventType::ADDITONAL_VACATION_DAYS => $additionalVacationDays,
              ];
         }
         return $totals;

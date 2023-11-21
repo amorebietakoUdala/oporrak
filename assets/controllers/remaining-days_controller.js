@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-   static targets = ['year','overtimeDays', 'vacationDays', 'particularBusinessLeave', 'antiquityDays'];
+   static targets = ['year','overtimeDays', 'vacationDays', 'particularBusinessLeave', 'antiquityDays','additionalVacationDays'];
    static values = {
        remainingDaysUrl: String,
    };
@@ -40,6 +40,9 @@ export default class extends Controller {
     }
     if (this.hasAntiquityDaysTarget) {
         this.antiquityDaysTarget.innerHTML = this.remainingDays[4] !== null ? this.remainingDays[4] : 0;
+    }
+    if (this.hasAdditionalVacationDaysTarget) {
+        this.additionalVacationDaysTarget.innerHTML = this.remainingDays[5] !== null ? this.remainingDays[5] : 0;
     }
     return this;
   }

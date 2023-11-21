@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
-use App\Entity\AntiquityDays;
 use App\Entity\Event;
 use App\Entity\Status;
-use App\Entity\User;
 use App\Entity\WorkCalendar;
+use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\HolidayRepository;
 use App\Repository\UserRepository;
@@ -18,12 +17,14 @@ class StatsService
    private HolidayRepository $holidayRepo;
    private AntiquityDaysRepository $adRepo;
    private UserRepository $userRepo;
+   private AdditionalVacationDaysRepository $avdRepo;
 
-   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo, AntiquityDaysRepository $adRepo, UserRepository $userRepo) {
+   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo, AntiquityDaysRepository $adRepo, UserRepository $userRepo, AdditionalVacationDaysRepository $avdRepo) {
       $this->wcRepo = $wcRepo;
       $this->holidayRepo = $holidayRepo;
       $this->adRepo = $adRepo;
       $this->userRepo = $userRepo;
+      $this->avdRepo = $avdRepo;
    }
 
    public function calculateTotalWorkingDays(array $events, $workCalendar)
@@ -37,9 +38,9 @@ class StatsService
                $year = $workCalendar->getYear();
                $nextYear = $year + 1;
                $eventStartYear = intval($event->getStartDate()->format('Y'));
-               $thisYearEndDate = new \DateTime("${year}-12-31");
-               $thisYearStartDate = new \DateTime("${year}-01-01");
-               $nextYearStartDate = new \DateTime("${nextYear}-01-01");
+               $thisYearEndDate = new \DateTime("$year-12-31");
+               $thisYearStartDate = new \DateTime("$year-01-01");
+               $nextYearStartDate = new \DateTime("$nextYear-01-01");
                if ( $year === $eventStartYear ) {
                   $dummyEvent = new Event();
                   $dummyEvent->setStartDate($event->getStartDate());
@@ -61,7 +62,7 @@ class StatsService
       $startDate = $event->getStartDate();
       $year = $event->getStartDate()->format('Y');
       $nextYear = intval($event->getStartDate()->format('Y')) + 1;
-      $nextYearStartDate = new \DateTime("${nextYear}-01-01");
+      $nextYearStartDate = new \DateTime("$nextYear-01-01");
 
       $endDate = $event->getEndDate();
 
@@ -127,11 +128,14 @@ class StatsService
       foreach($usernames as $username) {
          $user = $this->userRepo->findOneBy(['username' => $username]);
          if ($user !== null) {
+            $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar);
             $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
             if ( null !== $antiquityDays ) {
-               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar) + $antiquityDays->getVacationDays();
-            } else {
-               $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar);
+               $counters[$username]['total'] = $counters[$username]['total'] + $antiquityDays->getVacationDays();
+            }
+            $additionalVacationDays = $this->avdRepo->findAdditionalVacationDaysForYearsWorked($user->getYearsWorked());
+            if ( null !== $additionalVacationDays ) {
+               $counters[$username]['total'] = $counters[$username]['total'] + $additionalVacationDays->getVacationDays();
             }
          }
       }

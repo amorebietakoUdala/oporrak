@@ -7,6 +7,7 @@ use App\Entity\Event;
 use App\Entity\EventType;
 use App\Entity\Status;
 use App\Entity\User;
+use DateInterval;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -316,6 +317,24 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Find all the events of the specified status before the given date.
+     * 
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findAllByStatusAskedBeforeDate($status, \DateTime $date)
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->andWhere('e.askedAt < :date')
+            ->setParameter('date', $date)
+            ->andWhere('e.status = :status')
+            ->setParameter('status', $status);
+        $qb->orderBy('e.id', 'ASC')
+            //            ->setMaxResults(10)
+        ;
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @return Event[] Returns an array of Event objects
      */
     public function findAllAprovedBeetweenDates($startDate, $endDate = null)
@@ -397,13 +416,21 @@ class EventRepository extends ServiceEntityRepository
         if (count($usernames) === 0) {
             return [];
         }
-        $events = $this->findByUsernamesAndBeetweenDates($usernames,new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
+        $events = $this->findByUsernamesAndBeetweenDates($usernames,new \DateTime("$year-01-01"), new \DateTime("$year-12-31"));
         $nextYear = intval($year)+1;
-        $eventsNextYearWithPreviousYearDays = $this->findByUsernamesAndBeetweenDates($usernames,new \DateTime("${nextYear}-01-01"), new \DateTime("${nextYear}-12-31"), true);
+        $eventsNextYearWithPreviousYearDays = $this->findByUsernamesAndBeetweenDates($usernames,new \DateTime("$nextYear-01-01"), new \DateTime("$nextYear-12-31"), true);
 //        dd($events, $eventsNextYearWithPreviousYearDays);
         $events = array_merge($events, $eventsNextYearWithPreviousYearDays);
 
         return $events;
+    }
+
+    public function findAllReservedAndAskedDaysAgo($daysAgo) {
+        $events = null;
+        $beforeDate = (new \DateTime())->sub(new DateInterval('P'.$daysAgo.'D'));
+        $events = $this->findAllByStatusAskedBeforeDate(Status::RESERVED, $beforeDate);
+        return $events;
+
     }
 
 }

@@ -202,6 +202,7 @@ message.maximum_1_days_exceeded: "Ezin da epe hori eskatu urteko opor kopurua { 
 message.maximum_2_days_exceeded: "Ezin da epe hori eskatu urteko norbere kontuetarako egun kopurua { days } egunetan gainditzen delako."
 message.maximum_3_days_exceeded: "Ezin da epe hori eskatu urteko gehiegizko jardunaldiko egun kopurua { days } egunetan gainditzen delako."
 message.maximum_4_days_exceeded: "Ezin da epe hori eskatu urteko antzinatsun egun kopurua { days } egunetan gainditzen delako."
+message.maximum_5_days_exceeded: "Ezin da epe hori eskatu urteko opor egun gehigarri kopurua { days } egunetan gainditzen delako."
 message.partitionableDaysType: "Bakarrik norbere kontuetarako egunak zati daitezke eta bakarrik { hours } ordu { year } urtean"
 message.partitionableHoursExceeded: "Zatigarriak diren ordu kopurua gainditu duzu. { year }. urtean { maximumHours } ordu bakarrik zati daitezke, zuk { hours } eskatu dituzu"
 message.deadLineNextYearExceeded: "Aurten ezin dira { deadline } baino beranduagoko datak eskatu"

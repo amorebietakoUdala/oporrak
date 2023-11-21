@@ -205,6 +205,7 @@ message.maximum_1_days_exceeded: "No puede solicitar ese período porque excede 
 message.maximum_2_days_exceeded: "No puede solicitar ese período porque excede el máximo número de días de asuntos particulares anuales en { days } días"
 message.maximum_3_days_exceeded: "No puede solicitar ese período porque excede el máximo número de días de exceso de jornada anuales en { days } días"
 message.maximum_4_days_exceeded: "No puede solicitar ese período porque excede el máximo número de días por antigüedad en { days } días"
+message.maximum_5_days_exceeded: "No puede solicitar ese período porque excede el máximo número de días de vacaciones adicionales en { days } días"
 message.partitionableDaysType: "Sólo se pueden partir los días de asuntos particulares y sólo { hours } horas el año { year }"
 message.partitionableHoursExceeded: "Ha excedido el máximo número de horas particionables. El año { year } se pueden solicitar un máximo de { maximumHours }, usted ha solicitado { hours } horas"
 message.deadLineNextYearExceeded: "Este año no se pueden solicitar fechas posteriores a { deadline }"

@@ -39,18 +39,23 @@ class AntiquityDaysUpdaterCommand extends Command
             'activated' => true,
         ]);
         $io->info('Total users to update: '.count($users));
-        foreach ($users as $user) {
-            if ( null !== $user->getYearsWorked()) {
-                $user->setYearsWorked($user->getYearsWorked()+1);
-            } else {
-                $user->setYearsWorked(1);
+        try {
+            foreach ($users as $user) {
+                if ( null !== $user->getYearsWorked()) {
+                    $user->setYearsWorked($user->getYearsWorked()+1);
+                } else {
+                    $user->setYearsWorked(1);
+                }
+                $this->em->persist($user);
             }
-            $this->em->persist($user);
-        }
-        if ($input->getOption('dry-run')) {
-            $this->em->clear();
-        } else {
-            $this->em->flush();
+            if ($input->getOption('dry-run')) {
+                $this->em->clear();
+            } else {
+                $this->em->flush();
+            }
+        } catch( \Exception $e ) {
+            $io->error($e->getMessage());
+            return Command::FAILURE;
         }
         $io->success('Successfully updated: '.count($users));
         return Command::SUCCESS;

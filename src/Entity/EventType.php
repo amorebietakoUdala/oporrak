@@ -16,8 +16,9 @@ class EventType
     const PARTICULAR_BUSSINESS_LEAVE = 2;
     const OVERTIME = 3;
     const ANTIQUITY_DAYS = 4;
-    const OTHERS = 5;
-
+    const ADDITONAL_VACATION_DAYS = 5;
+    const OTHERS = 6;
+    
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
