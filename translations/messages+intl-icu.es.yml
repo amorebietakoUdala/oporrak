@@ -105,7 +105,7 @@ modal.title.department: "Nuevo Departamento"
 modal.title.event: "Nuevo evento"
 modal.title.event.edit: "Editar evento"
 modal.title.eventType: "Tipo de evento"
-modal.title.additionalVacationDays: "Vacaciones addicionales"
+modal.title.additionalVacationDays: "Vacaciones adicionales"
 
 
 # Labels
@@ -141,7 +141,7 @@ Asuntos particulares/Norbere kontuetarako baimena: "Asuntos particulares"
 Exceso jornada/Gehiegizko lanaldia: "Exceso jornada"
 Días antigüedad/Antzinatasun egunak: "Días antigüedad"
 Otros/Besteren bat: "Otros"
-label.additionalVacationDays: "Vacaciones addicionales"
+label.additionalVacationDays: "Vacaciones adicionales"
 
 #Placeholders
 placeholder.choose: "Elije una opción"
