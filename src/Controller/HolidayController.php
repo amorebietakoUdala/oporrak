@@ -36,13 +36,17 @@ class HolidayController extends AbstractController
     public function refresh(Request $request, EntityManagerInterface $em): Response
     {
         $year = $request->get('year');
+        $clean = $request->get('clean') ? boolval($request->get('clean')) : false;
+
         $response = $this->client->request(
             'GET',
             "https://opendata.euskadi.eus/contenidos/ds_eventos/calendario_laboral_$year/opendata/calendario_laboral_$year.json"
         );
         if ($response->getStatusCode() === Response::HTTP_OK) {
             $content = $response->getContent();
-            $json = substr($content, 13, -1);
+            if ($clean) {
+                $json = substr($content, 13, -1);
+            }
             $jsonData = json_decode($json, true);
             foreach ($jsonData as $day) {
                 if (
