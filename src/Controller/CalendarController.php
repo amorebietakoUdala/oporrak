@@ -119,6 +119,7 @@ class CalendarController extends AbstractController
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();
+        $additionalVacationDays = $this->avdRepo->findAll();
 
         return $this->render($template, [
             'form' => $form->createView(),
@@ -133,6 +134,7 @@ class CalendarController extends AbstractController
             'roles' => array_values($this->getUser()->getRoles()),
             'colorPalette' => $this->getParameter('colorPalette'),
             'hhrr' => $this->isGranted("ROLE_HHRR"),
+            'additionalVacationDays' => $additionalVacationDays,
         ]);
     }
 
