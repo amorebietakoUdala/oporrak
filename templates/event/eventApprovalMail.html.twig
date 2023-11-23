@@ -107,6 +107,9 @@
          </div>
          {% endif %}
 			<div>
+				<b>{{ 'message.daysForApproval' | trans({ '{ daysForApproval }': daysForApproval }, 'messages') }}</b>
+			</div>
+			<div>
 				<a class="btn btn-primary" href="{{ absolute_url(path('event_approve', { 'event': event.id }))}}">{{'btn.approve' | trans}}</a>
 				&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				<a class="btn btn-danger" href="{{ absolute_url(path('event_deny', { 'event': event.id }))}}">{{'btn.deny' | trans}}</a>

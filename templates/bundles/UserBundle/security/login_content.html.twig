@@ -2,7 +2,7 @@
 
 {% block user_content %}
 <form action="{{ path("user_security_login_check") }}" method="post">
-    <div class="container margin-top-13">
+    <div id="login-form" class="container margin-top-13">
         <div class="row">
             <div class="container-fluid col-lg-5 col-md-5 p-3 border border-info rounded bg-light">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}" />

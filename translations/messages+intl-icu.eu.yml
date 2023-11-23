@@ -221,3 +221,4 @@ message.startOfContract: "Zure kontratua { startDate }-an hasten da eta eskatzen
 message.betweenYears: "Epea ezin urte batean hasi eta hurrengoan bukatu. Mesedez, eskatu itzazu bi epe ezberdin, bata urte batean eta beste bestean."
 message.particularBussinesLeaveDaysOnlyCurrentYear: "Norbere kontuetarako baimen egunak bakarrik aurten eska daitezke."
 message.particularBussinesLeaveDaysNotWithPreviousYearDays: "Norbere kontuetarako baimen egunak ezin dira pasa den urteko egunekin eskatu."
+message.daysForApproval: "{ daysForApproval } egun dituzu eskaera onartzeko edo ukatzeko. Erantzuten ez baduzu epe hori bukatzean automatikoki onartuko da."

@@ -42,8 +42,9 @@ class EventController extends AbstractController
     private AntiquityDaysRepository $adRepo;
     private AdditionalVacationDaysRepository $avdRepo;
     private EntityManagerInterface $em;
+    private int $daysForApproval;
 
-    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService, EventRepository $eventRepo, StatusRepository $statusRepo, WorkCalendarRepository $wcRepo, AntiquityDaysRepository $adRepo, EntityManagerInterface $em, AdditionalVacationDaysRepository $avdRepo)
+    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService, EventRepository $eventRepo, StatusRepository $statusRepo, WorkCalendarRepository $wcRepo, AntiquityDaysRepository $adRepo, EntityManagerInterface $em, AdditionalVacationDaysRepository $avdRepo, $daysForApproval = 15)
     {
         $this->mailer = $mailer;
         $this->translator = $translator;
@@ -54,6 +55,7 @@ class EventController extends AbstractController
         $this->adRepo = $adRepo;
         $this->em = $em;
         $this->avdRepo = $avdRepo;
+        $this->daysForApproval = $daysForApproval;
     }
 
     /**
@@ -411,7 +413,8 @@ class EventController extends AbstractController
         if (null !== $boss) {
             $html = $this->renderView('event/eventApprovalMail.html.twig', [
                 'event' => $event,
-                'overlaps' => $overlaps
+                'overlaps' => $overlaps,
+                'daysForApproval' => $this->daysForApproval,
             ]);
             if ($sendMail) {
                 $user = $event->getUser();

@@ -5,34 +5,34 @@
 	<div class="row m-1">
 		<div class="col">
 			<div class="row mt-1">
-				<div class="col-2 ">
+				<div class="col-lg-2">
 					{{ form_label(form.username) }}
 					<span class="text-danger">{{ form_errors(form.username) }}</span>
 					{{ form_widget(form.username, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-				<div class="col-2">
+				<div class="col-lg-2">
 					{{ form_label(form.idNumber) }}
 					<span class="text-danger">{{ form_errors(form.idNumber) }}</span>
 					{{ form_widget(form.idNumber, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-				<div class="col-3">
+				<div class="col-lg-3">
 					{{ form_label(form.firstName) }}
 					<span class="text-danger">{{ form_errors(form.firstName) }}</span>
 					{{ form_widget(form.firstName, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-				<div class="col-3">
+				<div class="col-lg-3">
 					{{ form_label(form.email) }}
 					<span class="text-danger">{{ form_errors(form.email) }}</span>
 					{{ form_widget(form.email, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-				<div class="col-2 d-flex align-items-end justify-content-center">
+				<div class="col-lg-2 d-flex align-items-end justify-content-center">
 					{{ form_row(form.activated) }}
 					<span class="text-danger">{{ form_errors(form.activated) }}</span>
 				</div>                
 			</div>
 			<div class="row mt-1">
 				{% if not readonly and password_change %}
-					<div class="col-2">
+					<div class="col-lg-2">
 					{{ form_label(form.password.first) }}
 					<span class="text-danger">{{ form_errors(form.password.first) }}</span>
 					{{ form_widget(form.password.first, {'attr': {'class': 'form-control form-control-sm'}}) }}

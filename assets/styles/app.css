@@ -36,6 +36,10 @@ main {
     border-radius: 3rem;
 }
 
+#login-form {
+    line-height: 1.5;
+}
+
 .overlaps ul.list-group li.list-group-item {
     padding-left: 1rem;
     padding-right: 0.2rem;

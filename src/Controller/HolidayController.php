@@ -44,6 +44,7 @@ class HolidayController extends AbstractController
         );
         if ($response->getStatusCode() === Response::HTTP_OK) {
             $content = $response->getContent();
+            $json = $content;
             if ($clean) {
                 $json = substr($content, 13, -1);
             }
@@ -51,8 +52,8 @@ class HolidayController extends AbstractController
             foreach ($jsonData as $day) {
                 if (
                     $day['territory'] === 'Todos/denak' ||
-                    (trim($day['MunicipalityEu']) === trim($this->getParameter('municipalityEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) ) ||
-                    (trim($day['MunicipalityEu']) === trim($this->getParameter('territoryEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) )
+                    (trim($day['municipalityEu']) === trim($this->getParameter('municipalityEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) ) ||
+                    (trim($day['municipalityEu']) === trim($this->getParameter('territoryEu')) && trim($day['territory']) === trim($this->getParameter('territoryEu')) )
                 ) {
                     $found = $this->holidayRepo->findOneBy(['date' => new \DateTime($day['date'])]);
                     if (null === $found) {
