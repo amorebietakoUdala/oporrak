@@ -345,7 +345,7 @@ class EventController extends AbstractController
               intval(($event->getEndDate())->format('Y')) > intval((new DateTime())->format('Y'))
             ) ) 
         {
-            $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysOnlyCurrentYear'));            
+            $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysOnlyCurrentYear'));
             return false;
         }
         if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getUsePreviousYearDays() ) {
@@ -369,6 +369,10 @@ class EventController extends AbstractController
             if (!$this->checkDoesNotExcessMaximumPartionableHours($user, $event, $event->getStartDate()->format('Y'), $workCalendar)) {
                 return false;
             }
+        }
+        if ($event->getType()->getId() === EventType::ADDITONAL_VACATION_DAYS && $event->getStartDate() < new DateTime('2024-01-01')) {
+            $this->addFlash('error', $this->translator->trans('message.addAdditionalVacationDaysOnlyAfter2023'));
+            return false;
         }
         if (!$this->checkDoesNotExcessMaximumDaysForType($user, $event, $workCalendar)) {
             return false;

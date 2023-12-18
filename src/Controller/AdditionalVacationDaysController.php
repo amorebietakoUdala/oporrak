@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 /**
- * @Route("{_locale}/antiquity/days")
+ * @Route("{_locale}/additional-vacation-days")
  * @IsGranted("ROLE_USER")
  */
 class AdditionalVacationDaysController extends AbstractController

@@ -225,3 +225,4 @@ message.betweenYears: "El periodo no puede empezar un año y terminar el siguien
 message.particularBussinesLeaveDaysOnlyCurrentYear: "Los días asuntos particulares sólo se pueden solicitar en el año en curso."
 message.particularBussinesLeaveDaysNotWithPreviousYearDays: "Los días de asuntos propios no se pueden solicitar con días del año pasado."
 message.daysForApproval: "Tiene { daysForApproval } días para aceptar o rechazar esta solicitud. Si no responde de aprobará automáticamente después de esos días."
+message.addAdditionalVacationDaysOnlyAfter2023: "No se pueden pedir vacaciones en este concepto antes de 2024"
