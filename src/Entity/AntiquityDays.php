@@ -5,26 +5,18 @@ namespace App\Entity;
 use App\Repository\AntiquityDaysRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=AntiquityDaysRepository::class)
- */
+#[ORM\Entity(repositoryClass: AntiquityDaysRepository::class)]
 class AntiquityDays
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="integer", nullable=false)
-     */
+    #[ORM\Column(type: 'integer', nullable: false)]
     private $yearsWorked;
 
-    /**
-     * @ORM\Column(type="integer", nullable=false)
-     */
+    #[ORM\Column(type: 'integer', nullable: false)]
     private $vacationDays;
 
     public function getId(): ?int

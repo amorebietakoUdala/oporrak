@@ -223,3 +223,5 @@ message.particularBussinesLeaveDaysOnlyCurrentYear: "Norbere kontuetarako baimen
 message.particularBussinesLeaveDaysNotWithPreviousYearDays: "Norbere kontuetarako baimen egunak ezin dira pasa den urteko egunekin eskatu."
 message.daysForApproval: "{ daysForApproval } egun dituzu eskaera onartzeko edo ukatzeko. Erantzuten ez baduzu epe hori bukatzean automatikoki onartuko da."
 message.addAdditionalVacationDaysOnlyAfter2023: "2024a baino lehen ezin dira mota honetako oporrak eskatu"
+message.workCalendarNotDefined: "{ year }-ko lan egutegia ez dago ezarrita. Ezarri arte ezin dira opor egunak eskatu urte horretan"
+message.noStatsAvailable: "Urte horretako estatistikak ez daude eskuragarri. Birpasatu ea lan egutegia definitita dagoen urte horretarako."

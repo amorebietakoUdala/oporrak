@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Department;
 use App\Entity\Event;
-use App\Entity\Status;
 use App\Entity\User;
 use App\Form\EventFormType;
 use App\Form\UserFilterType;
@@ -17,50 +15,37 @@ use App\Repository\UserRepository;
 use App\Repository\WorkCalendarRepository;
 use App\Services\StatsService;
 use DateInterval;
-use PhpParser\Node\Expr\FuncCall;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @IsGranted("ROLE_USER")
- */
+#[IsGranted('ROLE_USER')]
 class CalendarController extends AbstractController
 {
 
-    private StatsService $statsService;
-    private StatusRepository $statusRepo;
-    private AntiquityDaysRepository $adRepo;
-    private WorkCalendarRepository $wcRepo;
-    private EventRepository $eventRepo;
-    private HolidayRepository $holidayRepo;
-    private UserRepository $userRepo;
-    private AdditionalVacationDaysRepository $avdRepo;
-
-    public function __construct (StatsService $statsService, StatusRepository $statusRepo, AntiquityDaysRepository $adRepo, WorkCalendarRepository $wcRepo, EventRepository $eventRepo, HolidayRepository $holidayRepo, UserRepository $userRepo, AdditionalVacationDaysRepository $avdRepo) {
-        $this->statsService = $statsService;
-        $this->statusRepo = $statusRepo;
-        $this->adRepo = $adRepo;
-        $this->wcRepo = $wcRepo;
-        $this->eventRepo = $eventRepo;
-        $this->holidayRepo = $holidayRepo;
-        $this->userRepo = $userRepo;
-        $this->avdRepo = $avdRepo;
+    public function __construct(
+        private readonly StatsService $statsService, 
+        private readonly StatusRepository $statusRepo, 
+        private readonly AntiquityDaysRepository $adRepo, 
+        private readonly WorkCalendarRepository $wcRepo, 
+        private readonly EventRepository $eventRepo, 
+        private readonly HolidayRepository $holidayRepo, 
+        private readonly UserRepository $userRepo, 
+        private readonly AdditionalVacationDaysRepository $avdRepo,
+        private readonly Security $security)
+    {
     }
 
-    /**
-     * @Route("/", name="app_home")
-     */
-    public function home(Request $request): Response
+    #[Route(path: '/', name: 'app_home')]
+    public function home() : Response
     {
         return $this->redirectToRoute('myCalendar');
     }
 
-    /**
-     * @Route("/{_locale}/mycalendar", name="myCalendar")
-     */
+    #[Route(path: '/{_locale}/mycalendar', name: 'myCalendar')]
     public function personal(Request $request): Response
     {
         $event = new Event();
@@ -76,7 +61,7 @@ class CalendarController extends AbstractController
         $antiquityDays = $this->adRepo->findAll();
         $additionalVacationDays = $this->avdRepo->findAll();
         return $this->render('calendar/personal.html.twig', [
-            'form' => $form->createView(),
+            'form' => $form,
             'holidaysColor' => $this->getParameter('holidaysColor'),
             'year' => $year,
             'statuses' => $statuses,
@@ -86,9 +71,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{_locale}/department-calendar", name="departmentCalendar")
-     */
+    #[Route(path: '/{_locale}/department-calendar', name: 'departmentCalendar')]
     public function department(Request $request): Response
     {
         /** @var User $user */
@@ -96,9 +79,7 @@ class CalendarController extends AbstractController
         return $this->renderCalendar($request, 'calendar/department.html.twig', false, $user->getDepartment());
     }
 
-    /**
-     * @Route("/{_locale}/city-hall-calendar", name="cityHallCalendar")
-     */
+    #[Route(path: '/{_locale}/city-hall-calendar', name: 'cityHallCalendar')]
     public function cityHall(Request $request): Response
     {
         return $this->renderCalendar($request, 'calendar/city-hall.html.twig', true);
@@ -116,14 +97,16 @@ class CalendarController extends AbstractController
             'locale' => $request->getLocale(),
             'showDepartment' => $showDepartment,
             'department' => $department,
+            'isGrantedHHRR' => $this->security->isGranted('ROLE_HHRR'),
+            'isGrantedAdmin' => $this->security->isGranted('ROLE_ADMIN'),
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();
         $additionalVacationDays = $this->avdRepo->findAll();
 
         return $this->render($template, [
-            'form' => $form->createView(),
-            'userFilterForm' => $userFilterForm->createView(),
+            'form' => $form,
+            'userFilterForm' => $userFilterForm,
             'holidaysColor' => $this->getParameter('holidaysColor'),
             'year' => $year,
             'statuses' => $statuses,
@@ -138,9 +121,7 @@ class CalendarController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/{_locale}/my/stats", name="api_get_my_stats", methods="GET")
-     */
+    #[Route(path: '/{_locale}/my/stats', name: 'api_get_my_stats', methods: 'GET')]
     public function getMyStats(Request $request): Response
     {
         $year = $request->get('year');
@@ -159,12 +140,15 @@ class CalendarController extends AbstractController
         $user = $this->getUser();
 
         $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+        if ($workCalendar === null) {
+            return null;
+        }
         $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
         $counters = $this->statsService->calculateStatsByStatus($events, $year);
         $eventsWithLastYearDays = $this->eventRepo->findUserEventsOfTheYearWithPreviousYearDays($user, $year, true);
         $workingDaysWithPreviousYearDays = $this->statsService->calculateTotalWorkingDays($eventsWithLastYearDays, $workCalendar);
         $statuses = $this->statusRepo->findAll();
-        $holidays = $this->holidayRepo->findHolidaysBetween(new \DateTime("${year}-01-01"), new \DateTime("${year}-12-31"));
+        $holidays = $this->holidayRepo->findHolidaysBetween(new \DateTime("$year-01-01"), new \DateTime("$year-12-31"));
         $stats = $this->initializeCounters($statuses, $locale);
         foreach ($counters as $key => $value) {
             $stats[$key]['count'] = $value;

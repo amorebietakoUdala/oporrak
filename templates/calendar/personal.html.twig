@@ -5,16 +5,12 @@
 {% endblock %}
 
 {% block body %}
-	<div {{ stimulus_controller({
-            'summary': {'summary-url': path('api_getWorkCalendar')}, 
-            'legend': {
-               'statsUrl': path('api_get_my_stats', {'_locale': app.request.locale|split('_')[0]})
-            },
-            'remaining-days': {'remainingDaysUrl': path('api_get_my_remaining_days')}, 
-         }) }} data-action="personal-calendar:yearChanged->summary#refreshSummary personal-calendar:yearChanged->legend#refreshStats personal-calendar:update->legend#refreshStats personal-calendar:yearChanged->remaining-days#refresh personal-calendar:update->remaining-days#refresh">
+	<div {{ stimulus_controller('summary', {'summary-url': path('api_getWorkCalendar')}) |
+        stimulus_controller('legend', {'statsUrl': path('api_get_my_stats', {'_locale': app.request.locale|split('_')[0]})}) |
+        stimulus_controller('remaining-days', {'remainingDaysUrl': path('api_get_my_remaining_days')}) }} 
+        data-action="personal-calendar:yearChanged->summary#refreshSummary personal-calendar:yearChanged->legend#refreshStats personal-calendar:update->legend#refreshStats personal-calendar:yearChanged->remaining-days#refresh personal-calendar:update->remaining-days#refresh">
 		<div class="container-fluid" 
-         {{ stimulus_controller({
-            'personal-calendar': { 
+         {{ stimulus_controller( 'personal-calendar', { 
                'locale': app.request.locale|split('_')[0], 
                'holidays-url': path('api_getHolidays'), 
                'holidays-color': holidaysColor, 
@@ -22,8 +18,8 @@
                'formUrl' : path('event_save') , 
                'year' : year, 
                'days' : days 
-            } }) }}
-      >
+            } ) 
+         }}>
 
 			<div id="calendar" data-personal-calendar-target="content"></div>
 			<div class="row d-flex justify-content-between m-1">

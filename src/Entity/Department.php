@@ -7,31 +7,21 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=DepartmentRepository::class)
- */
-class Department
+#[ORM\Entity(repositoryClass: DepartmentRepository::class)]
+class Department implements \Stringable
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $nameEs;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     private $nameEu;
 
-    /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="department")
-     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'department')]
     private $users;
 
     public function __construct()

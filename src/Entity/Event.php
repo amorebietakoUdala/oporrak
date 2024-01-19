@@ -6,85 +6,59 @@ use App\Repository\EventRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=EventRepository::class)
- */
+#[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * @Groups({"event"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['event'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     * @Groups({"event"})
-     */
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['event'])]
     private $name;
 
-    /**
-     * @ORM\Column(type="date", nullable=false)
-     * @Groups({"event"})
-     */
+    #[ORM\Column(type: 'date', nullable: false)]
+    #[Groups(['event'])]
     private $startDate;
 
-    /**
-     * @ORM\Column(type="date", nullable=false)
-     * @Groups({"event"})
-     */
+    #[ORM\Column(type: 'date', nullable: false)]
+    #[Groups(['event'])]
     private $endDate;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Status::class, inversedBy="event")
-     * @ORM\JoinColumn(nullable=true)
-     * @Groups({"event"})
-     */
+    #[ORM\ManyToOne(targetEntity: Status::class, inversedBy: 'event')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['event'])]
     private $status;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class)
-     * @ORM\JoinColumn(nullable=false)
-     * @Groups({"event"})
-     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['event'])]
     private $user;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true, options={"default" : false} )
-     * @Groups({"event"})
-     */
-    private $halfDay;
+    #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => false])]
+    #[Groups(['event'])]
+    private $halfDay = false;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=EventType::class)
-     * @Groups({"event"})
-     */
+    #[ORM\ManyToOne(targetEntity: EventType::class)]
+    #[Groups(['event'])]
     private $type;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     * @Groups({"event"})
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    #[Groups(['event'])]
     private $askedAt;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     * @Groups({"event"})
-     */
+    #[ORM\Column(type: 'float', nullable: true)]
+    #[Groups(['event'])]
     private $hours;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     * @Groups({"event"})
-     */
-    private $usePreviousYearDays;
+    #[ORM\Column(type: 'boolean', nullable: true)]
+    #[Groups(['event'])]
+    private $usePreviousYearDays = false;
 
     public function __construct()
     {
-        $this->halfDay = false;
-        $this->usePreviousYearDays = false;
     }
 
     public function getId(): ?int
@@ -158,6 +132,8 @@ class Event
         $this->halfDay = $event->getHalfDay();
         $this->askedAt = $event->getAskedAt();
         $this->type = $event->getType();
+        $this->usePreviousYearDays = $event->getUsePreviousYearDays();
+        $this->hours = $event->getHours();
     }
 
     public function getUser(): ?User
@@ -259,9 +235,7 @@ class Event
         return $this;
     }
 
-    /**
-     * @Groups({"event"})
-     */
+    #[Groups(['event'])]
     public function isBetweenYears(): bool {
         if ( $this->startDate->format('Y') !== $this->endDate->format('Y') ) {
             return true;
@@ -274,13 +248,13 @@ class Event
         $startDate = $this->getStartDate();
         $year = $this->getStartDate()->format('Y');
         $nextYear = intval($year) + 1;
-        $nextYearStartDate = new \DateTime("${nextYear}-01-01");
+        $nextYearStartDate = new \DateTime("$nextYear-01-01");
         return $nextYearStartDate->diff($startDate)->format("%a");
     }
 
     public function getDaysSecondYear(): int {
         $year = $this->getEndDate()->format('Y');
-        $endYearStartDate = new \DateTime("${year}-01-01");
+        $endYearStartDate = new \DateTime("$year-01-01");
         return $this->endDate->diff($endYearStartDate)->format("%a") + 1;
     }
 }

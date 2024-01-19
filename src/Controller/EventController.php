@@ -23,45 +23,20 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * @Route("/{_locale}/event")
- * @IsGranted("ROLE_USER")
- */
+#[Route(path: '/{_locale}/event')]
+#[IsGranted('ROLE_USER')]
 class EventController extends AbstractController
 {
-    private $mailer = null;
-    private $translator = null;
-    private $statsService = null;
-    private EventRepository $eventRepo;
-    private StatusRepository $statusRepo;
-    private WorkCalendarRepository $wcRepo;
-    private AntiquityDaysRepository $adRepo;
-    private AdditionalVacationDaysRepository $avdRepo;
-    private EntityManagerInterface $em;
-    private int $daysForApproval;
-
-    public function __construct(MailerInterface $mailer, TranslatorInterface $translator, StatsService $statsService, EventRepository $eventRepo, StatusRepository $statusRepo, WorkCalendarRepository $wcRepo, AntiquityDaysRepository $adRepo, EntityManagerInterface $em, AdditionalVacationDaysRepository $avdRepo, $daysForApproval = 15)
+    public function __construct(private readonly MailerInterface $mailer, private readonly TranslatorInterface $translator, private readonly StatsService $statsService, private readonly EventRepository $eventRepo, private readonly StatusRepository $statusRepo, private readonly WorkCalendarRepository $wcRepo, private readonly AntiquityDaysRepository $adRepo, private readonly EntityManagerInterface $em, private readonly AdditionalVacationDaysRepository $avdRepo, private readonly int $daysForApproval = 15)
     {
-        $this->mailer = $mailer;
-        $this->translator = $translator;
-        $this->statsService = $statsService;
-        $this->eventRepo = $eventRepo;
-        $this->statusRepo = $statusRepo;
-        $this->wcRepo = $wcRepo;
-        $this->adRepo = $adRepo;
-        $this->em = $em;
-        $this->avdRepo = $avdRepo;
-        $this->daysForApproval = $daysForApproval;
     }
 
-    /**
-     * @Route("/{event}/approve", name="event_approve", methods={"GET"}, options = { "expose" = true })
-     * @IsGranted("ROLE_BOSS")
-     */
+    #[Route(path: '/{event}/approve', name: 'event_approve', methods: ['GET'], options: ['expose' => true])]
+    #[IsGranted('ROLE_BOSS')]
     public function approve(Request $request, Event $event = null): Response
     {
         if (null !== $event) {
@@ -69,7 +44,7 @@ class EventController extends AbstractController
                 $this->addFlash('success', 'message.alreadyApproved');
                 return $this->render('event/confirmation.html.twig');
             }
-            if ($event->getUser()->getBoss()->getUsername() !== $this->getUser()->getUserIdentifier() && !$this->isGranted('ROLE_HHRR')){
+            if ($event->getUser()->getBoss()->getUserIdentifier() !== $this->getUser()->getUserIdentifier() && !$this->isGranted('ROLE_HHRR')){
                 $this->addFlash('error', 'message.notAuthorizedToApprove');
             } else {
                 $event->setStatus($this->statusRepo->find(Status::APPROVED));
@@ -80,7 +55,7 @@ class EventController extends AbstractController
                     'event' => $event
                 ]);
                 $user = $event->getUser();
-                $subject = "{$user->getUsername()} opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
+                $subject = "{$user->getUserIdentifier()} opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUserIdentifier()}";
                 $this->sendEmail($user->getEmail(), $subject, $html, true);
             }
         } else {
@@ -94,10 +69,8 @@ class EventController extends AbstractController
         }
     }
 
-    /**
-     * @Route("/{event}/deny", name="event_deny", methods={"GET"}, options = { "expose" = true })
-     * @IsGranted("ROLE_BOSS")
-     */
+    #[Route(path: '/{event}/deny', name: 'event_deny', methods: ['GET'], options: ['expose' => true])]
+    #[IsGranted('ROLE_BOSS')]
     public function deny(Request $request, Event $event = null): Response
     {
         if (null !== $event) {
@@ -105,7 +78,7 @@ class EventController extends AbstractController
                 $this->addFlash('success', 'message.alreadyNotApproved');
                 return $this->render('event/confirmation.html.twig');
             }
-            if ($event->getUser()->getBoss()->getUsername() !== $this->getUser()->getUserIdentifier()&& !$this->isGranted('ROLE_HHRR')){
+            if ($event->getUser()->getBoss()->getUserIdentifier() !== $this->getUser()->getUserIdentifier()&& !$this->isGranted('ROLE_HHRR')){
                 $this->addFlash('error', 'message.notAuthorizedToDeny');
             } else {
                 $event->setStatus($this->statusRepo->find(Status::NOT_APPROVED));
@@ -116,7 +89,7 @@ class EventController extends AbstractController
                     'event' => $event
                 ]);
                 $user = $event->getUser();
-                $subject = "{$user->getUsername()}-en opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUsername()}";
+                $subject = "{$user->getUserIdentifier()}-en opor eskaera erantzuna / Respuesta solicitud de vacaciones de {$user->getUserIdentifier()}";
                 $this->sendEmail($user->getEmail(), $subject, $html, false);
             }
         } else {
@@ -130,10 +103,8 @@ class EventController extends AbstractController
         }
     }
 
-    /**
-     * @IsGranted("ROLE_HHRR")
-     * @Route("/{event}/edit", name="event_edit", methods={"GET","POST"}, options = { "expose" = true })
-     */
+    #[IsGranted('ROLE_HHRR')]
+    #[Route(path: '/{event}/edit', name: 'event_edit', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function edit(Event $event, Request $request): Response
     {
         $isCityHallReferer = $this->isRefererCityHallCalendar($request);
@@ -148,7 +119,7 @@ class EventController extends AbstractController
             $event = $form->getData();
             if ($event->getStartDate() > $event->getEndDate()) {
                 $this->addFlash('error', 'message.startDateGreaterThanEndDate');
-                return $this->renderForm('event/edit.html.twig', [
+                return $this->render('event/edit.html.twig', [
                     'form' => $form,
                     'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer, 
                 ]);
@@ -160,7 +131,7 @@ class EventController extends AbstractController
             // If any limitations exceeded it return the error directly
             $valid = $this->checkDoesNotExcessLimitations($event, $workCalendar, $user);
             if (!$valid) {
-                return $this->renderForm('event/edit.html.twig', [
+                return $this->render('event/edit.html.twig', [
                     'form' => $form,
                     'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer, 
                 ]);
@@ -170,19 +141,17 @@ class EventController extends AbstractController
         }
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
         return $this->render('event/' . $template, [
-            'form' => $form->createView(),
+            'form' => $form,
             'hhrr' => $this->isGranted('ROLE_HHRR'),
             ], new Response(null,$form->isSubmitted() && !$form->isValid() ? 422 : 200,)
         );
     }
 
-    /**
-     * @Route("/{event}/delete", name="event_delete", methods={"GET"}, options = { "expose" = true })
-     */
+    #[Route(path: '/{event}/delete', name: 'event_delete', methods: ['GET'], options: ['expose' => true])]
     public function delete(Event $event = null): Response
     {
         $days = $this->getParameter('days');
-        $interval = new \DateInterval("P${days}D");
+        $interval = new \DateInterval("P{$days}D");
         $interval->invert = 1;
         $deadline = (new \DateTime())->add($interval);
         $deadlineStr = $deadline->format('Y-m-d 23:59:59');
@@ -200,21 +169,19 @@ class EventController extends AbstractController
                 $subject = "{$user->getUserIdentifier()}-en opor eskaera bertan behera uztea / Cancelación de vacaciones de {$user->getUserIdentifier()}";
                 $this->sendEmail($boss->getEmail(), $subject, $html, false);
             }
-            return new Response(null, 204);
+            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
         } else {
             $message = $this->translator->trans('message.canNotDeletePastDay', [
                 'deadline' => $deadline->format('Y-m-d'),
             ], 'messages');
-            $response = new Response($message, 422);
+            $response = new Response($message, \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY);
             return $response;
         }
         $this->addFlash('error', 'message.eventNotFound');
         return $this->redirectToRoute('calendar');
     }
 
-    /**
-     * @Route("/new", name="event_new", methods={"GET","POST"})
-     */
+    #[Route(path: '/new', name: 'event_new', methods: ['GET', 'POST'])]
     public function new(Request $request): Response
     {
         return $this->save($request);
@@ -222,11 +189,10 @@ class EventController extends AbstractController
 
     /**
      * Saves the received event. Could be new or a change on and existing one.
-     * 
+     *
      * When HTTP method is get serves and empty form.
-     * 
-     * @Route("/save", name="event_save", methods={"GET","POST"})
      */
+    #[Route(path: '/save', name: 'event_save', methods: ['GET', 'POST'])]
     public function save(Request $request): Response
     {
         $isCityHallReferer = $this->isRefererCityHallCalendar($request);
@@ -254,6 +220,11 @@ class EventController extends AbstractController
             $year = $this->getEffectiveYear($event);
             /** @var WorkCalendar $workCalendar */
             $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+            $currentYear = (new \DateTime())->format('Y');
+            if ( $year !== $currentYear && $workCalendar === null ) {
+                $this->addFlash('error', new TranslatableMessage('message.workCalendarNotDefined',['year' => $year]));
+                return $this->renderError($form, $request->isXmlHttpRequest(), $isCityHallReferer);
+            }
             // If any limitations exceeded it return the error directly
             $valid = $this->checkDoesNotExcessLimitations($event, $workCalendar, $user);
             if (!$valid) {
@@ -274,7 +245,7 @@ class EventController extends AbstractController
 
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'new.html.twig';
         return $this->render('event/' . $template, [
-            'form' => $form->createView(),
+            'form' => $form,
             'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer,
             ],  new Response(null,$form->isSubmitted() && !$form->isValid() ? 422 : 200,)
         );
@@ -332,18 +303,18 @@ class EventController extends AbstractController
             return false;
         }
         $year = intval($event->getStartDate()->format('Y'));
-        if (new \DateTime() < new \DateTime("${year}-01-01") && ($event->getUsePreviousYearDays() === null || $event->getUsePreviousYearDays() === false)) {
+        if (new \DateTime() < new \DateTime("$year-01-01") && ($event->getUsePreviousYearDays() === null || $event->getUsePreviousYearDays() === false)) {
             $this->addFlash('error', $this->translator->trans('message.canNotAskBeforeDate', [
                 'year' => $year,
-                'startDate' => "${year}-01-01",
+                'startDate' => "$year-01-01",
             ]));
             return false;
         }
-        if (
-            $event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && 
-            ( intval(($event->getStartDate())->format('Y')) > intval((new DateTime())->format('Y')) ||  
-              intval(($event->getEndDate())->format('Y')) > intval((new DateTime())->format('Y'))
-            ) ) 
+        // TODO Concretar con Bea en qué casos se puede pedir este tipo de vacaciones, creo que mientras no se pasen de un año para otro se pueden
+        // pedir con días del año anterior.
+        if ( $event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && 
+                ( intval(($event->getEndDate())->format('Y')) > intval(($event->getStartDate())->format('Y')) ) 
+           ) 
         {
             $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysOnlyCurrentYear'));
             return false;
@@ -427,7 +398,7 @@ class EventController extends AbstractController
             }
         }
         if ($ajax) {
-            return new Response(null, 204);
+            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
         } else {
             return $this->redirectToRoute('myCalendar');
         }
@@ -490,7 +461,7 @@ class EventController extends AbstractController
         return $this->render('event/' . $template, [
             'form' => $form->createView(),
             'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer, 
-        ], new Response(null, 422));
+        ], new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 
     /**

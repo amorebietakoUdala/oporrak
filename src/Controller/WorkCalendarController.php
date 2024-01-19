@@ -10,36 +10,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @Route("/{_locale}/workcalendar")
- * @IsGranted("ROLE_USER")
- */
+#[Route(path: '/{_locale}/workcalendar')]
+#[IsGranted('ROLE_USER')]
 class WorkCalendarController extends AbstractController
 {
 
-    private $wcRepo = null;
-
-    public function __construct(WorkCalendarRepository $wcRepo)
+    public function __construct(private readonly WorkCalendarRepository $wcRepo)
     {
-        $this->wcRepo = $wcRepo;
     }
 
     /**
      * List all the WorkCalendars
-     * 
-     * @Route("/", name="workcalendar_index", methods={"GET"})
      */
+    #[Route(path: '/', name: 'workcalendar_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $ajax = $request->get('ajax') !== null ? $request->get('ajax') : "false";
+        $ajax = $request->get('ajax') ?? "false";
         if ($ajax === "false") {
             $WorkCalendar = new WorkCalendar();
             $form = $this->createForm(WorkCalendarType::class, $WorkCalendar);
             return $this->render('workcalendar/index.html.twig', [
                 'workcalendars' => $this->wcRepo->findBy([], ['year' => 'DESC']),
-                'form' => $form->createView(),
+                'form' => $form,
             ]);
         } else {
             return $this->render('workcalendar/_list.html.twig', [
@@ -50,9 +44,8 @@ class WorkCalendarController extends AbstractController
 
     /**
      * Creates or updates a WorkCalendar
-     * 
-     * @Route("/new", name="workcalendar_save", methods={"GET","POST"})
      */
+    #[Route(path: '/new', name: 'workcalendar_save', methods: ['GET', 'POST'])]
     public function createOrSave(Request $request, EntityManagerInterface $em): Response
     {
         $workCalendar = new WorkCalendar();
@@ -70,7 +63,7 @@ class WorkCalendarController extends AbstractController
             $em->flush();
 
             if ($request->isXmlHttpRequest()) {
-                return new Response(null, 204);
+                return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
             }
             return $this->redirectToRoute('workcalendar_index');
         }
@@ -78,16 +71,15 @@ class WorkCalendarController extends AbstractController
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'new.html.twig';
         return $this->render('workcalendar/' . $template, [
             'workcalendar' => $workCalendar,
-            'form' => $form->createView(),
+            'form' => $form,
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200,));
     }
 
     /**
      * Show the WorkCalendar form specified by id.
      * The WorkCalendar can't be changed
-     * 
-     * @Route("/{id}", name="workcalendar_show", methods={"GET"})
      */
+    #[Route(path: '/{id}', name: 'workcalendar_show', methods: ['GET'])]
     public function show(Request $request, WorkCalendar $workCalendar): Response
     {
         $form = $this->createForm(WorkCalendarType::class, $workCalendar, [
@@ -96,16 +88,15 @@ class WorkCalendarController extends AbstractController
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'show.html.twig';
         return $this->render('workcalendar/' . $template, [
             'workcalendar' => $workCalendar,
-            'form' => $form->createView(),
+            'form' => $form,
             'readonly' => true
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200,));
     }
 
     /**
      * Renders the WorkCalendar form specified by id to edit it's fields
-     * 
-     * @Route("/{id}/edit", name="workcalendar_edit", methods={"GET","POST"})
      */
+    #[Route(path: '/{id}/edit', name: 'workcalendar_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, WorkCalendar $workCalendar, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(WorkCalendarType::class, $workCalendar, [
@@ -122,14 +113,12 @@ class WorkCalendarController extends AbstractController
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
         return $this->render('workcalendar/' . $template, [
             'workcalendar' => $workCalendar,
-            'form' => $form->createView(),
+            'form' => $form,
             'readonly' => false
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200,));
     }
 
-    /**
-     * @Route("/{id}/delete", name="workcalendar_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}/delete', name: 'workcalendar_delete', methods: ['DELETE'])]
     public function delete(Request $request, WorkCalendar $id, EntityManagerInterface $em): Response
     {
         $em->remove($id);
@@ -137,7 +126,7 @@ class WorkCalendarController extends AbstractController
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('workcalendar_index');
         } else {
-            return new Response(null, 204);
+            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
         }
     }
 }

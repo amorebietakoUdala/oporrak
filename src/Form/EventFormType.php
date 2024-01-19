@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints\Positive;
 
 class EventFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $days = $options['days'];
         $locale = $options['locale'];
@@ -91,16 +91,12 @@ class EventFormType extends AbstractType
                     ->add('user', EntityType::class, [
                         'class' => User::class,
                         'label' => 'event.user',
-                        'query_builder' => function (UserRepository $er): QueryBuilder {
-                            return $er->findByActivedQB(true);
-                        },                        
+                        'query_builder' => fn(UserRepository $er): QueryBuilder => $er->findByActivedQB(true),                        
                     ])
                     ->add('status', EntityType::class, [
                         'class' => Status::class,
                         'label' => 'event.status',
-                        'choice_label' => function ($status) use ($locale) {
-                            return $status->getDescription($locale);
-                        },
+                        'choice_label' => fn($status) => $status->getDescription($locale),
                     ]);
             } else {
                 $builder->add('status', EntityType::class, [
@@ -111,7 +107,7 @@ class EventFormType extends AbstractType
             }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Event::class,

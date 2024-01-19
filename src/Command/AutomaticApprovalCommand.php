@@ -14,21 +14,13 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[\Symfony\Component\Console\Attribute\AsCommand('app:automatic-approval', 'This command automatically approves events asked more than the number of days specified.')]
 class AutomaticApprovalCommand extends Command
 {
-    protected static $defaultName = 'app:automatic-approval';
-    protected static $defaultDescription = 'This command automatically approves events asked more than the number of days specified.';
-
-    private EventRepository $repo;
-    private EntityManagerInterface $em;
-    private StatusRepository $statusRepo;
     private int $days = 0;
 
-    public function __construct(EventRepository $repo, StatusRepository $statusRepo, EntityManagerInterface $em)
+    public function __construct(private readonly EventRepository $repo, private readonly StatusRepository $statusRepo, private readonly EntityManagerInterface $em)
     {
-        $this->repo = $repo;
-        $this->statusRepo = $statusRepo;
-        $this->em = $em;
         parent::__construct();
     }
 

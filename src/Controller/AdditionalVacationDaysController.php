@@ -10,27 +10,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @Route("{_locale}/additional-vacation-days")
- * @IsGranted("ROLE_USER")
- */
+#[Route(path: '{_locale}/additional-vacation-days')]
+#[IsGranted('ROLE_USER')]
 class AdditionalVacationDaysController extends AbstractController
 {
-    /**
-     * @Route("/", name="additional_vacation_days_index", methods={"GET"})
-     */
+    #[Route(path: '/', name: 'additional_vacation_days_index', methods: ['GET'])]
     public function index(AdditionalVacationDaysRepository $AdditionalVacationDaysRepository, Request $request): Response
     {
-        $ajax = $request->get('ajax') !== null ? $request->get('ajax') : "false";
+        $ajax = $request->get('ajax') ?? "false";
         if ($ajax === "false") {
             $AdditionalVacationDays = new AdditionalVacationDays();
             $form = $this->createForm(AdditionalVacationDaysType::class, $AdditionalVacationDays);
 
             return $this->render('additional_vacation_days/index.html.twig', [
                 'additional_vacation_days' => $AdditionalVacationDaysRepository->findAll(),
-                'form' => $form->createView(),
+                'form' => $form,
             ]);
         } else {
             return $this->render('additional_vacation_days/_list.html.twig', [
@@ -41,9 +37,8 @@ class AdditionalVacationDaysController extends AbstractController
 
     /**
      * Creates or updates a antiquity days record
-     * 
-     * @Route("/new", name="additional_vacation_days_save", methods={"GET","POST"})
      */
+    #[Route(path: '/new', name: 'additional_vacation_days_save', methods: ['GET', 'POST'])]
     public function createOrSave(Request $request, AdditionalVacationDaysRepository $repo, EntityManagerInterface $em): Response
     {
         $antiquityDay = new AdditionalVacationDays();
@@ -61,7 +56,7 @@ class AdditionalVacationDaysController extends AbstractController
             $em->flush();
 
             if ($request->isXmlHttpRequest()) {
-                return new Response(null, 204);
+                return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
             }
             return $this->redirectToRoute('additional_vacation_days_index');
         }
@@ -69,14 +64,12 @@ class AdditionalVacationDaysController extends AbstractController
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'new.html.twig';
         return $this->render('additional_vacation_days/' . $template, [
             'additional_vacation_day' => $antiquityDay,
-            'form' => $form->createView(),
+            'form' => $form,
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200,));
     }
 
 
-    /**
-     * @Route("/{id}", name="additional_vacation_days_show", methods={"GET"})
-     */
+    #[Route(path: '/{id}', name: 'additional_vacation_days_show', methods: ['GET'])]
     public function show(Request $request, AdditionalVacationDays $antiquityDay): Response
     {
         $form = $this->createForm(AdditionalVacationDaysType::class, $antiquityDay, [
@@ -85,14 +78,12 @@ class AdditionalVacationDaysController extends AbstractController
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'show.html.twig';
         return $this->render('additional_vacation_days/' . $template, [
             'additional_vacation_day' => $antiquityDay,
-            'form' => $form->createView(),
+            'form' => $form,
             'readonly' => true
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200,));
     }
 
-    /**
-     * @Route("/{id}/edit", name="additional_vacation_days_edit", methods={"GET","POST"})
-     */
+    #[Route(path: '/{id}/edit', name: 'additional_vacation_days_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, AdditionalVacationDays $antiquityDay, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(AdditionalVacationDaysType::class, $antiquityDay, [
@@ -109,14 +100,12 @@ class AdditionalVacationDaysController extends AbstractController
         $template = $request->isXmlHttpRequest() ? '_form.html.twig' : 'edit.html.twig';
         return $this->render('additional_vacation_days/' . $template, [
             'additional_vacation_day' => $antiquityDay,
-            'form' => $form->createView(),
+            'form' => $form,
             'readonly' => false
         ], new Response(null, $form->isSubmitted() && !$form->isValid() ? 422 : 200,));
     }
 
-    /**
-     * @Route("/{id}", name="additional_vacation_days_delete", methods={"DELETE"})
-     */
+    #[Route(path: '/{id}', name: 'additional_vacation_days_delete', methods: ['DELETE'])]
     public function delete(Request $request, AdditionalVacationDays $antiquityDay, EntityManagerInterface $em): Response
     {
         $em->remove($antiquityDay);
@@ -124,7 +113,7 @@ class AdditionalVacationDaysController extends AbstractController
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('additional_vacation_days_index');
         } else {
-            return new Response(null, 204);
+            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
         }
     }
 }
