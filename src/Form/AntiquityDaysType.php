@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class AntiquityDaysType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $readonly = $options['readonly'];
         $builder
@@ -44,7 +44,7 @@ class AntiquityDaysType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => AntiquityDays::class,

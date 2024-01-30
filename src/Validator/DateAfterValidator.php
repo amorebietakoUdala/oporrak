@@ -7,9 +7,9 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class DateAfterValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
-        /** @var App\Validator\DateAfter $constraint */
+        /** @var DateAfter $constraint */
 
         if (null === $value || '' === $value) {
             return;

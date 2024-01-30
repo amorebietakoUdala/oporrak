@@ -2,7 +2,7 @@
    <h5 class="card-title text-center">{{'title.legend' | trans }}&nbsp;<span data-remaining-days-target="year"></span></h5>
    <div class="card-body">
       <div>
-         {% if stats is defined %}
+         {% if stats is defined and stats != null %}
             {% for stat in stats %}
                <p>
                   <span id="colorSquare{{loop.index}}" class="color-square col-2 text-center" style="background-color: {{stat.color}};">
@@ -16,6 +16,8 @@
                   </span>&nbsp;<span>{{stat.description | trans}}</span>
                </p>
             {% endfor %}
+         {% else %}
+            <div class="alert alert-warning">{{ 'message.noStatsAvailable' | trans }}</div>
          {% endif %}
       </div>
    </div>

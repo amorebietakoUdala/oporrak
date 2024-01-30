@@ -5,51 +5,33 @@ namespace App\Entity;
 use App\Repository\WorkCalendarRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=WorkCalendarRepository::class)
- */
+#[ORM\Entity(repositoryClass: WorkCalendarRepository::class)]
 class WorkCalendar
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $year;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $vacationDays;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $particularBusinessLeave;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $overtimeDays;
 
-    /**
-     * @ORM\Column(type="decimal", precision=5, scale=2)
-     */
+    #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
     private $workingHours;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
+    #[ORM\Column(type: 'integer')]
     private $partitionableDays;
 
-    /**
-     * @ORM\Column(type="date", nullable=true)
-     */
+    #[ORM\Column(type: 'date', nullable: true)]
     private $deadlineNextYear;
 
     public function getId(): ?int

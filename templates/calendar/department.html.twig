@@ -3,24 +3,17 @@
 {% block title %}{{'title.departmentCalendar' | trans }}{% endblock %}
 
 {% block body %}
-	<div {{ stimulus_controller({
-         'summary': {
-            'summary-url': path('api_getWorkCalendar') 
-         }, 
-         'day-details': {
+	<div {{ stimulus_controller('summary', {'summary-url': path('api_getWorkCalendar') }) | 
+           stimulus_controller('day-details', {
             'roles': roles,
             'user': app.user.username,
             'boss': app.user.boss != null ? app.user.boss.username: null,
             'previousYearDaysColor': previousYearDaysColor,
             'type': 'department',
-         },
-         'user-legend': {
-            statsUrl: path('api_get_user_stats')
-         },
-         'overlaps': {
-            serviceUrl: path('api_department_overlaps', {'department': app.user.department.id})
-         },
-         }) }} 
+         }) |
+         stimulus_controller('user-legend', { statsUrl: path('api_get_user_stats') }) |
+         stimulus_controller('overlaps', { serviceUrl: path('api_department_overlaps', {'department': app.user.department.id})}) 
+      }} 
          data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:loaded->day-details#hideDetails department-calendar:clickDay->day-details#showDetails department-calendar:loaded->user-legend#load department-calendar:loaded->overlaps#load" 
    >
 		<div class="container-fluid"

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ReportsFilterFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $locale = $options['locale'];
 
@@ -54,16 +54,14 @@ class ReportsFilterFormType extends AbstractType
         ->add('department', EntityType::class, [
             'class' => Department::class,
             'placeholder' => '',
-            'choice_label' => function ($department) use ($locale) {
-                return ($locale === 'es') ? $department->getNameEs() : $department->getNameEu();
-            },
+            'choice_label' => fn($department) => ($locale === 'es') ? $department->getNameEs() : $department->getNameEu(),
             'label' => 'label.department',
             'multiple' => false
         ])
     ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'locale' => 'eu',

@@ -8,43 +8,31 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass=StatusRepository::class)
- */
-class Status
+#[ORM\Entity(repositoryClass: StatusRepository::class)]
+class Status implements \Stringable
 {
-    const RESERVED = 1;
-    const APPROVED = 2;
-    const NOT_APPROVED = 3;
-    /**
-     * @Groups({"event"})
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
+    final public const RESERVED = 1;
+    final public const APPROVED = 2;
+    final public const NOT_APPROVED = 3;
+    #[Groups(['event'])]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @Groups({"event"})
-     * @ORM\Column(type="string", length=255)
-     */
+    #[Groups(['event'])]
+    #[ORM\Column(type: 'string', length: 255)]
     private $descriptionEs;
 
-    /**
-     * @Groups({"event"})
-     * @ORM\Column(type="string", length=255)
-     */
+    #[Groups(['event'])]
+    #[ORM\Column(type: 'string', length: 255)]
     private $descriptionEu;
 
-    /**
-     * @Groups({"event"})
-     * @ORM\Column(type="string", length=8)
-     */
+    #[Groups(['event'])]
+    #[ORM\Column(type: 'string', length: 8)]
     private $color;
 
-    /**
-     * @ORM\OneToMany(targetEntity=Event::class, mappedBy="status")
-     */
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'status')]
     private $event;
 
     public function __construct()
@@ -101,9 +89,9 @@ class Status
         return $this->event;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->descriptionEs;
+        return (string) $this->descriptionEs;
     }
 
     public function copy(Status $status): self

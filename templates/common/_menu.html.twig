@@ -37,7 +37,7 @@
             {% if is_granted('ROLE_ADMIN') %}            
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle
-                  {% if (    app.request.attributes.get('_route') == 'admin_user_list' or
+                  {% if (    app.request.attributes.get('_route') == 'admin_user_index' or
                              app.request.attributes.get('_route') == 'department_index' or 
                              app.request.attributes.get('_route') == 'antiquity_days_index' or
                              app.request.attributes.get('_route') == 'holiday_index' or
@@ -50,7 +50,7 @@
 						{{ 'navitem.administration' | trans | capitalize }}
 					</a>
 					<div id="js-menu-administration" class="dropdown-menu" aria-labelledby="navbarAdministration">
-						<a class="dropdown-item" href="{{path('admin_user_list')}}">{{"navitem.users" | trans | capitalize}}</a>
+						<a class="dropdown-item" href="{{path('admin_user_index')}}">{{"navitem.users" | trans | capitalize}}</a>
 						<a class="dropdown-item" href="{{path('department_index')}}">{{"navitem.department" | trans | capitalize}}</a>
 						<a class="dropdown-item" href="{{path('additional_vacation_days_index')}}">{{"navitem.additionalVacationDays" | trans | capitalize}}</a>
 						<a class="dropdown-item" href="{{path('antiquity_days_index')}}">{{"navitem.antiquityDays" | trans | capitalize}}</a>

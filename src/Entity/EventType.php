@@ -7,36 +7,28 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 use App\Repository\EventTypeRepository;
 
-/**
- * @ORM\Entity(repositoryClass=EventTypeRepository::class)
- */
-class EventType
+#[ORM\Entity(repositoryClass: EventTypeRepository::class)]
+class EventType implements \Stringable
 {
-    const VACATION = 1;
-    const PARTICULAR_BUSSINESS_LEAVE = 2;
-    const OVERTIME = 3;
-    const ANTIQUITY_DAYS = 4;
-    const ADDITONAL_VACATION_DAYS = 5;
-    const OTHERS = 6;
+    final public const VACATION = 1;
+    final public const PARTICULAR_BUSSINESS_LEAVE = 2;
+    final public const OVERTIME = 3;
+    final public const ANTIQUITY_DAYS = 4;
+    final public const ADDITONAL_VACATION_DAYS = 5;
+    final public const OTHERS = 6;
     
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     * @Groups({"event"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['event'])]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"event"})
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['event'])]
     private $descriptionEs;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     * @Groups({"event"})
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['event'])]
     private $descriptionEu;
 
     public function getId(): ?int
@@ -82,7 +74,7 @@ class EventType
         return $this;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->descriptionEs . '/' . $this->descriptionEu;
     }

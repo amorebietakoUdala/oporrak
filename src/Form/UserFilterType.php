@@ -13,53 +13,54 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class UserFilterType extends AbstractType
 {
+    private User $user;
 
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->user = $tokenStorage->getToken()->getUser();
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ( null !== $this->user) {
             $roles = array_key_exists('data', $options) ? $this->user->getRoles() : null;
         }
         $showDepartment = array_key_exists('data', $options) ? $options['data']['showDepartment'] : null;
         $department = array_key_exists('data', $options) ? $options['data']['department'] : null;
+        $isGrantedHHRR = array_key_exists('data', $options) ? $options['data']['isGrantedHHRR'] : null;
+        $isGrantedAdmin = array_key_exists('data', $options) ? $options['data']['isGrantedAdmin'] : null;
         $locale = $options['locale'];
         $builder
             ->add('user', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'username',
                 'placeholder' => '',
-                'query_builder' => function (UserRepository $ur) use ($department) {
-                    return $ur->findUsersByDepartmentOrBossQB($department,$this->user);
-                },
+                'query_builder' => fn(UserRepository $ur) => $ur->findUsersByDepartmentOrBossQB($department,$this->user),
                 'label' => 'label.user',
                 'multiple' => true,
 //                'expanded' => false,
             ]);
-        if (null !== $roles && $showDepartment && (in_array('ROLE_HHRR', $roles) || in_array('ROLE_ADMIN', $roles))) {
+        if (null !== $roles && $showDepartment && ( $isGrantedHHRR || $isGrantedAdmin )) {
             $builder->add('department', EntityType::class, [
                 'class' => Department::class,
                 'placeholder' => '',
-                'choice_label' => function ($department) use ($locale) {
-                    return ($locale === 'es') ? $department->getNameEs() : $department->getNameEu();
-                },
+                'choice_label' => fn($department) => ($locale === 'es') ? $department->getNameEs() : $department->getNameEu(),
                 'label' => 'label.department',
                 'multiple' => false,
             ]);
         }
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => null,
             'user' => null,
             'locale' => null,
             'showDepartment' => false,
-            'department' => null
+            'department' => null,
+            'isGrantedHHRR' => false,
+            'isGrantedAdmin' => false,
         ]);
     }
 }

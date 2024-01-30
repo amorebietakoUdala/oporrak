@@ -9,105 +9,74 @@ use AMREU\UserBundle\Model\UserInterface as AMREUserInterface;
 use AMREU\UserBundle\Model\User as BaseUser;
 use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
+use App\Repository\UserRepository;
 use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
-/**
- * @ORM\Table(name="user")
- * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- */
+#[ORM\Table(name: 'user')]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedUserInterface
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     * @Groups({"list"})
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    #[Groups(['list'])]
     protected $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"event","list"})
-     */
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['event', 'list'])]
     protected $username;
 
-    /**
-     * @ORM\Column(type="json")
-     */
+    #[ORM\Column(type: 'json')]
     protected $roles = [];
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: 'string')]
     protected $password;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     protected $firstName;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
+    #[ORM\Column(type: 'string', length: 255)]
     protected $email;
 
-    /**
-     * @ORM\Column(type="boolean", options={"default":"1"}, nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', options: ['default' => '1'], nullable: true)]
     protected $activated;
 
-    /**
-     * @ORM\Column(type="datetime", nullable=true)
-     */
+    #[ORM\Column(type: 'datetime', nullable: true)]
     protected $lastLogin;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="employees")
-     */
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'employees')]
     private $boss;
 
-    /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="boss")
-     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'boss')]
     private $employees;
 
     private $events;
 
-    /**
-     * @ORM\ManyToOne(targetEntity=Department::class, inversedBy="users")
-     * @ORM\JoinColumn(nullable=false)
-     */
+    #[ORM\ManyToOne(targetEntity: Department::class, inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: false)]
     private $department;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $yearsWorked;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $yearsWorked = 0;
 
-    /**
-     * @ORM\Column(type="date", nullable=true)
-     */
+    #[ORM\Column(type: 'date', nullable: true)]
     private $startDate;
 
-    /**
-     * @ORM\Column(type="date", nullable=true)
-     */
+    #[ORM\Column(type: 'date', nullable: true)]
     private $endDate;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
-    private $extraDays;
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private $extraDays = 0;
 
     public function __construct()
     {
         $this->employees = new ArrayCollection();
         $this->events = new ArrayCollection();
-        $this->yearsWorked = 0;
-        $this->extraDays = 0;
     }
 
     public function getBoss(): ?self
@@ -174,7 +143,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return $this;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->username;
     }
@@ -196,7 +165,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
      */ 
     public function getYearsWorked()
     {
-        return $this->yearsWorked === null ? 0 : $this->yearsWorked;
+        return $this->yearsWorked ?? 0;
     }
 
     /**

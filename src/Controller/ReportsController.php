@@ -10,23 +10,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class ReportsController extends AbstractController
 {
 
-    private $statsService = null;
-    private EventRepository $eventRepo;
-
-    public function __construct(StatsService $statsService, EventRepository $eventRepo) {
-        $this->statsService = $statsService;
-        $this->eventRepo = $eventRepo;
+    public function __construct(private readonly StatsService $statsService, private readonly EventRepository $eventRepo)
+    {
     }
 
-    /**
-     * @Route("/{_locale}/reports", name="reportsIndex")
-     * @IsGranted("ROLE_HHRR")
-     */
+    #[Route(path: '/{_locale}/reports', name: 'reportsIndex')]
+    #[IsGranted('ROLE_HHRR')]
     public function index(Request $request): Response
     {
         $form = $this->createForm(ReportsFilterFormType::class, new ReportsFilterFormDTO(), [
@@ -43,7 +37,7 @@ class ReportsController extends AbstractController
                  null === $data->getDepartment()
                 ) {
                 $this->addFlash('error', 'message.selectOneCriteria');
-                return $this->renderForm('reports/index.html.twig', [
+                return $this->render('reports/index.html.twig', [
                     'form' => $form,
                 ]);
             }
@@ -56,13 +50,13 @@ class ReportsController extends AbstractController
 
             $counters = $this->statsService->calculateStatsByUserAndEventType($events);
             
-            return $this->renderForm('reports/index.html.twig', [
+            return $this->render('reports/index.html.twig', [
                 'form' => $form,
                 'counters' => $counters,
             ]);
         }
 
-        return $this->renderForm('reports/index.html.twig', [
+        return $this->render('reports/index.html.twig', [
             'form' => $form,
         ]);
     }

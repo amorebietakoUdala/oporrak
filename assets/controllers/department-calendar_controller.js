@@ -9,7 +9,7 @@ import Translator, { defaultDomain } from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 import '@fortawesome/fontawesome-free/js/all.js';
 const routes = require('../../public/js/fos_js_routes.json');
-import Routing from '../../public/js/router.min.js';
+import Routing from '../../public/bundles/fosjsrouting/js/router.js';
 
 export default class extends Controller {
     static targets = ['events', 'holidays', 'workdays', 'holidaysLegend', 'approved', 'userSelect', 'departmentSelect','modal', 'modalBody', 'modalTitle'];

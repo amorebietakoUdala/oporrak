@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class HolidayType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $readonly = $options['readonly'];
         $builder
@@ -38,7 +38,7 @@ class HolidayType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Holiday::class,

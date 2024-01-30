@@ -226,3 +226,5 @@ message.particularBussinesLeaveDaysOnlyCurrentYear: "Los días asuntos particula
 message.particularBussinesLeaveDaysNotWithPreviousYearDays: "Los días de asuntos propios no se pueden solicitar con días del año pasado."
 message.daysForApproval: "Tiene { daysForApproval } días para aceptar o rechazar esta solicitud. Si no responde de aprobará automáticamente después de esos días."
 message.addAdditionalVacationDaysOnlyAfter2023: "No se pueden pedir vacaciones en este concepto antes de 2024"
+message.workCalendarNotDefined: "El calendario del año { year } no está definido no se pueden pedir vacaciones en ese año mientras no esté definido"
+message.noStatsAvailable: "Estadísticas no disponibles para ese año. Revise que haya un calendario laboral definido para dicho año"

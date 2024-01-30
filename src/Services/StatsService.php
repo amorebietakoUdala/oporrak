@@ -13,18 +13,8 @@ use App\Repository\WorkCalendarRepository;
 
 class StatsService
 {
-   private WorkCalendarRepository $wcRepo;
-   private HolidayRepository $holidayRepo;
-   private AntiquityDaysRepository $adRepo;
-   private UserRepository $userRepo;
-   private AdditionalVacationDaysRepository $avdRepo;
-
-   public function __construct(WorkCalendarRepository $wcRepo, HolidayRepository $holidayRepo, AntiquityDaysRepository $adRepo, UserRepository $userRepo, AdditionalVacationDaysRepository $avdRepo) {
-      $this->wcRepo = $wcRepo;
-      $this->holidayRepo = $holidayRepo;
-      $this->adRepo = $adRepo;
-      $this->userRepo = $userRepo;
-      $this->avdRepo = $avdRepo;
+   public function __construct(private readonly WorkCalendarRepository $wcRepo, private readonly HolidayRepository $holidayRepo, private readonly AntiquityDaysRepository $adRepo, private readonly UserRepository $userRepo, private readonly AdditionalVacationDaysRepository $avdRepo)
+   {
    }
 
    public function calculateTotalWorkingDays(array $events, $workCalendar)
@@ -233,6 +223,6 @@ class StatsService
    }
 
    private function getWeekday($date) {
-      return intval(date('w', strtotime($date)));
+      return intval(date('w', strtotime((string) $date)));
    }
 }

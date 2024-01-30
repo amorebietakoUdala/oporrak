@@ -19,37 +19,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * @Route("/api")
- * @IsGranted("ROLE_USER")
- */
+#[Route(path: '/api')]
+#[IsGranted('ROLE_USER')]
 class ApiController extends AbstractController
 {
 
-   private AntiquityDaysRepository $adRepo;
-   private EventRepository $eventRepo;
-   private HolidayRepository $hollidayRepo;
-   private WorkCalendarRepository $wcRepo;
-   private StatsService $statsService;
-   private StatusRepository $statusRepo;
-   private AdditionalVacationDaysRepository $avdRepo;
-
-   public function __construct(AntiquityDaysRepository $adRepo, EventRepository $eventRepo, HolidayRepository $hollidayRepo, WorkCalendarRepository $wcRepo, StatsService $statsService, StatusRepository $statusRepo, AdditionalVacationDaysRepository $avdRepo)
+   public function __construct(private readonly AntiquityDaysRepository $adRepo, private readonly EventRepository $eventRepo, private readonly HolidayRepository $hollidayRepo, private readonly WorkCalendarRepository $wcRepo, private readonly StatsService $statsService, private readonly StatusRepository $statusRepo, private readonly AdditionalVacationDaysRepository $avdRepo)
    {
-      $this->adRepo = $adRepo;
-      $this->eventRepo = $eventRepo;
-      $this->hollidayRepo = $hollidayRepo;
-      $this->wcRepo = $wcRepo;
-      $this->statsService = $statsService;
-      $this->statusRepo = $statusRepo;
-      $this->avdRepo = $avdRepo;
    }
 
-   /**
-    * @Route("/holidays", name="api_getHolidays", methods="GET")
-    */
+   #[Route(path: '/holidays', name: 'api_getHolidays', methods: 'GET')]
    public function getHolidays(Request $request): Response
    {
       $year = $request->get('year');
@@ -71,9 +52,7 @@ class ApiController extends AbstractController
       return $this->json($holidays, 200, []);
    }
 
-   /**
-    * @Route("/my/remaining-days", name="api_get_my_remaining_days", methods="GET")
-    */
+   #[Route(path: '/my/remaining-days', name: 'api_get_my_remaining_days', methods: 'GET')]
     public function getMyRemainigDays(Request $request): Response
     {
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
@@ -103,9 +82,7 @@ class ApiController extends AbstractController
       return $totals;
     }
 
-   /**
-    * @Route("/my/dates", name="api_get_my_dates", methods="GET")
-    */
+   #[Route(path: '/my/dates', name: 'api_get_my_dates', methods: 'GET')]
    public function getMyDates(Request $request): Response
    {
       $year = $request->get('year');
@@ -127,22 +104,20 @@ class ApiController extends AbstractController
       $items = array_merge($items, $eventsWithLastYearDays);
       $dates = [
          'total_count' => $items === null ? 0 : count($items),
-         'items' => $items === null ? [] : $items
+         'items' => $items ?? []
       ];
 
       return $this->json($dates, 200, [], ['groups' => ['event']]);
    }
 
-   /**
-    * @Route("/dates", name="api_get_dates", methods="GET")
-    */
+   #[Route(path: '/dates', name: 'api_get_dates', methods: 'GET')]
    public function getDepartmentDates(Request $request, EventRepository $repo): Response
    {
       $usersParam = $request->get('users');
-      $calendar = $request->get('calendar') !== null ? $request->get('calendar') : 'department';
+      $calendar = $request->get('calendar') ?? 'department';
       $users = null;
       if ($usersParam !== null && $usersParam !== '') {
-         $users = explode(',', $usersParam);
+         $users = explode(',', (string) $usersParam);
       }
       $status = $request->get('status') === null ? null : intval($request->get('status'));
       /** @var User $me */
@@ -159,20 +134,18 @@ class ApiController extends AbstractController
       $items = $repo->findByDepartmentAndUsersAndStatusBeetweenDates(new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"), $department, $users, $status);
       /** If he/she has role boss and it's department calendar, adds his/her workers events to the list */
       if (in_array('ROLE_BOSS', $me->getRoles()) && $calendar === 'department' && $usersParam === null ) {
-         $workers = $repo->findByBossAndStatusBeetweenDates($me, $department, $status, new \DateTime("$year-01-01"), new \DateTime("$nextYear-01-01"));
+         $workers = $repo->findByBossAndStatusBeetweenDates($department, new \DateTime("$year-01-01"), $me, $status, new \DateTime("$nextYear-01-01"));
          $items = array_merge($items, $workers);
       }
       $dates = [
          'total_count' => $items === null ? 0 : count($items),
-         'items' => $items === null ? [] : $items
+         'items' => $items ?? []
       ];
 
       return $this->json($dates, 200, [], ['groups' => ['event']]);
    }
 
-   /**
-    * @Route("/work_calendar", name="api_getWorkCalendar", methods="GET")
-    */
+   #[Route(path: '/work_calendar', name: 'api_getWorkCalendar', methods: 'GET')]
    public function workCalendar(Request $request, EntityManagerInterface $em)
    {
       $year = $request->get('year');
@@ -180,21 +153,17 @@ class ApiController extends AbstractController
       return $this->json($workCalendar, 200, [],);
    }
 
-   /**
-    * @Route("/department/{id}/users", name="api_get_department_users", methods="GET", options = { "expose" = true })
-    */
+   #[Route(path: '/department/{id}/users', name: 'api_get_department_users', methods: 'GET', options: ['expose' => true])]
    public function departmentUsers(Department $deparment)
    {
       $users = $deparment->getUsers()->toArray();
       return $this->json($users, 200, [], ['groups' => ['list']]);
    }
 
-   /**
-    * @Route("/{_locale}/user/stats", name="api_get_user_stats", methods="GET")
-    */
+   #[Route(path: '/{_locale}/user/stats', name: 'api_get_user_stats', methods: 'GET')]
    public function getUserStats(Request $request) {
-      $users = (null === $request->get('users') || $request->get('users') === '') ? [] : explode(",",$request->get('users'));
-      $colors = (null === $request->get('colors') || $request->get('colors') === '') ? [] : explode(",",$request->get('colors'));
+      $users = (null === $request->get('users') || $request->get('users') === '') ? [] : explode(",",(string) $request->get('users'));
+      $colors = (null === $request->get('colors') || $request->get('colors') === '') ? [] : explode(",",(string) $request->get('colors'));
       $json = (null === $request->get('json') || $request->get('json') === '') ? false : boolval($request->get('json'));
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       $userColors = $this->createArray($users, $colors);
@@ -219,9 +188,7 @@ class ApiController extends AbstractController
       return $userColors;
    }
 
-    /**
-     * @Route("/{_locale}/department/{department}/overlaps", name="api_department_overlaps", methods="GET")
-     */
+    #[Route(path: '/{_locale}/department/{department}/overlaps', name: 'api_department_overlaps', methods: 'GET')]
     public function reservedEvents(Request $request, Department $department = null) {
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       $json = (null === $request->get('json') || $request->get('json') === '') ? false : boolval($request->get('json'));
@@ -235,7 +202,7 @@ class ApiController extends AbstractController
               null, 
               Status::RESERVED 
           );
-          $reservedEventsFromMyMinions = $this->eventRepo->findByBossAndStatusBeetweenDates($this->getUser(),$department,Status::RESERVED, date_create_from_format('Y-m-d',$year.'-01-01'), date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'));
+          $reservedEventsFromMyMinions = $this->eventRepo->findByBossAndStatusBeetweenDates($department, date_create_from_format('Y-m-d',$year.'-01-01'), $this->getUser(), Status::RESERVED, date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'));
           $reservedEvents = array_merge($reservedEvents, $reservedEventsFromMyMinions);
           $overlaps = [];
           foreach ($reservedEvents as $event) {

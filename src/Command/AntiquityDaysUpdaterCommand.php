@@ -10,18 +10,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[\Symfony\Component\Console\Attribute\AsCommand('app:antiquity-days-updater', 'This command updates the antiquity days for all activated users. Is intended to be run on 1st of January every year through a cron job.')]
 class AntiquityDaysUpdaterCommand extends Command
 {
-    protected static $defaultName = 'app:antiquity-days-updater';
-    protected static $defaultDescription = 'This command updates the antiquity days for all activated users. Is intended to be run on 1st of January every year through a cron job.';
-
-    private UserRepository $repo;
-    private EntityManagerInterface $em;
-
-    public function __construct(UserRepository $repo, EntityManagerInterface $em)
+    public function __construct(private readonly UserRepository $repo, private readonly EntityManagerInterface $em)
     {
-        $this->repo = $repo;
-        $this->em = $em;
         parent::__construct();
     }
 
