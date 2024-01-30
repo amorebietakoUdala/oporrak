@@ -307,7 +307,8 @@ class EventController extends AbstractController
             $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysNotWithPreviousYearDays'));            
             return false;
         }
-        if ($event->getStartDate() > $workCalendar->getDeadlineNextYear()) {
+        if ( $event->getStartDate() > $workCalendar->getDeadlineNextYear() && 
+             $event->getUser() === null && !$this->isGranted('ROLE_HHRR') ) {
             $this->addFlash('error', $this->translator->trans('message.deadLineNextYearExceeded', [
                 'deadline' => $workCalendar->getDeadlineNextYear()->format('Y-m-d'),
             ]));
