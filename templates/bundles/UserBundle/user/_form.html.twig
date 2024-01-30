@@ -32,12 +32,12 @@
 			</div>
 			<div class="row mt-1">
 				{% if not readonly and password_change %}
-					<div class="col-lg-2">
-					{{ form_label(form.password.first) }}
-					<span class="text-danger">{{ form_errors(form.password.first) }}</span>
-					{{ form_widget(form.password.first, {'attr': {'class': 'form-control form-control-sm'}}) }}
-					{{ form_label(form.password.second) }}
-					{{ form_widget(form.password.second, {'attr': {'class': 'form-control form-control-sm mt-1'}}) }}
+					<div class="col-lg-3">
+						{{ form_label(form.password.first) }}
+						<span class="text-danger">{{ form_errors(form.password.first) }}</span>
+						{{ form_widget(form.password.first, {'attr': {'class': 'form-control form-control-sm', 'data-controller' : 'readonly-remove', 'readonly': "readonly"}}) }}
+						{{ form_label(form.password.second) }}
+						{{ form_widget(form.password.second, {'attr': {'class': 'form-control form-control-sm mt-1', 'data-controller' : 'readonly-remove', 'readonly': "readonly"}}) }}
 					</div>
 				{% endif %}
 				<div class="col">
