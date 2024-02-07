@@ -33,7 +33,7 @@ class UserType extends BaseUserType
                 'placeholder' => 'placeholder.choose',
                 'disabled' => $options['readonly'],
                 'query_builder' => function (UserRepository $userRepo): QueryBuilder {
-                    return $userRepo->findAllOrderedByUsername();
+                    return $userRepo->findAllOrderedByUsernameAndRoleBossQB();
                 },
             ])
             ->add('department', EntityType::class, [
@@ -45,7 +45,7 @@ class UserType extends BaseUserType
                 ],
                 'disabled' => $options['readonly'],
                 'query_builder' => function (DepartmentRepository $departmentRepo): QueryBuilder {
-                    return $departmentRepo->findAllOrderedByName();
+                    return $departmentRepo->findAllOrderedByNameQB();
                 },
             ])
             ->add('yearsWorked', IntegerType::class,[

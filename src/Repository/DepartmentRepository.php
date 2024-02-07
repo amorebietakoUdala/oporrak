@@ -19,7 +19,7 @@ class DepartmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Department::class);
     }
 
-    public function findAllOrderedByName() {
+    public function findAllOrderedByNameQB() {
         $qb = $this->createQueryBuilder('d')
             ->orderBy('d.nameEu', 'ASC');
         return $qb;

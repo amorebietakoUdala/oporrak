@@ -7,7 +7,7 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "amorebietakoudala/stimulus-controller-bundle": "*",
+        "amorebietakoudala/stimulus-controller-bundle": "1.*",
         "amorebietakoudala/user-bundle": "^2.0.1",
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",

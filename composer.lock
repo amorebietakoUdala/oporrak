@@ -4,11 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f1af97007ca89873f77b6ccaaf2f447f",
+    "content-hash": "d7ee752e65f4461bcaa8be1974843514",
     "packages": [
         {
             "name": "amorebietakoudala/stimulus-controller-bundle",
-            "version": "1.0.10",
+            "version": "1.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amorebietakoUdala/stimulus-controller-bundle.git",
@@ -48,7 +48,7 @@
             ],
             "support": {
                 "issues": "https://github.com/amorebietakoUdala/stimulus-controller-bundle/issues",
-                "source": "https://github.com/amorebietakoUdala/stimulus-controller-bundle/tree/1.0.10"
+                "source": "https://github.com/amorebietakoUdala/stimulus-controller-bundle/tree/1.0.11"
             },
             "time": "2024-01-15T13:22:41+00:00"
         },

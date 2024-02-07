@@ -63,10 +63,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb;
     }
 
-    public function findAllOrderedByUsername(): QueryBuilder {
-        return $this->createQueryBuilder('u')
-            ->orderBy('u.username', 'ASC');    
+    public function findAllOrderedByUsernameQB(): QueryBuilder {
+        return $this->findByActivedQB(true);
     }
 
+    public function findAllOrderedByUsernameAndRoleBossQB(): QueryBuilder {
+        return $this->findAllOrderedByUsernameQB()
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('role','%ROLE_BOSS%')
+            ->orderBy('u.username', 'ASC');    
+    }
 
 }
