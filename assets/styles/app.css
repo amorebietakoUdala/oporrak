@@ -30,6 +30,11 @@ main {
     text-align: center;
 }
 
+#hizkuntza {
+    margin-left: 20px;
+    margin-right: 10px;
+}
+
 .avatar {
     float: right;
     height: 3rem;

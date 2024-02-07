@@ -18,7 +18,7 @@
 	{% endif %}
 	<div {{ stimulus_controller('locale', {
       'locale' : app.request.locale|split('_')[0]
-   }) }} id="hizkuntza" class="col-lg-auto text-black padding-top-18 ml-1 mr-1" >
+   }) }} id="hizkuntza" class="col-lg-auto ml-1 mr-1" >
 		<a id="js-locale-es" href="#" data-action="click->locale#changeLocale">es</a>
 		/
 		<a id="js-locale-eu" href="#" data-action="click->locale#changeLocale">eu</a>
