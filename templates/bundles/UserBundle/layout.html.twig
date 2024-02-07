@@ -4,9 +4,7 @@
 {% block menu %}{% endblock %}
 
 {% block message %}
-    {{ include('common/_messages.html.twig', {
-        'domain' : 'user_bundle',
-    }) }}
+	{{ include('@User/user/_messages.html.twig') }}
 {% endblock message %}
 
 {% block body %}
