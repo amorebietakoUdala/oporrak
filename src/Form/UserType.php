@@ -6,6 +6,9 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use AMREU\UserBundle\Form\UserType as BaseUserType;
 use App\Entity\Department;
+use App\Repository\DepartmentRepository;
+use App\Repository\UserRepository;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -29,6 +32,9 @@ class UserType extends BaseUserType
                 'label' => 'user.boss',
                 'placeholder' => 'placeholder.choose',
                 'disabled' => $options['readonly'],
+                'query_builder' => function (UserRepository $userRepo): QueryBuilder {
+                    return $userRepo->findAllOrderedByUsername();
+                },
             ])
             ->add('department', EntityType::class, [
                 'class' => Department::class,
@@ -38,6 +44,9 @@ class UserType extends BaseUserType
                     new NotBlank()
                 ],
                 'disabled' => $options['readonly'],
+                'query_builder' => function (DepartmentRepository $departmentRepo): QueryBuilder {
+                    return $departmentRepo->findAllOrderedByName();
+                },
             ])
             ->add('yearsWorked', IntegerType::class,[
                 'label' => 'user.yearsWorked',

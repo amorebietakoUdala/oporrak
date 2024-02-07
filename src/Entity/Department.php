@@ -68,7 +68,15 @@ class Department implements \Stringable
 
     public function __toString(): string
     {
-        return $this->getNameEs() . ' / ' . $this->getNameEs();
+        return $this->getNameEu() . ' / ' . $this->getNameEs();
+    }
+
+    public function getName(string $locale): string {
+        $name = $this->nameEs;
+        if ($locale === 'eu') {
+            $name = $this->nameEu;
+        }
+        return $name;
     }
 
     public function fill(Department $department)

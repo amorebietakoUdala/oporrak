@@ -43,12 +43,12 @@
 				<div class="col">
 					{{ form_label(form.department) }}
 					<span class="text-danger">{{ form_errors(form.department) }}</span>
-					{{ form_widget(form.department, {'attr': {'class': 'ml-1 form-control-sm js-select2'}}) }}
+					{{ form_widget(form.department, {'attr': {'class': 'ml-1 form-control-sm', 'data-controller' : 'select2'}}) }}
 				</div>
 				<div class="col">
 					{{ form_label(form.boss) }}
 					<span class="text-danger">{{ form_errors(form.boss) }}</span>
-					{{ form_widget(form.boss, {'attr': {'class': 'ml-1 form-control-sm js-select2'}}) }}
+					{{ form_widget(form.boss, {'attr': {'class': 'ml-1 form-control-sm', 'data-controller' : 'select2'}}) }}
 				</div>
 			</div>
 			<div class="row">

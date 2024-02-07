@@ -22,8 +22,8 @@ framework:
 
 when@dev:
     framework:
-        # Add this to test error pages on dev
-        error_controller: App\Controller\AppErrorController::show
+        # Add this to test customized error pages on dev
+        # error_controller: App\Controller\AppErrorController::show
 
 when@test:
     framework:
