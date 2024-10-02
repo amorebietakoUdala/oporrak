@@ -6,6 +6,7 @@ use App\Entity\AdditionalVacationDays;
 use App\Form\AdditionalVacationDaysType;
 use App\Repository\AdditionalVacationDaysRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

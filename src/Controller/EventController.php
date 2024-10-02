@@ -35,7 +35,7 @@ class EventController extends AbstractController
     {
     }
 
-    #[Route(path: '/{event}/approve', name: 'event_approve', methods: ['GET'], options: ['expose' => true])]
+    #[Route(path: '/{id}/approve', name: 'event_approve', methods: ['GET'], options: ['expose' => true])]
     #[IsGranted('ROLE_BOSS')]
     public function approve(Request $request, Event $event = null): Response
     {
@@ -69,7 +69,7 @@ class EventController extends AbstractController
         }
     }
 
-    #[Route(path: '/{event}/deny', name: 'event_deny', methods: ['GET'], options: ['expose' => true])]
+    #[Route(path: '/{id}/deny', name: 'event_deny', methods: ['GET'], options: ['expose' => true])]
     #[IsGranted('ROLE_BOSS')]
     public function deny(Request $request, Event $event = null): Response
     {
@@ -104,7 +104,7 @@ class EventController extends AbstractController
     }
 
     #[IsGranted('ROLE_HHRR')]
-    #[Route(path: '/{event}/edit', name: 'event_edit', methods: ['GET', 'POST'], options: ['expose' => true])]
+    #[Route(path: '/{id}/edit', name: 'event_edit', methods: ['GET', 'POST'], options: ['expose' => true])]
     public function edit(Event $event, Request $request): Response
     {
         $isCityHallReferer = $this->isRefererCityHallCalendar($request);
@@ -147,7 +147,7 @@ class EventController extends AbstractController
         );
     }
 
-    #[Route(path: '/{event}/delete', name: 'event_delete', methods: ['GET'], options: ['expose' => true])]
+    #[Route(path: '/{id}/delete', name: 'event_delete', methods: ['GET'], options: ['expose' => true])]
     public function delete(Event $event = null): Response
     {
         $days = $this->getParameter('days');
