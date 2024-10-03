@@ -62,8 +62,8 @@ export default class extends Controller {
                         return: document.location.href,
                     });
                     if (element.statusId === 1 && (roles.includes("ROLE_BOSS") || roles.includes("ROLE_ADMIN") && element.user !== user )) {
-                            let urlApprove = app_base + Routing.generate('event_approve', { _locale: global.locale, event: element.id }) + '?' + params.toString();
-                            let urlDeny = app_base + Routing.generate('event_deny', { _locale: global.locale, event: element.id }) + '?' + params.toString();
+                            let urlApprove = app_base + Routing.generate('event_approve', { _locale: global.locale, id: element.id }) + '?' + params.toString();
+                            let urlDeny = app_base + Routing.generate('event_deny', { _locale: global.locale, id: element.id }) + '?' + params.toString();
                             content += '&nbsp;&nbsp;&nbsp;<span><a href="' + urlApprove + '"><i class="fas fa-check"></i></a></span>&nbsp;' +
                                 '<span><a href="' + urlDeny + '"><i class="fas fa-times"></i></a></span>';
                     }

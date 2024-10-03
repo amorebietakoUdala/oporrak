@@ -6,10 +6,10 @@
 			{% for event in reservedEvents %}
 				<div>
                {% if ( is_granted("ROLE_BOSS") or is_granted("ROLE_ADMIN") ) and app.user != event.user %}
-                  <a href="{{ path('event_approve', { event: event.id }) }}">
+                  <a href="{{ path('event_approve', { id: event.id }) }}">
                      <i class="fas fa-check"></i>
                   </a>&nbsp;
-                  <a href="{{ path('event_deny', { event: event.id }) }}">
+                  <a href="{{ path('event_deny', { id: event.id }) }}">
                      <i class="fas fa-times"></i>
                   </a>&nbsp;
                {% endif %}

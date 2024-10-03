@@ -170,7 +170,7 @@ export default class extends Controller {
                 template: '#my-template'
             }).then(async(result) => {
                 if (result.value) {
-                    let url = app_base + Routing.generate('event_delete', { _locale: global.locale, event: event.id });
+                    let url = app_base + Routing.generate('event_delete', { _locale: global.locale, id: event.id });
                     await $.ajax({
                         url: url,
                         method: 'GET'
