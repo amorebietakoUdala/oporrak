@@ -269,6 +269,7 @@ class EventRepository extends ServiceEntityRepository
         if (null !== $boss) {
             $qb = $this->andWhereBossEqual($qb, $boss);
         }
+        $qb = $this->andExcludeBeforeUserStartAndEndDate($qb);
         $qb = $this->andWhereActivated($qb,$activated);
         $qb = $this->orderByIdAsc($qb);
         ;
@@ -335,6 +336,7 @@ class EventRepository extends ServiceEntityRepository
         $qb->andWhere($where)
             ->setParameter('d2s', $event->getStartDate())
             ->setParameter('d2e', $event->getEndDate());
+        $qb = $this->andExcludeBeforeUserStartAndEndDate($qb);
         $qb = $this->andWhereActivated($qb, $activated);
         $qb = $this->orderByIdAsc($qb);
         return $qb->getQuery()->getResult();
