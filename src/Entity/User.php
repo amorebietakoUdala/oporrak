@@ -284,9 +284,9 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return true;
     }
 
-    public function calculateCurrentYearBaseDays(WorkCalendar $workCalendar): int  {
+    public function calculateCurrentYearBaseDays(WorkCalendar $workCalendar, int $year): int  {
         $baseDays = $workCalendar->getBaseDays() + $this->getExtraDays();
-        if ( !$this->isWorkingAllYear() ) {
+        if ( !$this->isThisYearWorkingAllDays($year) ) {
             $hasToWork = $this->calculateHasToWorkDaysThisYear();
             $baseDays = ceil( $hasToWork * $baseDays / 365);
         }
@@ -337,7 +337,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         } else {
             $totals = [
                 /* If is not working all year, we leave 2 days for particular bussiness days, to allow taking half days */
-                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar) - 2,
+                EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar, $year) - 2,
                 EventType::PARTICULAR_BUSSINESS_LEAVE => 2,
                 EventType::OVERTIME => 0,
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,

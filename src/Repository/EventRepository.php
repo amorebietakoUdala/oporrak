@@ -208,6 +208,7 @@ class EventRepository extends ServiceEntityRepository
         if (null !== $usernames) {
             $qb = $this->andWhereUsernamesIn($qb, $usernames);
         }
+        $qb = $this->andExcludeBeforeUserStartAndEndDate($qb);
         $qb = $this->andWhereActivated($qb,$activated);
         $qb = $this->orderByIdAsc($qb);
 
@@ -232,8 +233,7 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate);
         // If user has start date or end date we 
-        $qb->andWhere('( u.startDate IS NULL OR ( u.startDate IS NOT NULL and e.startDate >= u.startDate ))');
-        $qb->andWhere('( u.endDate IS NULL OR ( u.endDate IS NOT NULL and e.startDate <= u.endDate ))');
+        $qb = $this->andExcludeBeforeUserStartAndEndDate($qb);
         if (null !== $users) {
             $qb = $this->andWhereUsersIn($qb,$users);
         }
@@ -524,5 +524,11 @@ class EventRepository extends ServiceEntityRepository
     private function andWhereBossEqual (QueryBuilder $qb, User $boss): QueryBuilder {
         return $qb->andWhere('u.boss = :boss')
         ->setParameter('boss', $boss);
+    }
+
+    private function andExcludeBeforeUserStartAndEndDate (QueryBuilder $qb): QueryBuilder {
+        $qb->andWhere('( u.startDate IS NULL OR ( u.startDate IS NOT NULL and e.startDate >= u.startDate ))');
+        $qb->andWhere('( u.endDate IS NULL OR ( u.endDate IS NOT NULL and e.startDate <= u.endDate ))');
+        return $qb;
     }
 }

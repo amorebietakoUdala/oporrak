@@ -118,7 +118,7 @@ class StatsService
       foreach($usernames as $username) {
          $user = $this->userRepo->findOneBy(['username' => $username]);
          if ($user !== null) {
-            $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar);
+            $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar, $year);
             $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
             if ( null !== $antiquityDays ) {
                $counters[$username]['total'] = $counters[$username]['total'] + $antiquityDays->getVacationDays();
