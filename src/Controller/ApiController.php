@@ -78,7 +78,7 @@ class ApiController extends AbstractController
 
     private function totalDaysForEachType(User $user, $year) {
       $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-      $totals = $user->getTotals($workCalendar,$this->adRepo, $this->avdRepo);
+      $totals = $user->getTotals($workCalendar,$this->adRepo, $this->avdRepo, intval($year));
       return $totals;
     }
 

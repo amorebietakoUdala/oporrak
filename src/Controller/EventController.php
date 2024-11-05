@@ -395,7 +395,7 @@ class EventController extends AbstractController
     private function checkDoesNotExcessMaximumDaysForType(User $user, Event $event, WorkCalendar $workCalendar): bool
     {
         $year = $event->getStartDate()->format('Y');
-        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo);
+        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo, intval($year));
         $valid = true;
         $maxDays = $totals[$event->getType()->getId()];
         $valid = $this->checkDoesNotExcessMaximumDays($user, $event, $maxDays, $year, $workCalendar);

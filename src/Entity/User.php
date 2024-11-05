@@ -233,10 +233,30 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return false;
     }
 
+    public function isThisYearFirst(int $year): bool {
+        if ($this->startDate !== null) {
+            $startYear = intval($this->startDate->format('Y'));
+            if ($startYear === $year) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function isLastYear(): bool {
         $year = (new DateTime())->format('Y');
         if ($this->endDate !== null) {
             $endYear = $this->endDate->format('Y');
+            if ($endYear === $year) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function isThisYearLast(int $year): bool {
+        if ($this->endDate !== null) {
+            $endYear = intval($this->endDate->format('Y'));
             if ($endYear === $year) {
                 return true;
             }
@@ -254,10 +274,21 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return true;
     }
 
+    public function isThisYearWorkingAllDays(int $year): bool {
+        if ( $this->isThisYearFirst($year) || $this->isThisYearLast($year) ) {
+            return false;
+        }
+        if ( null === $this->endDate ) {
+            return true;
+        }
+        return true;
+    }
+
     public function calculateCurrentYearBaseDays(WorkCalendar $workCalendar): int  {
         $baseDays = $workCalendar->getBaseDays() + $this->getExtraDays();
         if ( !$this->isWorkingAllYear() ) {
-            $baseDays = ceil($this->calculateHasToWorkDaysThisYear() * $baseDays / 365);
+            $hasToWork = $this->calculateHasToWorkDaysThisYear();
+            $baseDays = ceil( $hasToWork * $baseDays / 365);
         }
         return $baseDays;
     }
@@ -293,9 +324,9 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return false;
     }
 
-    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo, AdditionalVacationDaysRepository $avdRepo ): array {
+    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo, AdditionalVacationDaysRepository $avdRepo, int $year ): array {
         $additionalVacationDays = $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked) !== null ? $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0;
-        if ( $this->isWorkingAllYear() ) {
+        if ( $this->isThisYearWorkingAllDays($year) ) {
             $totals = [
                 EventType::VACATION => $workCalendar->getVacationDays(),
                 EventType::PARTICULAR_BUSSINESS_LEAVE => $workCalendar->getParticularBusinessLeave(),

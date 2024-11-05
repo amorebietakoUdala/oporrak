@@ -10,6 +10,7 @@ use App\Entity\User;
 use DateInterval;
 use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -32,50 +33,47 @@ class EventRepository extends ServiceEntityRepository
     {
         $startDate = new \DateTime($year . '-01-01');
         $endDate = new \DateTime($year + 1 . '-01-01');
+        return $this->findUserEventsBeetweenDatesAndType($user, $startDate, $endDate, $type, $onlyHalfDays, $activated);
+    }
+
+    public function findUserEventsBeetweenDatesAndType (User $user, DateTime $startDate, DateTime $endDate, $type = null, $onlyHalfDays = false, bool $activated = true) {
         $qb = $this->createQueryBuilder('e')
-            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-            ->andWhere('e.user = :user')
-            ->setParameter('user', $user)
-            ->andWhere('e.startDate >= :startDate')
-            ->setParameter('startDate', $startDate)
-            ->andWhere('e.endDate < :endDate')
-            ->setParameter('endDate', $endDate);
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
+        $qb = $this->andWhereStartDateGTE($qb, $startDate);
+        $qb = $this->andWhereEndDateLT($qb, $endDate);
+        $qb = $this->andWhereUser($qb, $user);
         if ($onlyHalfDays) {
-            $qb->andWhere('e.halfDay = :halfDay')
-                ->setParameter('halfDay', $onlyHalfDays);
+            $qb = $this->andWhereHalfDaysEqual($qb, $onlyHalfDays);
         }
         if (null !== $type) {
-            $qb->andWhere('e.type = :type')
-                ->setParameter('type', $type);
+            $qb = $this->andWhereEventTypeEqual($qb, $type);
         }
-        $qb->orderBy('e.id', 'ASC')
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated)
-            //            ->setMaxResults(10)
+        $qb = $this->andWhereActivated($qb, $activated);
+        $qb = $this->orderByIdAsc($qb);
         ;
         return $qb->getQuery()->getResult();
     }
 
     /**
+     * Return the events of the user filter by start and endDate and the activation status of the user
+     * 
+     * @param User $user ---------------- User to look for his/her events
+     * @param DateTime $startDate ------- The start date to find events from (included) 
+     * @param DateTime $endDate --------- The end date to find events to (NOT included) 
+     * @param bool $activated ----------- If activated true filters only activated users. If false only not activated users
+     * 
      * @return Event[] Returns an array of Event objects
      */
-    public function findUserEventsBeetweenDates($user, $startDate, $endDate = null, bool $activated = true)
+    public function findUserEventsBeetweenDates(User $user, DateTime $startDate, DateTime $endDate = null, bool $activated = true): array
     {
-        $qb = $this->createQueryBuilder('e')
-            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-            ->andWhere('e.user = :user')
-            ->setParameter('user', $user)
-            ->andWhere('e.startDate >= :startDate')
-            ->setParameter('startDate', $startDate);
+        $qb = $this->createQueryBuilder('e')->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
+        $qb = $this->andWhereUser($qb, $user);
+        $qb = $this->andWhereStartDateGTE($qb, $startDate);
         if (null !== $endDate) {
-            $qb->andWhere('e.endDate < :endDate')
-                ->setParameter('endDate', $endDate);
+            $qb = $this->andWhereEndDateLT($qb, $endDate);
         }
-        $qb->orderBy('e.id', 'ASC')
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated)
-            //            ->setMaxResults(10)
-        ;
+        $qb = $this->andWhereActivated($qb, $activated);
+        $qb = $this->orderByIdAsc($qb);
         return $qb->getQuery()->getResult();
     }
 
@@ -92,42 +90,41 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findEffectiveEventsOfTheYearForUsers(array $users, int $year, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
     {
-        $thisYearStart = new DateTime("$year-01-01");
-        $thisYearEnd = new DateTime("$year-12-31");
-        $nextYear = $year + 1;
-        $nextYearStart = new DateTime("$nextYear-01-01");
-        $nextYearEnd = new DateTime("$nextYear-12-31");
-        $condition = "(
-            ( e.startDate >= :startDate AND e.endDate <= :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
-            OR ( e.startDate >= :nextYearStartDate AND e.endDate <= :nextYearEndDate AND e.usePreviousYearDays = :true )
-            OR ( e.startDate < :nextYearStartDate AND e.endDate >= :nextYearStartDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) )
-            )";
-            $qb = $this->createQueryBuilder('e')
-                ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-                ->andWhere($condition)
-                ->setParameter('startDate', $thisYearStart)
-                ->setParameter('endDate', $thisYearEnd)
-                ->setParameter('false', false)
-                ->setParameter('nextYearStartDate', $nextYearStart)
-                ->setParameter('nextYearEndDate', $nextYearEnd)
-                ->setParameter('true', true);
-            if (null !== $users) {
-                $qb->andWhere('e.user in (:users)')
-                    ->setParameter('users', $users);
-            }
-            if (null !== $eventType) {
-                $qb->andWhere('e.type = :type')
-                    ->setParameter('type', $eventType);
-            }
-            if (!$includeNotApproved) {
-                $qb->andWhere('e.status != :status')
-                    ->setParameter('status', Status::NOT_APPROVED);
-            }
-            $qb->orderBy('e.id', 'ASC')
-                ->andWhere('u.activated = :activated')
-                ->setParameter('activated', $activated)
-            ;
+        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($users, $year, $eventType, $includeNotApproved, $activated);
         return $qb->getQuery()->getResult();
+    }
+
+    public function findEffectiveEventsOfTheYearForUsersStartingFromDate(array $users, int $year, DateTime $startingFromDate, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
+    {
+        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($users, $year, $eventType, $includeNotApproved, $activated);
+        $qb = $this->andWhereStartingDateGTE($qb, $startingFromDate);
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findEffectiveEventsOfTheYearForUsersEndingAtDate(array $users, int $year, DateTime $endingFromDate, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
+    {
+        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($users, $year, $eventType, $includeNotApproved, $activated);
+        $qb = $this->andWhereEndingDateLTE($qb, $endingFromDate);
+        return $qb->getQuery()->getResult();
+    }
+
+    private function findEffectiveEventsOfTheYearForUsersQB(array $users, int $year, EventType $eventType = null, $includeNotApproved = true, bool $activated = true): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
+        $qb = $this->andWhereIncludeEffectiveEventsOfTheYear($qb, $year);
+        if (null !== $users) {
+            $qb = $this->andWhereUsersIn($qb, $users);
+        }
+        if (null !== $eventType) {
+            $qb = $this->andWhereEventTypeEqual($qb, $eventType);
+        }
+        if (!$includeNotApproved) {
+            $qb = $this->andWhereStatusNotEqual($qb, Status::NOT_APPROVED);
+        }
+        $qb = $this->andWhereActivated($qb, $activated);
+        $qb = $this->orderByIdAsc($qb);
+        return $qb;
     }
 
     /**
@@ -142,6 +139,12 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findEffectiveUserEventsOfTheYear(User $user, int $year, EventType $eventType = null, $includeNotApproved = true)
     {
+        if (null !== $user->getStartDate() && intval($user->getStartDate()->format('Y')) === $year ) {
+            return $this->findEffectiveEventsOfTheYearForUsersStartingFromDate([$user],$year, $user->getStartDate(),$eventType,$includeNotApproved);    
+        }
+        if (null !== $user->getEndDate() && intval($user->getEndDate()->format('Y')) === $year) {
+            return $this->findEffectiveEventsOfTheYearForUsersEndingAtDate([$user],$year, $user->getEndDate(),$eventType,$includeNotApproved);    
+        }
         return $this->findEffectiveEventsOfTheYearForUsers([$user],$year,$eventType,$includeNotApproved);
     }
 
@@ -150,38 +153,29 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findUserEventsOfTheYearWithPreviousYearDays(User $user, int $year, bool $previousYearDays = false, bool $activated = true)
     {
-        $thisYearStart = new DateTime("$year-01-01");
-        $nextYear = $year+1;
-        $nextYearStart = new DateTime("$nextYear-01-01");
-        $thisYearEnd = new DateTime("$year-12-31");
+        $qb = $this->findUserEventsOfTheYearWithPreviousYearDaysQB($user,$year, $previousYearDays, $activated);
+        // TODO add filters for users start date and endDate
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findUserEventsOfTheYearWithPreviousYearDaysQB(User $user, int $year, bool $previousYearDays = false, bool $activated = true) {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
-        if ($previousYearDays) {
-            $condition = "
-                e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :true  ) 
-                OR ( e.startDate < :startDate AND e.endDate >= :startDate )
-                ";
-            $qb->andWhere($condition)
-                ->setParameter('true', true);
-        } else {
-            $condition = " 
-                ( e.startDate >= :startDate AND e.endDate <= :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
-                OR ( e.startDate <= :endDate AND e.endDate >= :nextYearStart )
-                ";
-            $qb->andWhere($condition)
-                ->setParameter('false', false)
-                ->setParameter('nextYearStart', $nextYearStart);
+        $qb = $this->andWhereUser($qb, $user);
+        $thisYearStart = new DateTime("$year-01-01");
+        $thisYearEnd = new DateTime("$year-12-31");
+        /** We ignore events before user start date and after end date */
+        if ( $user->isThisYearFirst($year) ) {
+            $thisYearStart = $user->getStartDate();
         }
-        $qb->setParameter('startDate', $thisYearStart)
-            ->setParameter('endDate', $thisYearEnd)
-            ->andWhere('e.user = :user')
-            ->setParameter('user', $user);
-            
-        $qb->orderBy('e.id', 'ASC')
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated)
-        ;
-        return $qb->getQuery()->getResult();
+        if ( $user->isThisYearLast($year) ) {
+            $thisYearEnd = $user->getEndDate();
+        }
+        $qb = $this->includeEventsWithPreviousYearDays($qb, $year, $previousYearDays, $thisYearStart, $thisYearEnd);
+        $qb = $this->andWhereActivated($qb,$activated);
+        $qb = $this->orderByIdAsc($qb);
+        return $qb;
     }
 
     /**
@@ -212,14 +206,11 @@ class EventRepository extends ServiceEntityRepository
             $qb->setParameter('startDate', $startDate);
         }
         if (null !== $usernames) {
-            $qb->andWhere('u.username in (:usernames)')
-                ->setParameter('usernames', $usernames);
+            $qb = $this->andWhereUsernamesIn($qb, $usernames);
         }
-        $qb->orderBy('e.id', 'ASC')
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated)
-            //            ->setMaxResults(10)
-        ;
+        $qb = $this->andWhereActivated($qb,$activated);
+        $qb = $this->orderByIdAsc($qb);
+
         return $qb->getQuery()->getResult();
     }
 
@@ -240,22 +231,21 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('true', true)
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate);
+        // If user has start date or end date we 
+        $qb->andWhere('( u.startDate IS NULL OR ( u.startDate IS NOT NULL and e.startDate >= u.startDate ))');
+        $qb->andWhere('( u.endDate IS NULL OR ( u.endDate IS NOT NULL and e.startDate <= u.endDate ))');
         if (null !== $users) {
-            $qb->andWhere('e.user in (:users)')
-                ->setParameter('users', $users);
+            $qb = $this->andWhereUsersIn($qb,$users);
         }
         if (null !== $status) {
-            $qb->andWhere('e.status = :status')
-                ->setParameter('status', $status);
+            $qb = $this->andWhereStatusEqual($qb, $status);
         }
         if (null !== $department) {
-            $qb->andWhere('u.department = :department')
-                ->setParameter('department', $department);
+            $qb = $this->andWhereDepartmentEqual($qb, $department);
         }
-        $qb->orderBy('e.id', 'ASC')
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated)
-        ;
+        $qb = $this->andWhereActivated($qb,$activated);
+        $qb = $this->orderByIdAsc($qb);
+
         return $qb->getQuery()->getResult();
     }
 
@@ -265,30 +255,22 @@ class EventRepository extends ServiceEntityRepository
     public function findByBossAndStatusBeetweenDates($excludedDepartment, $startDate, $boss = null, $status = null, $endDate = null, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
-            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-            ->andWhere('e.startDate >= :startDate')
-            ->setParameter('startDate', $startDate)
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated)
-        ;
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
+        $qb = $this->andWhereStartDateGTE($qb, $startDate);
         if (null !== $endDate) {
-            $qb->andWhere('e.endDate < :endDate')
-                ->setParameter('endDate', $endDate);
+            $qb = $this->andWhereEndDateLT($qb, $endDate);
         }
         if (null !== $status) {
-            $qb->andWhere('e.status = :status')
-                ->setParameter('status', $status);
+            $qb = $this->andWhereStatusEqual($qb, $status);
         }
         if (null !== $excludedDepartment) {
-            $qb->andWhere('u.department != :department')
-                ->setParameter('department', $excludedDepartment);
+            $qb = $this->andWhereDepartmentNotEqual($qb, $excludedDepartment);
         }
         if (null !== $boss) {
-            $qb->andWhere('u.boss = :boss')
-                ->setParameter('boss', $boss);
+            $qb = $this->andWhereBossEqual($qb, $boss);
         }
-        $qb->orderBy('e.id', 'ASC')
-            //            ->setMaxResults(10)
+        $qb = $this->andWhereActivated($qb,$activated);
+        $qb = $this->orderByIdAsc($qb);
         ;
         return $qb->getQuery()->getResult();
     }
@@ -299,19 +281,14 @@ class EventRepository extends ServiceEntityRepository
     public function findAllByStatusBeetweenDates($status, $startDate, $endDate = null, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
-            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-            ->andWhere('e.startDate >= :startDate')
-            ->setParameter('startDate', $startDate)
-            ->andWhere('e.status = :status')
-            ->setParameter('status', $status)
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated);
+            ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
+        $qb = $this->andWhereStartDateGTE($qb, $startDate);
+        $qb = $this->andWhereStatusEqual($qb, $status);
+        $qb = $this->andWhereActivated($qb, $activated);
         if (null !== $endDate) {
-            $qb->andWhere('e.endDate < :endDate')
-                ->setParameter('endDate', $endDate);
+            $qb = $this->andWhereEndDateLT($qb, $endDate);
         }
-        $qb->orderBy('e.id', 'ASC')
-            //            ->setMaxResults(10)
+        $qb = $this->orderByIdAsc($qb);
         ;
         return $qb->getQuery()->getResult();
     }
@@ -325,12 +302,9 @@ class EventRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('e')
             ->andWhere('e.askedAt < :date')
-            ->setParameter('date', $date)
-            ->andWhere('e.status = :status')
-            ->setParameter('status', $status);
-        $qb->orderBy('e.id', 'ASC')
-            //            ->setMaxResults(10)
-        ;
+            ->setParameter('date', $date);
+        $qb = $this->andWhereStatusEqual($qb, $status);
+        $qb = $this->orderByIdAsc($qb);
         return $qb->getQuery()->getResult();
     }
 
@@ -349,15 +323,10 @@ class EventRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-            ->innerJoin('u.department', 'd', 'WITH', 'u.department = d.id')
-            ->andWhere('u.department = :department')
-            ->setParameter('department', $event->getUser()->getDepartment())
-            // Exclude self events
-            ->andWhere('e.user <> :user')
-            ->setParameter('user', $event->getUser())
-            ->andWhere('u.activated = :activated')
-            ->setParameter('activated', $activated);
-
+            ->innerJoin('u.department', 'd', 'WITH', 'u.department = d.id');
+        $qb = $this->andWhereDepartmentEqual($qb, $event->getUser()->getDepartment());
+        // Exclude self events
+        $qb = $this->andWhereUserNotEqual($qb, $event->getUser());
         $where = '(' .
             '(e.startDate >= :d2s and e.endDate <= :d2e ) or ' .
             '(e.startDate <= :d2s and e.endDate >= :d2e ) or ' .
@@ -366,7 +335,8 @@ class EventRepository extends ServiceEntityRepository
         $qb->andWhere($where)
             ->setParameter('d2s', $event->getStartDate())
             ->setParameter('d2e', $event->getEndDate());
-        $qb->orderBy('e.id', 'ASC');
+        $qb = $this->andWhereActivated($qb, $activated);
+        $qb = $this->orderByIdAsc($qb);
         return $qb->getQuery()->getResult();
     }
 
@@ -377,30 +347,22 @@ class EventRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('e');
         if ( null !== $user ) {
-            $qb->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-               ->andWhere('e.user  = :user')
-               ->setParameter('user', $user);
+            $qb->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
+            $qb = $this->andWhereUser($qb, $user);
         }
         if ( null !== $department ) {
-            $qb->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id')
-               ->andWhere('u.department = :department')
-               ->setParameter('department', $department);
+            $qb->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
+            $qb = $this->andWhereDepartmentEqual($qb, $department);
         }
         if ( null !== $startDate   ) {
-            $qb->andWhere('e.startDate >= :startDate')
-               ->setParameter('startDate', $startDate);
+            $qb = $this->andWhereStartDateGTE($qb, $startDate);
         }
         if ( null !== $endDate ) {
-            $qb->andWhere('e.endDate < :endDate')
-                ->setParameter('endDate', $endDate);
+            $qb = $this->andWhereEndDateLT($qb, $endDate);
         }
-        $qb->andWhere('e.status = :status')
-           ->setParameter('status', Status::APPROVED )
-           ->andWhere('u.activated = :activated')
-           ->setParameter('activated', $activated);
-
-        $qb->orderBy('e.id', 'ASC');
-
+        $qb = $this->andWhereStatusEqual($qb, Status::APPROVED);
+        $qb = $this->andWhereActivated($qb, $activated);
+        $qb = $this->orderByIdAsc($qb);
         return $qb->getQuery()->getResult();
     }
 
@@ -419,7 +381,6 @@ class EventRepository extends ServiceEntityRepository
         $events = $this->findByUsernamesAndBeetweenDates(new \DateTime("$year-01-01"), $usernames, new \DateTime("$year-12-31"));
         $nextYear = intval($year)+1;
         $eventsNextYearWithPreviousYearDays = $this->findByUsernamesAndBeetweenDates(new \DateTime("$nextYear-01-01"), $usernames, new \DateTime("$nextYear-12-31"), true);
-//        dd($events, $eventsNextYearWithPreviousYearDays);
         $events = array_merge($events, $eventsNextYearWithPreviousYearDays);
 
         return $events;
@@ -433,4 +394,135 @@ class EventRepository extends ServiceEntityRepository
 
     }
 
+    private function orderByIdAsc(QueryBuilder $qb): QueryBuilder {
+        return $qb->orderBy('e.id', 'ASC');
+    }
+
+    private function andWhereUser(QueryBuilder $qb, User $user): QueryBuilder {
+        return $qb->andWhere('e.user = :user')
+            ->setParameter('user', $user);
+    }
+
+    private function andWhereUserNotEqual(QueryBuilder $qb, User $user): QueryBuilder {
+        return $qb->andWhere('e.user <> :user')
+            ->setParameter('user', $user);
+    }
+
+    private function andWhereActivated(QueryBuilder $qb, bool $activated): QueryBuilder {
+        return $qb->andWhere('u.activated = :activated')
+            ->setParameter('activated', $activated);
+    }
+
+    private function andWhereStatusEqual(QueryBuilder $qb, int $status): QueryBuilder {
+        return $qb->andWhere('e.status = :status')
+            ->setParameter('status', $status);
+    }
+
+    private function andWhereStatusNotEqual(QueryBuilder $qb, int $status): QueryBuilder {
+        return $qb->andWhere('e.status != :status')
+            ->setParameter('status', $status);
+    }
+
+    private function andWhereEventTypeEqual(QueryBuilder $qb, EventType $eventType): QueryBuilder {
+        return $qb->andWhere('e.type = :type')
+            ->setParameter('type', $eventType);
+    }
+
+    private function andWhereUsersIn(QueryBuilder $qb, array $users): QueryBuilder {
+        return $qb->andWhere('e.user in (:users)')
+            ->setParameter('users', $users);
+    }
+
+    private function andWhereStartDateGTE(QueryBuilder $qb, DateTime $startDate): QueryBuilder {
+        return $qb->andWhere('e.startDate >= :startDate')
+            ->setParameter('startDate', $startDate);
+    }
+
+    private function andWhereStartingDateGTE(QueryBuilder $qb, DateTime $startingDate): QueryBuilder {
+        return $qb->andWhere('e.startDate >= :startingDate')
+            ->setParameter('startingDate', $startingDate);
+    }
+
+    private function andWhereEndDateLT(QueryBuilder $qb, DateTime $endDate): QueryBuilder {
+        return $qb->andWhere('e.endDate >= :endDate')
+            ->setParameter('endDate', $endDate);
+    }
+
+    private function andWhereEndingDateLTE(QueryBuilder $qb, DateTime $endingDate): QueryBuilder {
+        return $qb->andWhere('e.endDate <= :endingDate')
+            ->setParameter('endingDate', $endingDate);
+    }
+
+    private function andWhereIncludeEffectiveEventsOfTheYear(QueryBuilder $qb, int $year) {
+        $thisYearStart = new DateTime("$year-01-01");
+        $thisYearEnd = new DateTime("$year-12-31");
+        $nextYear = $year + 1;
+        $nextYearStart = new DateTime("$nextYear-01-01");
+        $nextYearEnd = new DateTime("$nextYear-12-31");
+        $condition = "(
+            ( e.startDate >= :startDate AND e.endDate <= :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
+            OR ( e.startDate >= :nextYearStartDate AND e.endDate <= :nextYearEndDate AND e.usePreviousYearDays = :true )
+            OR ( e.startDate < :nextYearStartDate AND e.endDate >= :nextYearStartDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) )
+            )";
+        $qb->andWhere($condition);
+        $qb->setParameter('startDate', $thisYearStart)
+        ->setParameter('endDate', $thisYearEnd)
+        ->setParameter('false', false)
+        ->setParameter('nextYearStartDate', $nextYearStart)
+        ->setParameter('nextYearEndDate', $nextYearEnd)
+        ->setParameter('true', true);
+        return $qb;        
+    }
+
+    private function includeEventsWithPreviousYearDays(QueryBuilder $qb, int $year, bool $previousYearDays, DateTime $startDate, DateTime $endDate): QueryBuilder {
+        $nextYear = $year+1;
+        $nextYearStart = new DateTime("$nextYear-01-01");
+        if ($previousYearDays) {
+            $condition = "
+                e.startDate >= :startDate AND e.endDate < :endDate AND ( e.usePreviousYearDays = :true  ) 
+                OR ( e.startDate < :startDate AND e.endDate >= :startDate )
+                ";
+            $qb->andWhere($condition)
+                ->setParameter('true', true);
+
+        } else {
+            $condition = " 
+                ( e.startDate >= :startDate AND e.endDate <= :endDate AND ( e.usePreviousYearDays = :false OR e.usePreviousYearDays IS NULL ) ) 
+                OR ( e.startDate <= :endDate AND e.endDate >= :nextYearStart )
+                ";
+            $qb->andWhere($condition)
+                ->setParameter('false', false)
+                ->setParameter('nextYearStart', $nextYearStart);
+        }
+        $qb->setParameter('startDate', $startDate)
+           ->setParameter('endDate', $endDate);
+        return $qb;
+    }
+
+    private function andWhereHalfDaysEqual(QueryBuilder $qb, $halfDays): QueryBuilder {
+        return             $qb->andWhere('e.halfDay = :halfDay')
+        ->setParameter('halfDay', $halfDays);
+
+    }
+
+    private function andWhereUsernamesIn(QueryBuilder $qb, array $usernames): QueryBuilder {
+        $qb->andWhere('u.username in (:usernames)')
+            ->setParameter('usernames', $usernames);
+        return $qb;
+    }
+
+    private function andWhereDepartmentEqual(QueryBuilder $qb, $department): QueryBuilder {
+        return $qb->andWhere('u.department = :department')
+            ->setParameter('department', $department);
+    }
+
+    private function andWhereDepartmentNotEqual(QueryBuilder $qb, $department): QueryBuilder {
+        return $qb->andWhere('u.department != :department')
+            ->setParameter('department', $department);
+    }
+
+    private function andWhereBossEqual (QueryBuilder $qb, User $boss): QueryBuilder {
+        return $qb->andWhere('u.boss = :boss')
+        ->setParameter('boss', $boss);
+    }
 }
