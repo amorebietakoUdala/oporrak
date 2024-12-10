@@ -216,38 +216,10 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return $this;
     }
 
-    public function getWorkDaysCurrentYear(): int {
-        $interval = date_diff($this->endDate, $this->startDate);
-   
-        return $interval->days;        
-    }
-
-    public function isFirstYear(): bool {
-        $year = (new DateTime())->format('Y');
-        if ($this->startDate !== null) {
-            $startYear = $this->startDate->format('Y');
-            if ($startYear === $year) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public function isThisYearFirst(int $year): bool {
         if ($this->startDate !== null) {
             $startYear = intval($this->startDate->format('Y'));
             if ($startYear === $year) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public function isLastYear(): bool {
-        $year = (new DateTime())->format('Y');
-        if ($this->endDate !== null) {
-            $endYear = $this->endDate->format('Y');
-            if ($endYear === $year) {
                 return true;
             }
         }
@@ -264,16 +236,6 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return false;
     }
 
-    public function isWorkingAllYear(): bool {
-        if ( $this->isFirstYear() || $this->isLastYear() ) {
-            return false;
-        }
-        if ( null === $this->endDate ) {
-            return true;
-        }
-        return true;
-    }
-
     public function isThisYearWorkingAllDays(int $year): bool {
         if ( $this->isThisYearFirst($year) || $this->isThisYearLast($year) ) {
             return false;
@@ -287,27 +249,27 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     public function calculateCurrentYearBaseDays(WorkCalendar $workCalendar, int $year): int  {
         $baseDays = $workCalendar->getBaseDays() + $this->getExtraDays();
         if ( !$this->isThisYearWorkingAllDays($year) ) {
-            $hasToWork = $this->calculateHasToWorkDaysThisYear();
+            $hasToWork = $this->calculateHasToWorkDaysThisYear($year);
             $baseDays = ceil( $hasToWork * $baseDays / 365);
         }
         return $baseDays;
     }
 
-    public function calculateHasToWorkDaysThisYear(): int {
-        if ( $this->isLastYear() && $this->isFirstYear()) {
+    public function calculateHasToWorkDaysThisYear($year): int {
+        if ( $this->isThisYearLast($year) && $this->isThisYearFirst($year)) {
             $currentYear = $this->endDate->format('Y');
             $interval = date_diff($this->endDate, $this->startDate);
             $hasToWork =  $interval->days + 1;
             return $hasToWork;
         }
-        if ( $this->isLastYear() ) {
+        if ( $this->isThisYearLast($year) ) {
             $currentYear = $this->endDate->format('Y');
             $firstDayOfTheYear = date_create_from_format('Y/m/d',$currentYear.'/01/01');
             $interval = date_diff($this->endDate, $firstDayOfTheYear);
             $hasToWork =  $interval->days + 1;
             return $hasToWork;
         }
-        if ( $this->isFirstYear() ) {
+        if ( $this->isThisYearFirst($year)) {
             $nextYear = $this->startDate->format('Y') + 1;
             $firstDayNextYear = date_create_from_format('Y/m/d',$nextYear.'/01/01');
             $interval = date_diff($firstDayNextYear, $this->startDate);
