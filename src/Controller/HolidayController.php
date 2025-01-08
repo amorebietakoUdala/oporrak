@@ -39,12 +39,18 @@ class HolidayController extends AbstractController
             if ($clean) {
                 $json = substr($content, 13, -1);
             }
-            $jsonData = json_decode($json, true);
+            // We lowercase everything because sometimes comes "municipalityEu" and other times "MunicipalityEu" to avoid errors
+            $json_lowerCase = mb_strtolower($json);
+            $jsonData = json_decode($json_lowerCase, true);
+            $municipalityEu = mb_strtolower(trim($this->getParameter('municipalityEu')));
+            $territoryEu = mb_strtolower(trim($this->getParameter('territoryEu')));
             foreach ($jsonData as $day) {
                 if (
-                    $day['territory'] === 'Todos/denak' ||
-                    (trim((string) $day['municipalityEu']) === trim($this->getParameter('municipalityEu')) && trim((string) $day['territory']) === trim($this->getParameter('territoryEu')) ) ||
-                    (trim((string) $day['municipalityEu']) === trim($this->getParameter('territoryEu')) && trim((string) $day['territory']) === trim($this->getParameter('territoryEu')) )
+                    $day['territory'] === 'todos/denak' ||
+                    (trim((string) mb_strtolower($day['municipalityeu'])) === $municipalityEu && trim((string) mb_strtolower($day['territory'])) === $territoryEu ) ||
+                    (trim((string) mb_strtolower($day['municipalityeu'])) === $municipalityEu && trim((string) mb_strtolower($day['territory'])) === $territoryEu ) ||
+                    // When it's holiday in all the province MunicipalityEu is set to territoryEu so we add those too
+                    (trim((string) mb_strtolower($day['municipalityeu'])) === $territoryEu && trim((string) mb_strtolower($day['territory'])) === $territoryEu )
                 ) {
                     $found = $this->holidayRepo->findOneBy(['date' => new \DateTime($day['date'])]);
                     if (null === $found) {

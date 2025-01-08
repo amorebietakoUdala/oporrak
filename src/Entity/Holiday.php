@@ -88,17 +88,18 @@ class Holiday
     {
         $this->date = new \DateTime($data['date']);
         $this->year = (new \DateTime($data['date']))->format('Y');
-        if ( array_key_exists('descriptionEs', $data) )
+        // Capitalize descriptions
+        if ( array_key_exists('descriptiones', $data) )
         {
-            $this->descriptionEs = $data['descriptionEs'];
-        } elseif (array_key_exists('descripcionEs', $data)) {
-            $this->descriptionEs = $data['descripcionEs'];
+            $this->descriptionEs = mb_convert_case($data['descriptiones'], MB_CASE_TITLE, "UTF-8");
+        } elseif (array_key_exists('descripciones', $data)) {
+            $this->descriptionEs = mb_convert_case($data['descripciones'], MB_CASE_TITLE, "UTF-8");
         }
-        if ( array_key_exists('descriptionEu', $data) )
+        if ( array_key_exists('descriptioneu', $data) )
         {
-            $this->descriptionEu = $data['descriptionEu'];
-        } elseif (array_key_exists('descripcionEu', $data)) {
-            $this->descriptionEu = $data['descripcionEu'];
+            $this->descriptionEu = mb_convert_case($data['descriptioneu'], MB_CASE_TITLE, "UTF-8");
+        } elseif (array_key_exists('descripcioneu', $data)) {
+            $this->descriptionEu = mb_convert_case($data['descripcioneu'], MB_CASE_TITLE, "UTF-8");
         }
         return $this;
     }
