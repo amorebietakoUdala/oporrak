@@ -2,13 +2,17 @@
    <div {{ stimulus_controller('user-filter',{ 'locale': app.request.locale|split('_')[0], } ) }}>
       {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
          <div class="row">
-            <div class="col">
+            {# <div class="col">
                {{ form_label(form.startDate) }}
                {{ form_widget(form.startDate, { 'attr' : { 'class' : 'js-datepicker' } } ) }}
             </div>
             <div class="col">
                {{ form_label(form.endDate) }}
                {{ form_widget(form.endDate, { 'attr' : { 'class' : 'js-datepicker' } } ) }}
+            </div> #}
+            <div class="col">
+               {{ form_label(form.year) }}
+               {{ form_widget(form.year) }}
             </div>
             <div class="col">
                {{ form_label(form.user) }}

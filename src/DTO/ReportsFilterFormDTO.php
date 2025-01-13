@@ -7,52 +7,59 @@ use App\Entity\User;
 
 class ReportsFilterFormDTO
 {
-   private $startDate;
+   private int $year;
 
-   private $endDate;
+   // private $startDate;
 
-   private $user;
+   // private $endDate;
 
-   private $department;
+   private ?User $user = null;
 
-   /**
-    * Get the value of startDate
-    */ 
-   public function getStartDate(): ?\DateTime
+   private ?Department $department = null;
+
+   // /**
+   //  * Get the value of startDate
+   //  */ 
+   // public function getStartDate(): ?\DateTime
+   // {
+   //    return $this->startDate;
+   // }
+
+   // /**
+   //  * Set the value of startDate
+   //  *
+   //  * @return  self
+   //  */ 
+   // public function setStartDate(\DateTime $startDate = null)
+   // {
+   //    $this->startDate = $startDate;
+
+   //    return $this;
+   // }
+
+   // /**
+   //  * Get the value of endDate
+   //  */ 
+   // public function getEndDate(): ?\DateTime
+   // {
+   //    return $this->endDate;
+   // }
+
+   // /**
+   //  * Set the value of endDate
+   //  *
+   //  * @return  self
+   //  */ 
+   // public function setEndDate(\DateTime $endDate = null)
+   // {
+   //    $this->endDate = $endDate;
+
+   //    return $this;
+   // }
+
+   public function __construct()
    {
-      return $this->startDate;
-   }
-
-   /**
-    * Set the value of startDate
-    *
-    * @return  self
-    */ 
-   public function setStartDate(\DateTime $startDate = null)
-   {
-      $this->startDate = $startDate;
-
-      return $this;
-   }
-
-   /**
-    * Get the value of endDate
-    */ 
-   public function getEndDate(): ?\DateTime
-   {
-      return $this->endDate;
-   }
-
-   /**
-    * Set the value of endDate
-    *
-    * @return  self
-    */ 
-   public function setEndDate(\DateTime $endDate = null)
-   {
-      $this->endDate = $endDate;
-
-      return $this;
+      $this->year = intval((new \DateTime())->format('Y'));
    }
 
    /**
@@ -91,6 +98,26 @@ class ReportsFilterFormDTO
    public function setDepartment(Department $department = null)
    {
       $this->department = $department;
+
+      return $this;
+   }
+
+   /**
+    * Get the value of year
+    */ 
+   public function getYear():int 
+   {
+      return $this->year;
+   }
+
+   /**
+    * Set the value of year
+    *
+    * @return  self
+    */ 
+   public function setYear(int $year)
+   {
+      $this->year = $year;
 
       return $this;
    }

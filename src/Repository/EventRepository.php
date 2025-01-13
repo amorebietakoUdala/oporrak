@@ -90,25 +90,25 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findEffectiveEventsOfTheYearForUsers(array $users, int $year, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
     {
-        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($users, $year, $eventType, $includeNotApproved, $activated);
+        $qb = $this->findEffectiveEventsOfTheYearForUsersQB( $year, $users, null, $eventType, null, $includeNotApproved, $activated);
         return $qb->getQuery()->getResult();
     }
 
     public function findEffectiveEventsOfTheYearForUsersStartingFromDate(array $users, int $year, DateTime $startingFromDate, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
     {
-        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($users, $year, $eventType, $includeNotApproved, $activated);
+        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($year, $users, null, $eventType, null, $includeNotApproved, $activated);
         $qb = $this->andWhereStartingDateGTE($qb, $startingFromDate);
         return $qb->getQuery()->getResult();
     }
 
     public function findEffectiveEventsOfTheYearForUsersEndingAtDate(array $users, int $year, DateTime $endingFromDate, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
     {
-        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($users, $year, $eventType, $includeNotApproved, $activated);
+        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($year, $users, null, $eventType,  null, $includeNotApproved, $activated);
         $qb = $this->andWhereEndingDateLTE($qb, $endingFromDate);
         return $qb->getQuery()->getResult();
     }
 
-    private function findEffectiveEventsOfTheYearForUsersQB(array $users, int $year, EventType $eventType = null, $includeNotApproved = true, bool $activated = true): QueryBuilder
+    private function findEffectiveEventsOfTheYearForUsersQB(int $year, ?array $users = null, Department $department = null, EventType $eventType = null, int $status = null, $includeNotApproved = true, bool $activated = true): QueryBuilder
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
@@ -116,10 +116,15 @@ class EventRepository extends ServiceEntityRepository
         if (null !== $users) {
             $qb = $this->andWhereUsersIn($qb, $users);
         }
+        if (null !== $department) {
+            $qb = $this->andWhereDepartmentEqual($qb, $department);
+        }
         if (null !== $eventType) {
             $qb = $this->andWhereEventTypeEqual($qb, $eventType);
         }
-        if (!$includeNotApproved) {
+        if (null !== $status) {
+            $qb = $this->andWhereStatusEqual($qb, $status);
+        } else if (!$includeNotApproved) {
             $qb = $this->andWhereStatusNotEqual($qb, Status::NOT_APPROVED);
         }
         $qb = $this->andWhereActivated($qb, $activated);
@@ -367,6 +372,15 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->orderByIdAsc($qb);
         return $qb->getQuery()->getResult();
     }
+
+    public function findApprovedEventsByYearUserAndDepartment(int $year, User $user = null, Department $department = null, int $status = null, bool $activated=true): array
+    {
+        $users = null === $user ? null : [$user];
+        $qb = $this->findEffectiveEventsOfTheYearForUsersQB($year, $users, $department, null, $status, false, $activated);
+        $qb = $this->orderByIdAsc($qb);
+        return $qb->getQuery()->getResult();
+    }
+
 
     /**
      * Find all the events of the usernames of that year including next year events with previous year days.

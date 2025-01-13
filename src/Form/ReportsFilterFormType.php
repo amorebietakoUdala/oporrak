@@ -9,36 +9,40 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ReportsFilterFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $locale = $options['locale'];
 
         $builder
-        ->add('startDate', DateType::class, [
-            'widget' => 'single_text',
-            'html5' => false,
-            'format' => 'yyyy-MM-dd',
-            'attr' => ['class' => 'js-datepicker'],
-            'label' => 'event.startDate',
-            'constraints' => [
-                new NotBlank(),
-            ],
-        ])
-        ->add('endDate', DateType::class, [
-            'widget' => 'single_text',
-            'html5' => false,
-            'format' => 'yyyy-MM-dd',
-            'attr' => ['class' => 'js-datepicker'],
-            'label' => 'event.endDate',
-            'constraints' => [
-                new NotBlank(),
-            ],
+        // ->add('startDate', DateType::class, [
+        //     'widget' => 'single_text',
+        //     'html5' => false,
+        //     'format' => 'yyyy-MM-dd',
+        //     'attr' => ['class' => 'js-datepicker'],
+        //     'label' => 'event.startDate',
+        //     'constraints' => [
+        //         new NotBlank(),
+        //     ],
+        // ])
+        // ->add('endDate', DateType::class, [
+        //     'widget' => 'single_text',
+        //     'html5' => false,
+        //     'format' => 'yyyy-MM-dd',
+        //     'attr' => ['class' => 'js-datepicker'],
+        //     'label' => 'event.endDate',
+        //     'constraints' => [
+        //         new NotBlank(),
+        //     ],
+        // ])
+        ->add('year', IntegerType::class, [
+            'label' => 'label.year',
         ])
         ->add('user', EntityType::class, [
             'class' => User::class,
@@ -54,14 +58,16 @@ class ReportsFilterFormType extends AbstractType
         ->add('department', EntityType::class, [
             'class' => Department::class,
             'placeholder' => '',
-            'choice_label' => fn($department) => ($locale === 'es') ? $department->getNameEs() : $department->getNameEu(),
+            'choice_label' => function ($department) use ($locale) {
+                return ($locale === 'es') ? $department->getNameEs() : $department->getNameEu();
+            },
             'label' => 'label.department',
             'multiple' => false
         ])
     ;
     }
 
-    public function configureOptions(OptionsResolver $resolver): void
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'locale' => 'eu',

@@ -20,6 +20,12 @@ export default class extends Controller {
              exportTypes: ['excel'],
              exportDataType: 'all',
              showColumns: false,
+             showExport: true,
+             iconsPrefix: 'fa',
+             icons: {
+                 export: 'fa-download',
+             },
+             exportTypes: ['excel'],
              pagination: true,
              search: true,
              striped: true,

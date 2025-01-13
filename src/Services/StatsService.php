@@ -57,6 +57,7 @@ class StatsService
 
    public function calculateStatsByUserAndEventType(array $events) {
       $counters = [];
+
       foreach($events as $event) {
          $year = $event->getStartDate()->format('Y');
          $workCalendars = [];
@@ -69,6 +70,7 @@ class StatsService
          }
          $userId = "{$event->getUser()->getUsername()}";
          $typeId = "{$event->getType()->getId()}";
+         
          if ($event->getStatus()->getId() !== Status::NOT_APPROVED ) {
             if ( array_key_exists($userId, $counters) ) {
                if ( array_key_exists($typeId, $counters[$userId]) ) {
@@ -81,6 +83,8 @@ class StatsService
             }
          }
       }
+      $this->calculateTotals($counters);
+      $counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $workCalendars[$year]);
       return $counters;
    }
 
@@ -245,4 +249,14 @@ class StatsService
       return $newStats;
    }
 
+   private function calculateTotals(array &$counters) {
+      $total = 0;
+      foreach ($counters as $key => $typeValue) {
+         foreach ($typeValue as $key2 => $value2) {
+            $total += $value2;
+         }
+         $counters[$key]['total'] = $total;
+         $total = 0;
+      }
+   }
 }

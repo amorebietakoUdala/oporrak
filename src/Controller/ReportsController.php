@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\ReportsFilterFormDTO;
+use App\Entity\Status;
 use App\Form\ReportsFilterFormType;
 use App\Repository\EventRepository;
 use App\Services\StatsService;
@@ -31,8 +32,10 @@ class ReportsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var ReportsFilterFormDTO $data */
             $data = $form->getData();
-            if ( null === $data->getStartDate() && 
-                 null === $data->getEndDate() && 
+            if ( 
+                //  null === $data->getStartDate() && 
+                //  null === $data->getEndDate() && 
+                 null === $data->getYear() && 
                  null === $data->getUser() && 
                  null === $data->getDepartment()
                 ) {
@@ -41,15 +44,19 @@ class ReportsController extends AbstractController
                     'form' => $form,
                 ]);
             }
-            $events = $this->eventRepo->findApprovedEventsByDateUserAndDepartment(
-                $data->getStartDate(), 
-                $data->getEndDate(), 
+            // $events = $this->eventRepo->findApprovedEventsByDateUserAndDepartment(
+            //     $data->getStartDate(), 
+            //     $data->getEndDate(), 
+            //     $data->getUser(), 
+            //     $data->getDepartment()
+            // );
+            $events = $this->eventRepo->findApprovedEventsByYearUserAndDepartment(
+                $data->getYear(), 
                 $data->getUser(), 
                 $data->getDepartment()
             );
 
             $counters = $this->statsService->calculateStatsByUserAndEventType($events);
-            
             return $this->render('reports/index.html.twig', [
                 'form' => $form,
                 'counters' => $counters,
