@@ -84,7 +84,7 @@ class StatsService
          }
       }
       $this->calculateTotals($counters);
-      $counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $workCalendars[$year]);
+      //$counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $workCalendars[$year]);
       return $counters;
    }
 
