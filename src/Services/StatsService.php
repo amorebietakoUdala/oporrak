@@ -13,7 +13,14 @@ use App\Repository\WorkCalendarRepository;
 
 class StatsService
 {
-   public function __construct(private readonly WorkCalendarRepository $wcRepo, private readonly HolidayRepository $holidayRepo, private readonly AntiquityDaysRepository $adRepo, private readonly UserRepository $userRepo, private readonly AdditionalVacationDaysRepository $avdRepo)
+   public function __construct(
+      private readonly WorkCalendarRepository $wcRepo, 
+      private readonly HolidayRepository $holidayRepo, 
+      private readonly AntiquityDaysRepository $adRepo, 
+      private readonly UserRepository $userRepo, 
+      private readonly AdditionalVacationDaysRepository $avdRepo,
+      private readonly DaysFormattingService $daysFormattingService,
+      )
    {
    }
 
@@ -46,16 +53,6 @@ class StatsService
          }
       }
       return $totalWorkingDays;
-   }
-
-   private function calculateTotalWorkingDaysOnYear(Event $event, $year) {
-      $startDate = $event->getStartDate();
-      $year = $event->getStartDate()->format('Y');
-      $nextYear = intval($event->getStartDate()->format('Y')) + 1;
-      $nextYearStartDate = new \DateTime("$nextYear-01-01");
-
-      $endDate = $event->getEndDate();
-
    }
 
    public function calculateStatsByUserAndEventType(array $events) {
@@ -155,6 +152,7 @@ class StatsService
          } else {
             $counters[$username][$statusId] = $workingDays;
          }
+         $counters[$username]['remaining'] = $counters[$username]["total"] - $counters[$username][$statusId];
       }
       return $counters;
    }
@@ -208,7 +206,8 @@ class StatsService
            $workingDays -= $holidaysBetween;
            return $workingDays;
        } else {
-           return $workingDays = $event->getHours() / $workCalendar->getWorkingHours();
+            return $event->getEventTotalMinutes() / $workCalendar->getTotalWorkingMinutes();
+//           return $workingDays = $event->getHoursDecimal() / $workCalendar->getWorkingHoursDecimal();
        }
    }
 
@@ -225,4 +224,25 @@ class StatsService
    private function getWeekday($date) {
       return intval(date('w', strtotime((string) $date)));
    }
+
+   public function formatCounterAsDaysHoursAndMinutes(array $counters, WorkCalendar $wc): array {
+      $formattedCounters = [];
+      foreach ( $counters as $key => $value ) {
+         $formattedCounters[$key] = $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString($value,$wc);
+      }
+      return $formattedCounters;
+   }
+
+   public function formatStatsAsDaysHoursAndMinutes(array $stats, WorkCalendar $workCalendar): array {
+      $newStats  = [];
+      foreach ($stats as $key => $value) {
+         if ( is_array($value) ) {
+            foreach ( $value as $key2 => $item ) {
+               $newStats[$key][$key2] = $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString($item,$workCalendar);
+            }
+         }
+      }
+      return $newStats;
+   }
+
 }

@@ -6,7 +6,6 @@ use App\Entity\AdditionalVacationDays;
 use App\Form\AdditionalVacationDaysType;
 use App\Repository\AdditionalVacationDaysRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,7 +56,7 @@ class AdditionalVacationDaysController extends AbstractController
             $em->flush();
 
             if ($request->isXmlHttpRequest()) {
-                return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+                return new Response(null, Response::HTTP_NO_CONTENT);
             }
             return $this->redirectToRoute('additional_vacation_days_index');
         }
@@ -114,7 +113,7 @@ class AdditionalVacationDaysController extends AbstractController
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('additional_vacation_days_index');
         } else {
-            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+            return new Response(null, Response::HTTP_NO_CONTENT);
         }
     }
 }

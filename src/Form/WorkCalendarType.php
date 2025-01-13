@@ -72,6 +72,14 @@ class WorkCalendarType extends AbstractType
                 ],
                 'required' => true,
             ])
+            ->add('workingMinutes', NumberType::class, [
+                'label' => 'workcalendar.workingMinutes',
+                'disabled' => $readonly,
+                'constraints' => [
+                    new PositiveOrZero(),
+                ],
+                'required' => true,
+            ])
             ->add('partitionableDays', NumberType::class, [
                 'label' => 'workcalendar.partitionableDays',
                 'disabled' => $readonly,

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Entity\User;
+use App\Entity\WorkCalendar;
 use App\Form\EventFormType;
 use App\Form\UserFilterType;
 use App\Repository\AdditionalVacationDaysRepository;
@@ -13,8 +14,8 @@ use App\Repository\HolidayRepository;
 use App\Repository\StatusRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkCalendarRepository;
+use App\Services\DaysFormattingService;
 use App\Services\StatsService;
-use DateInterval;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +36,8 @@ class CalendarController extends AbstractController
         private readonly HolidayRepository $holidayRepo, 
         private readonly UserRepository $userRepo, 
         private readonly AdditionalVacationDaysRepository $avdRepo,
-        private readonly Security $security)
+        private readonly Security $security,
+        private readonly DaysFormattingService $daysFormattingService)
     {
     }
 
@@ -149,32 +151,32 @@ class CalendarController extends AbstractController
         $workingDaysWithPreviousYearDays = $this->statsService->calculateTotalWorkingDays($eventsWithLastYearDays, $workCalendar);
         $statuses = $this->statusRepo->findAll();
         $holidays = $this->holidayRepo->findHolidaysBetween(new \DateTime("$year-01-01"), new \DateTime("$year-12-31"));
-        $stats = $this->initializeCounters($statuses, $locale);
+        $stats = $this->initializeCounters($statuses, $locale, $workCalendar);
         foreach ($counters as $key => $value) {
-            $stats[$key]['count'] = $value;
+            $stats[$key]['count'] = $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString($value,$workCalendar);
         }
-        $stats['eventsWithLastYearDays']['count'] = $workingDaysWithPreviousYearDays;
+        $stats['eventsWithLastYearDays']['count'] = $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString($workingDaysWithPreviousYearDays,$workCalendar);
         $stats['holidays'] = [
             'description' => 'label.holidays',
-            'count' => count($holidays),
+            'count' => $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString(count($holidays),$workCalendar),
             'color' => $this->getParameter('holidaysColor'),
         ];
         return $stats;
     }
 
-    private function initializeCounters($statuses, $locale)
+    private function initializeCounters($statuses, $locale, WorkCalendar $workCalendar)
     {
         $stats = [];
         foreach ($statuses as $status) {
             $stats[$status->getId()] = [
                 'description' => $locale === 'es' ? $status->getDescriptionEs() : $status->getDescriptionEu(),
-                'count' => 0,
+                'count' => $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString(0,$workCalendar),
                 'color' => $status->getColor(),
             ];
         }
         $stats['eventsWithLastYearDays'] = [
             'description' => 'label.eventsWithLastYearDays',
-            'count' => 0,
+            'count' => $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString(0,$workCalendar),
             'color' => $this->getParameter('previousYearsDaysColor'),
         ];
         return $stats;

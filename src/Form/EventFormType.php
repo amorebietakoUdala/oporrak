@@ -15,11 +15,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use App\Validator\DateAfter;
-use App\Validator\Prueba;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\Positive;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class EventFormType extends AbstractType
 {
@@ -75,11 +76,19 @@ class EventFormType extends AbstractType
                 'attr' => ['class' => 'js-halfDay'],
                 'required' => false,
             ])
-            ->add('hours', NumberType::class, [
+            ->add('hours', IntegerType::class, [
                 'label' => 'event.hours',
                 'required' => false,
                 'constraints' => [
                     new Positive(),
+                ]
+            ])
+            ->add('minutes', IntegerType::class, [
+                'label' => 'event.minutes',
+                'required' => false,
+                'constraints' => [
+                    new PositiveOrZero(),
+                    new LessThan(60)
                 ]
             ])
             ->add('usePreviousYearDays', CheckboxType::class, [

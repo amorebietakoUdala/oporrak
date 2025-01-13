@@ -6,14 +6,11 @@
             {% for stat in stats %}
                <p>
                   <span id="colorSquare{{loop.index}}" class="color-square col-2 text-center" style="background-color: {{stat.color}};">
-                     &nbsp;
-                     {% if stat.count matches '/^\\d+$/' %}
-                        {{ stat.count }}
-                     {% else %}
-                        {{ stat.count | number_format(2, ',', '') }}
-                     {% endif %}                  
-                     &nbsp;
-                  </span>&nbsp;<span>{{stat.description | trans}}</span>
+                     &nbsp;{{ stat.count }}
+                  </span>
+                  <span>
+                     &nbsp;{{stat.description | trans}}
+                  </span>
                </p>
             {% endfor %}
          {% else %}

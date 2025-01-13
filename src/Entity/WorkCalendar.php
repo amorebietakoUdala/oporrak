@@ -25,14 +25,19 @@ class WorkCalendar
     #[ORM\Column(type: 'integer')]
     private $overtimeDays;
 
-    #[ORM\Column(type: 'decimal', precision: 5, scale: 2)]
+    #[ORM\Column(type: 'integer')]
     private $workingHours;
+
+    #[ORM\Column(type: 'integer')]
+    private $workingMinutes;
 
     #[ORM\Column(type: 'integer')]
     private $partitionableDays;
 
     #[ORM\Column(type: 'date', nullable: true)]
     private $deadlineNextYear;
+
+    private $workingHoursDecimal;
 
     public function getId(): ?int
     {
@@ -94,9 +99,17 @@ class WorkCalendar
         return $this;
     }
 
-    public function getPartitionableHours(): float
+    public function getPartitionableHoursDecimal(): float
     {
-        return $this->workingHours * $this->partitionableDays;
+        return $this->getWorkingHoursDecimal() * $this->partitionableDays;
+    }
+
+    public function getPartitionableHoursAsHoursAndMinutes(): string
+    {
+        $partitionableHours = $this->getPartitionableHoursDecimal();
+        $hours = floor($partitionableHours);
+        $minutes = ($partitionableHours-floor($partitionableHours))*60;
+        return "$hours:$minutes";
     }
 
     public function getWorkingHours(): ?string
@@ -109,6 +122,37 @@ class WorkCalendar
         $this->workingHours = $workingHours;
 
         return $this;
+    }
+
+    public function getWorkingMinutes(): ?int
+    {
+        return $this->workingMinutes;
+    }
+
+    public function setWorkingMinutes($workingMinutes): self
+    {
+        $this->workingMinutes = $workingMinutes;
+
+        return $this;
+    }
+
+    public function getWorkingHoursDecimal(): ?float
+    {
+        $this->workingHoursDecimal = ( $this->workingHours ?? 0 ) + ( $this->workingMinutes ?? 0)/60;
+        return $this->workingHoursDecimal;
+
+    }
+
+    public function setWorkingHoursDecimal($workingHoursDecimal): self
+    {
+        $this->workingHoursDecimal = $workingHoursDecimal;
+
+        return $this;
+    }
+
+    public function getTotalWorkingMinutes(): ?int
+    {
+        return $this->workingHours * 60 + $this->workingMinutes;
     }
 
     public function getPartitionableDays(): ?int
@@ -149,7 +193,7 @@ class WorkCalendar
         $this->deadlineNextYear = $data->getDeadlineNextYear();
         $this->partitionableDays = $data->getPartitionableDays();
         $this->workingHours = $data->getWorkingHours();
+        $this->workingMinutes = $data->getWorkingMinutes();
         return $this;
     }
-
 }

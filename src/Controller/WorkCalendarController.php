@@ -63,7 +63,7 @@ class WorkCalendarController extends AbstractController
             $em->flush();
 
             if ($request->isXmlHttpRequest()) {
-                return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+                return new Response(null, Response::HTTP_NO_CONTENT);
             }
             return $this->redirectToRoute('workcalendar_index');
         }
@@ -126,7 +126,7 @@ class WorkCalendarController extends AbstractController
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('workcalendar_index');
         } else {
-            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+            return new Response(null, Response::HTTP_NO_CONTENT);
         }
     }
 }

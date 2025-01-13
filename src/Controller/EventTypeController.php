@@ -2,15 +2,14 @@
 
 namespace App\Controller;
 
+use App\Repository\EventTypeRepository;
+use App\Entity\EventType;
+use App\Form\EventTypeFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-
-use App\Repository\EventTypeRepository;
-use App\Entity\EventType;
-use App\Form\EventTypeFormType;
 use Doctrine\ORM\EntityManagerInterface;
 
 #[Route(path: '/{_locale}/event_type')]
@@ -38,7 +37,7 @@ class EventTypeController extends AbstractController
             $em->flush();
 
             if ($request->isXmlHttpRequest()) {
-                return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+                return new Response(null, Response::HTTP_NO_CONTENT);
             }
             return $this->redirectToRoute('event_type_index');
         }
@@ -125,7 +124,7 @@ class EventTypeController extends AbstractController
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('event_type_index');
         } else {
-            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+            return new Response(null, Response::HTTP_NO_CONTENT);
         }
     }
 }

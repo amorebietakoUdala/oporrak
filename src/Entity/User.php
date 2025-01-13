@@ -10,7 +10,6 @@ use AMREU\UserBundle\Model\User as BaseUser;
 use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\UserRepository;
-use DateTime;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 

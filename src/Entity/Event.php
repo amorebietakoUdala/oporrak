@@ -49,9 +49,15 @@ class Event
     #[Groups(['event'])]
     private $askedAt;
 
-    #[ORM\Column(type: 'float', nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     #[Groups(['event'])]
     private $hours;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    #[Groups(['event'])]
+    private $minutes;
+
+    private ?float $hoursDecimal;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
     #[Groups(['event'])]
@@ -134,6 +140,7 @@ class Event
         $this->type = $event->getType();
         $this->usePreviousYearDays = $event->getUsePreviousYearDays();
         $this->hours = $event->getHours();
+        $this->minutes = $event->getMinutes();
     }
 
     public function getUser(): ?User
@@ -211,15 +218,53 @@ class Event
         return $this;
     }
 
-    public function getHours(): ?float
+    public function getHours(): ?int
     {
         return $this->hours;
     }
 
-    public function setHours(?float $hours): self
+    public function setHours(?int $hours): self
     {
         $this->hours = $hours;
 
+        return $this;
+    }
+
+    public function getMinutes(): ?int
+    {
+        return $this->minutes;
+    }
+
+    public function setMinutes($minutes): self
+    {
+        $this->minutes = $minutes;
+
+        return $this;
+    }
+
+    public function getHoursDecimal(): ?float
+    {
+        $this->setHoursDecimalFrom($this->hours, $this->minutes);
+        return $this->hoursDecimal;
+    }
+
+    public function getHoursAndMinutes(): ?string
+    {
+        $hoursDecimal = $this->getHoursDecimal();
+        $hours = floor($hoursDecimal);
+        $minutes = ($hoursDecimal-floor($hoursDecimal))*60;
+        return "$hours:$minutes";
+    }
+
+    public function setHoursDecimalFrom(?int $hours, ?int $minutes): self
+    {
+        $this->hoursDecimal = ( $hours ?? 0 ) + ( $minutes ?? 0)/60;
+        return $this;
+    }
+
+    public function setHoursDecimal(float $hoursDecimal): self
+    {
+        $this->hoursDecimal = $hoursDecimal;
         return $this;
     }
 
@@ -233,6 +278,10 @@ class Event
         $this->usePreviousYearDays = $usePreviousYearDays;
 
         return $this;
+    }
+
+    public function getEventTotalMinutes(): int {
+        return $this->hours * 60 + $this->minutes;
     }
 
     #[Groups(['event'])]
@@ -257,4 +306,5 @@ class Event
         $endYearStartDate = new \DateTime("$year-01-01");
         return $this->endDate->diff($endYearStartDate)->format("%a") + 1;
     }
+
 }

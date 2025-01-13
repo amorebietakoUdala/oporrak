@@ -111,7 +111,7 @@ class HolidayController extends AbstractController
             $em->flush();
 
             if ($request->isXmlHttpRequest()) {
-                return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+                return new Response(null, Response::HTTP_NO_CONTENT);
             }
             return $this->redirectToRoute('holiday_index');
         }
@@ -174,7 +174,7 @@ class HolidayController extends AbstractController
         if (!$request->isXmlHttpRequest()) {
             return $this->redirectToRoute('holiday_index');
         } else {
-            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+            return new Response(null, Response::HTTP_NO_CONTENT);
         }
     }
 }

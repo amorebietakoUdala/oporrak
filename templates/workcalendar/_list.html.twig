@@ -20,7 +20,7 @@
                   <td>{{ workcalendar.vacationDays }}</td>
                   <td>{{ workcalendar.particularBusinessLeave }}</td>
                   <td>{{ workcalendar.overtimeDays }}</td>
-                  <td>{{ workcalendar.workingHours }}</td>
+                  <td>{{ workcalendar.workingHours }}:{{ '%02d' | format(workcalendar.workingMinutes) }}</td>
                   <td>{{ workcalendar.partitionableDays }}</td>
                   <td>{{ workcalendar.deadlineNextYear is not null ? workcalendar.deadlineNextYear|date("Y-m-d") : '' }}</td>
                   <td>

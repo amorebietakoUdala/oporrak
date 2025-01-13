@@ -13,6 +13,12 @@ import Routing from '../../public/bundles/fosjsrouting/js/router.js';
 import Translator from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 
+// function pad(num, size) {
+//     num = num.toString();
+//     while (num.length < size) num = "0" + num;
+//     return num;
+// }
+
 export default class extends Controller {
     static targets = ['modal', 'modalBody'];
     static values = {
@@ -82,7 +88,8 @@ export default class extends Controller {
                             if ( !e.events[i].startHalfDay ) {
                                 content += e.events[i].type;
                             } else {
-                                content += e.events[i].type + " (" + e.events[i].hours + "h.)";
+                                let minutes = String(e.events[i].minutes ?? 0).padStart(2, '0');
+                                content += e.events[i].type + " (" + e.events[i].hours+":"+ minutes + "h.)";
                             }
                         }
                         content += '</div>'
@@ -239,6 +246,7 @@ export default class extends Controller {
                         color: r.status.color,
                         startHalfDay: r.halfDay,
                         hours: r.hours,
+                        minutes: r.minutes,
                         type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                     }));
                 }
@@ -258,4 +266,6 @@ export default class extends Controller {
     refreshCalendar() {
         this.load(this.calendar.getYear());
     }
+    
+
 }

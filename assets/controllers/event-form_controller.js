@@ -32,17 +32,23 @@ export default class extends Controller {
         if ( $('.js-halfDay').is(':checked') ) {
             $('#event_form_hours').removeClass('d-none');
             $('label[for="event_form_hours"]').removeClass('d-none');
+            $('#event_form_minutes').removeClass('d-none');
+            $('label[for="event_form_minutes"]').removeClass('d-none');
         } else {
             $('#event_form_hours').addClass('d-none');
             $('label[for="event_form_hours"]').addClass('d-none');
+            $('#event_form_minutes').addClass('d-none');
+            $('label[for="event_form_minutes"]').addClass('d-none');
         }
         $('.js-halfDay').on('click', function (event) {
             if ( $('.js-halfDay').is(':checked') ) {
                 $('#event_form_hours').removeClass('d-none');
                 $('label[for="event_form_hours"]').removeClass('d-none');
+                $('#event_form_minutes').removeClass('d-none');
+                $('label[for="event_form_minutes"]').removeClass('d-none');
             } else {          
-                $('#event_form_hours').addClass('d-none');
-                $('label[for="event_form_hours"]').addClass('d-none');
+                $('#event_form_minutes').addClass('d-none');
+                $('label[for="event_form_minutes"]').addClass('d-none');
             }
         });
     }

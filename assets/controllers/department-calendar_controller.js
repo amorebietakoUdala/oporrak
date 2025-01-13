@@ -64,7 +64,8 @@ export default class extends Controller {
                         }
                         content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].type;
                         if ( e.events[i].startHalfDay ) {
-                            content += " (" + e.events[i].hours + "h.)";
+                            let minutes = String(e.events[i].minutes ?? 0).padStart(2, '0');
+                            content += e.events[i].type + " (" + e.events[i].hours+":"+ minutes + "h.)";
                         }
                         content += '</div>';
                         if (typeof(e.events[i].status) != "undefined") {
@@ -168,6 +169,7 @@ export default class extends Controller {
                         color: this.typeValue == 'department' ? colorArray[r.user.username] : r.status.color,
                         startHalfDay: r.halfDay,
                         hours: r.hours,
+                        minutes: r.minutes,
                         type: this.localeValue == 'es' ? r.type.descriptionEs : r.type.descriptionEu,
                         user: r.user.username,
                         usePreviousYearDays: r.usePreviousYearDays,

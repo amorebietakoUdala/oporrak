@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Department;
-use App\Entity\EventType;
 use App\Entity\User;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
@@ -26,7 +25,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ApiController extends AbstractController
 {
 
-   public function __construct(private readonly AntiquityDaysRepository $adRepo, private readonly EventRepository $eventRepo, private readonly HolidayRepository $hollidayRepo, private readonly WorkCalendarRepository $wcRepo, private readonly StatsService $statsService, private readonly StatusRepository $statusRepo, private readonly AdditionalVacationDaysRepository $avdRepo)
+   public function __construct(
+      private readonly AntiquityDaysRepository $adRepo, 
+      private readonly EventRepository $eventRepo, 
+      private readonly HolidayRepository $hollidayRepo, 
+      private readonly WorkCalendarRepository $wcRepo, 
+      private readonly StatsService $statsService, 
+      private readonly StatusRepository $statusRepo, 
+      private readonly AdditionalVacationDaysRepository $avdRepo,
+      )
    {
    }
 
@@ -52,7 +59,7 @@ class ApiController extends AbstractController
       return $this->json($holidays, 200, []);
    }
 
-   #[Route(path: '/my/remaining-days', name: 'api_get_my_remaining_days', methods: 'GET')]
+   #[Route(path: '/{_locale}/my/remaining-days', name: 'api_get_my_remaining_days', methods: 'GET')]
     public function getMyRemainigDays(Request $request): Response
     {
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
@@ -65,15 +72,16 @@ class ApiController extends AbstractController
          $statsByEventType = $counters[$user->getUsername()];
          foreach ($totals as $key => $value) {
             if (array_key_exists($key, $statsByEventType)) {
-            $remaining[$key] = round($totals[$key] - $statsByEventType[$key], 2);
+            $remaining[$key] = round($totals[$key] - $statsByEventType[$key], 4);
             } else {
-            $remaining[$key] = round($totals[$key], 2);
+            $remaining[$key] = round($totals[$key], 4);
             }
          }
       } else {
          $remaining = $totals;
       }
-      return $this->json($remaining);
+      $formattedCounters = $this->statsService->formatCounterAsDaysHoursAndMinutes($remaining, $this->wcRepo->findOneBy(['year' => $year]));
+      return $this->json($formattedCounters);
     }
 
     private function totalDaysForEachType(User $user, $year) {
@@ -169,6 +177,7 @@ class ApiController extends AbstractController
       $userColors = $this->createArray($users, $colors);
       $events = $this->eventRepo->findEffectiveEventsOfTheYearByUsernames($year,$users);
       $stats = $this->statsService->calculateStatsByUserAndStatus($events, $year, $users);
+      $stats = $this->statsService->formatStatsAsDaysHoursAndMinutes($stats, $this->wcRepo->findOneBy(["year" => $year]));
       $statuses = $this->statusRepo->getArrayOfColors();
       if ($json) {
          return $this->json($stats, 200, [], ['groups' => ['event']]);

@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\AntiquityDays;
 use App\Entity\Event;
 use App\Entity\EventType;
 use App\Entity\Status;
@@ -14,6 +13,7 @@ use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\StatusRepository;
 use App\Repository\WorkCalendarRepository;
+use App\Services\DaysFormattingService;
 use App\Services\StatsService;
 use \DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,7 +31,18 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted('ROLE_USER')]
 class EventController extends AbstractController
 {
-    public function __construct(private readonly MailerInterface $mailer, private readonly TranslatorInterface $translator, private readonly StatsService $statsService, private readonly EventRepository $eventRepo, private readonly StatusRepository $statusRepo, private readonly WorkCalendarRepository $wcRepo, private readonly AntiquityDaysRepository $adRepo, private readonly EntityManagerInterface $em, private readonly AdditionalVacationDaysRepository $avdRepo, private readonly int $daysForApproval = 15)
+    public function __construct(
+        private readonly MailerInterface $mailer, 
+        private readonly TranslatorInterface $translator, 
+        private readonly StatsService $statsService, 
+        private readonly EventRepository $eventRepo, 
+        private readonly StatusRepository $statusRepo, 
+        private readonly WorkCalendarRepository $wcRepo, 
+        private readonly AntiquityDaysRepository $adRepo, 
+        private readonly EntityManagerInterface $em, 
+        private readonly AdditionalVacationDaysRepository $avdRepo, 
+        private readonly int $daysForApproval = 15,
+        private readonly DaysFormattingService $daysFormattingService)
     {
     }
 
@@ -169,12 +180,12 @@ class EventController extends AbstractController
                 $subject = "{$user->getUserIdentifier()}-en opor eskaera bertan behera uztea / Cancelación de vacaciones de {$user->getUserIdentifier()}";
                 $this->sendEmail($boss->getEmail(), $subject, $html, false);
             }
-            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+            return new Response(null, Response::HTTP_NO_CONTENT);
         } else {
             $message = $this->translator->trans('message.canNotDeletePastDay', [
                 'deadline' => $deadline->format('Y-m-d'),
             ], 'messages');
-            $response = new Response($message, \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY);
+            $response = new Response($message, Response::HTTP_UNPROCESSABLE_ENTITY);
             return $response;
         }
         $this->addFlash('error', 'message.eventNotFound');
@@ -294,15 +305,21 @@ class EventController extends AbstractController
             $this->addFlash('error', 'message.partitionableDaysOneByOne');
             return false;
         }
-
-        if ($event->getHalfDay() && ($event->getHours() < 2 || $event->getHours() > $workCalendar->getWorkingHours() / 2)) {
-            $this->addFlash('error', $this->translator->trans('message.partitionableHoursMinAndMax', [
-                'min' => "2",
-                'max' => number_format($workCalendar->getWorkingHours() / 2, 2),
+        if ($event->getType()->getId() !== EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
+            $this->addFlash('error', $this->translator->trans('message.partitionableDaysType', [
+                'hours' => $workCalendar->getPartitionableHoursAsHoursAndMinutes(),
+                'year' => $event->getStartDate()->format('Y'),
             ]));
             return false;
         }
-
+        if ($event->getHalfDay() && ($event->getHours() < 2 || $event->getHoursDecimal() > $workCalendar->getWorkingHoursDecimal() / 2)) {
+            $this->addFlash('error', $this->translator->trans('message.partitionableHoursMinAndMax', [
+                'min' => "2",
+                'maxHours' => floor($workCalendar->getWorkingHours() / 2),
+                'maxMinutes' => (( $workCalendar->getWorkingHours() / 2 ) - (floor($workCalendar->getWorkingHours() / 2)))*60,
+            ]));
+            return false;
+        }
         if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getUsePreviousYearDays() ) {
             $this->addFlash('error', $this->translator->trans('message.particularBussinesLeaveDaysNotWithPreviousYearDays'));            
             return false;
@@ -311,13 +328,6 @@ class EventController extends AbstractController
              $event->getUser() === null && !$this->isGranted('ROLE_HHRR') ) {
             $this->addFlash('error', $this->translator->trans('message.deadLineNextYearExceeded', [
                 'deadline' => $workCalendar->getDeadlineNextYear()->format('Y-m-d'),
-            ]));
-            return false;
-        }
-        if ($event->getType()->getId() !== EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
-            $this->addFlash('error', $this->translator->trans('message.partitionableDaysType', [
-                'hours' => $workCalendar->getPartitionableHours(),
-                'year' => $event->getStartDate()->format('Y'),
             ]));
             return false;
         }
@@ -366,7 +376,6 @@ class EventController extends AbstractController
 
     private function renderSuccess($event, $boss, $ajax = false, $sendMail = true)
     {
-        
         $this->em->persist($event);
         $this->em->flush();
         $overlaps = $this->eventRepo->findOverlapingEventsNotOfCurrentUser($event);
@@ -383,7 +392,7 @@ class EventController extends AbstractController
             }
         }
         if ($ajax) {
-            return new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+            return new Response(null, Response::HTTP_NO_CONTENT);
         } else {
             return $this->redirectToRoute('myCalendar');
         }
@@ -411,10 +420,10 @@ class EventController extends AbstractController
                 $totalHours += $element->getHours();
             }
         }
-        if ($totalHours + $event->getHours() > $workCalendar->getPartitionableHours()) {
+        if ($totalHours + $event->getHours() > $workCalendar->getPartitionableHoursDecimal()) {
             $this->addFlash('error', $this->translator->trans('message.partitionableHoursExceeded', [
-                'maximumHours' => $workCalendar->getPartitionableHours(),
-                'hours' => $totalHours + $event->getHours(),
+                'maximumHours' => $workCalendar->getPartitionableHoursAsHoursAndMinutes(),
+                'hours' => $totalHours + $event->getHoursAndMinutes(),
                 'year' => $event->getStartDate()->format('Y'),
             ]));
             return false;
@@ -428,10 +437,11 @@ class EventController extends AbstractController
             $eventsThisYear = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year, $event->getType(),false);
             $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
             if ($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) > $maxDays) {
+                $daysString = $this->daysFormattingService->calcularDiasHorasMinutosJornadaString($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) - $maxDays, $workCalendar->getWorkingHours(), $workCalendar->getWorkingMinutes());
                 $this->addFlash(
                     'error',
                     $this->translator->trans('message.maximum_' . $event->getType()->getId() . '_days_exceeded', [
-                        'days' => $workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) - $maxDays
+                        'days' => $daysString,
                     ])
                 );
                 return false;
@@ -446,7 +456,7 @@ class EventController extends AbstractController
         return $this->render('event/' . $template, [
             'form' => $form->createView(),
             'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer, 
-        ], new Response(null, \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY));
+        ], new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 
     /**
