@@ -30,8 +30,8 @@ export default class extends Controller {
              search: true,
              striped: true,
              sortStable: true,
-             pageSize: 10,
-             pageList: [10, 25, 50, 100],
+             pageSize: 100,
+             pageList: [100, 200],
              sortable: true,
              locale: this.localeValue + '-' + this.localeValue.toUpperCase(),
          });        
