@@ -373,9 +373,9 @@ class EventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findApprovedEventsByYearUserAndDepartment(int $year, User $user = null, Department $department = null, int $status = null, bool $activated=true): array
+    public function findEventsByYearUserAndDepartment(int $year, User $user = null, Department $department = null, int $status = null, bool $activated=true): array
     {
-        $users = null === $user ? null : [$user];
+        $users = ( null !== $user ) ? [$user] : null;
         $qb = $this->findEffectiveEventsOfTheYearForUsersQB($year, $users, $department, null, $status, false, $activated);
         $qb = $this->orderByIdAsc($qb);
         return $qb->getQuery()->getResult();

@@ -52,13 +52,12 @@ class ReportsController extends AbstractController
             //     $data->getUser(), 
             //     $data->getDepartment()
             // );
-            $events = $this->eventRepo->findApprovedEventsByYearUserAndDepartment(
+            $events = $this->eventRepo->findEventsByYearUserAndDepartment(
                 $data->getYear(), 
                 $data->getUser(), 
                 $data->getDepartment()
             );
-
-            $counters = $this->statsService->calculateStatsByUserAndEventType($events, true);
+            $counters = $this->statsService->calculateStatsByUserAndEventType($events, $data->getYear(), true);
             return $this->render('reports/index.html.twig', [
                 'form' => $form,
                 'counters' => $counters,

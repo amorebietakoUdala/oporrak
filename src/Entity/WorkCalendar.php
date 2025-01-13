@@ -152,7 +152,7 @@ class WorkCalendar
 
     public function getTotalWorkingMinutes(): ?int
     {
-        return $this->workingHours * 60 + $this->workingMinutes;
+        return ( $this->workingHours * 60 ) + $this->workingMinutes;
     }
 
     public function getPartitionableDays(): ?int

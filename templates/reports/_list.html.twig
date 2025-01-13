@@ -7,6 +7,7 @@
          <th data-sortable="true">{{"Asuntos particulares/Norbere kontuetarako baimena" | trans | capitalize}}</th>
          <th data-sortable="true">{{"Exceso jornada/Gehiegizko lanaldia" | trans | capitalize}}</th>
          <th data-sortable="true">{{"Días antigüedad/Antzinatasun egunak" | trans | capitalize}}</th>
+         <th data-sortable="true">{{"Vacaciones Adicionales/Opor egun gehigarriak" | trans | capitalize}}</th>
          <th data-sortable="true">{{"Otros/Besteren bat" | trans | capitalize}}</th>
          <th data-sortable="true" class="table-total" >{{"label.total" | trans | capitalize}}</th>
       </tr>
@@ -15,11 +16,11 @@
       {% for key in counters|keys %}
          <tr>
             <td>{{key}}</td>
-            {% for i in 1..5 %}
+            {% for i in 1..6 %}
                {% if counters[key][i] is defined %}
                   <td>{{ counters[key][i] }}</td>
                {% else %}
-                  <td>{{ 0 }}</td>
+                  <td>0 {{ 'label.days' | trans }} </td>
                {% endif %}
             {% endfor %}
             <td><b>{{ counters[key]['total'] }}</b></td>

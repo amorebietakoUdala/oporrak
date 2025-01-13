@@ -64,22 +64,33 @@ class StatsService
     * 
     * @return array $counters
     */
-   public function calculateStatsByUserAndEventType(array $events, $formattedCounters = false) {
+   public function calculateStatsByUserAndEventType(array $events, int $year, $formattedCounters = false) {
       $counters = [];
-
+      $totalMinutesOfHalfDaysPerUser = [];
+      $wc = $this->wcRepo->findOneBy(['year' => $year]);
       foreach($events as $event) {
-         $year = $event->getStartDate()->format('Y');
+         $eventStartYear = $event->getStartDate()->format('Y');
          $workCalendars = [];
-         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
-         $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
+         $workCalendars[$eventStartYear] = $this->wcRepo->findOneBy(['year' => $eventStartYear]);          
+         $workCalendars[$eventStartYear-1] = $this->wcRepo->findOneBy(['year' => $eventStartYear-1]);
          if ( !$event->getUsePreviousYearDays() ) {
-            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$eventStartYear]);
          } else {
-            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
+            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$eventStartYear-1]);
          }
          $userId = "{$event->getUser()->getUsername()}";
          $typeId = "{$event->getType()->getId()}";
-         
+         /** If workingDays is less than 0, it's a halfday. So we don't sum to the fulldays until the end 
+          *  This is needed to fix the total and remaining days of typeId = 2
+         */
+         if( $workingDays < 1) {
+            if (array_key_exists($userId, $totalMinutesOfHalfDaysPerUser)) {
+               $totalMinutesOfHalfDaysPerUser[$userId] += $event->getEventTotalMinutes();
+            } else {
+               $totalMinutesOfHalfDaysPerUser[$userId] = $event->getEventTotalMinutes();
+            }
+            $workingDays = 0;
+         }
          if ($event->getStatus()->getId() !== Status::NOT_APPROVED ) {
             if ( array_key_exists($userId, $counters) ) {
                if ( array_key_exists($typeId, $counters[$userId]) ) {
@@ -92,9 +103,20 @@ class StatsService
             }
          }
       }
+      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, 2, false);
       $this->calculateTotals($counters);
       if ($formattedCounters) {
-         $counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $workCalendars[$year]);
+         $counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $wc);
+      }
+      return $counters;
+   }
+
+   private function addTotalMinutesOfHalfDaysPerUserToCounters(array &$counters, $totalMinutesOfHalfDaysPerUser, $workCalendar, $typeId = 2, $fixRemaining = true): array {
+      foreach ($totalMinutesOfHalfDaysPerUser as $userId => $value) {
+         $counters[$userId][$typeId] += ( $value / $workCalendar->getTotalWorkingMinutes() );
+         if (array_key_exists('remaining', $counters[$userId])) {
+            $counters[$userId]['remaining'] -= ( $value / $workCalendar->getTotalWorkingMinutes() );
+         }
       }
       return $counters;
    }
@@ -147,6 +169,7 @@ class StatsService
 
    public function calculateStatsByUserAndStatus(array $events, int $year, array $usernames) {
       $counters = $this->calculateTotalsForUsernamesAndYear($usernames,$year);
+      $totalMinutesOfHalfDaysPerUser = [];
       foreach($events as $event) {
          $workCalendars = [];
          $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
@@ -158,6 +181,17 @@ class StatsService
          }
          $statusId = "{$event->getStatus()->getId()}";
          $username = "{$event->getUser()->getUsername()}";
+         /** If workingDays is less than 0, it's a halfday. So we don't sum to the fulldays until the end 
+          *  This is needed to fix the total and remaining days of typeId = 2
+         */
+         if( $workingDays < 1) {
+            if (array_key_exists($username, $totalMinutesOfHalfDaysPerUser)) {
+               $totalMinutesOfHalfDaysPerUser[$username] += $event->getEventTotalMinutes();
+            } else {
+               $totalMinutesOfHalfDaysPerUser[$username] = $event->getEventTotalMinutes();
+            }
+            $workingDays = 0;
+         }
          if ( array_key_exists($username, $counters) ) {
             if ( array_key_exists($statusId, $counters[$username]) ) {
                $counters[$username][$statusId] = $counters[$username][$statusId] + $workingDays;
@@ -169,11 +203,14 @@ class StatsService
          }
          $counters[$username]['remaining'] = $counters[$username]["total"] - $counters[$username][$statusId];
       }
+      $wc = $this->wcRepo->findOneBy(['year' => $year]);
+      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, 2, true);
       return $counters;
    }
 
    public function calculateStatsByUser(array $events, int $year) {
       $counters = [];
+      $totalMinutesOfHalfDaysPerUser = [];
       foreach($events as $event) {
          $workCalendars = [];
          $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
@@ -183,14 +220,26 @@ class StatsService
          } else {
             $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
          }
-
-         $user = "{$event->getUser()->getUsername()}";
-         if ( array_key_exists($user, $counters) ) {
-               $counters[$user] = $counters[$user] + $workingDays;
+         $userId = "{$event->getUser()->getUsername()}";
+         /** If workingDays is less than 0, it's a halfday. So we don't sum to the fulldays until the end 
+          *  This is needed to fix the total and remaining days of typeId = 2
+         */
+         if( $workingDays < 1) {
+            if (array_key_exists($userId, $totalMinutesOfHalfDaysPerUser)) {
+               $totalMinutesOfHalfDaysPerUser[$userId] += $event->getEventTotalMinutes();
+            } else {
+               $totalMinutesOfHalfDaysPerUser[$userId] = $event->getEventTotalMinutes();
+            }
+            $workingDays = 0;
+         }
+         if ( array_key_exists($userId, $counters) ) {
+               $counters[$userId] = $counters[$userId] + $workingDays;
          } else {
-            $counters[$user] = $workingDays;
+            $counters[$userId] = $workingDays;
          }
       }
+      $wc = $this->wcRepo->findOneBy(['year' => $year]);
+      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, 2, true);
       return $counters;
    }
 
