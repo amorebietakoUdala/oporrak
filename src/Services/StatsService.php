@@ -55,7 +55,16 @@ class StatsService
       return $totalWorkingDays;
    }
 
-   public function calculateStatsByUserAndEventType(array $events) {
+   /**
+    * It returns an array of usernames and their total event days.
+    * If $formattedCounters is set to true. Total days are returned as user friendly comprehensive strings instead of days in float format.
+    * 
+    * @param array $events. Array of the events to be classified and resumed.
+    * @param $formattedCounters
+    * 
+    * @return array $counters
+    */
+   public function calculateStatsByUserAndEventType(array $events, $formattedCounters = false) {
       $counters = [];
 
       foreach($events as $event) {
@@ -84,7 +93,9 @@ class StatsService
          }
       }
       $this->calculateTotals($counters);
-      //$counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $workCalendars[$year]);
+      if ($formattedCounters) {
+         $counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $workCalendars[$year]);
+      }
       return $counters;
    }
 

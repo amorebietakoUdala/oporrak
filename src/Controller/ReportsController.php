@@ -16,7 +16,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ReportsController extends AbstractController
 {
 
-    public function __construct(private readonly StatsService $statsService, private readonly EventRepository $eventRepo)
+    public function __construct(
+        private readonly StatsService $statsService, 
+        private readonly EventRepository $eventRepo)
     {
     }
 
@@ -56,7 +58,7 @@ class ReportsController extends AbstractController
                 $data->getDepartment()
             );
 
-            $counters = $this->statsService->calculateStatsByUserAndEventType($events);
+            $counters = $this->statsService->calculateStatsByUserAndEventType($events, true);
             return $this->render('reports/index.html.twig', [
                 'form' => $form,
                 'counters' => $counters,
