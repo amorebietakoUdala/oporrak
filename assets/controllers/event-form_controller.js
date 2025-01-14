@@ -47,6 +47,8 @@ export default class extends Controller {
                 $('#event_form_minutes').removeClass('d-none');
                 $('label[for="event_form_minutes"]').removeClass('d-none');
             } else {          
+                $('#event_form_hours').addClass('d-none');
+                $('label[for="event_form_hours"]').addClass('d-none');
                 $('#event_form_minutes').addClass('d-none');
                 $('label[for="event_form_minutes"]').addClass('d-none');
             }

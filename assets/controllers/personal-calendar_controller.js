@@ -13,12 +13,6 @@ import Routing from '../../public/bundles/fosjsrouting/js/router.js';
 import Translator from 'bazinga-translator';
 const translations = require('../../public/translations/' + Translator.locale + '.json');
 
-// function pad(num, size) {
-//     num = num.toString();
-//     while (num.length < size) num = "0" + num;
-//     return num;
-// }
-
 export default class extends Controller {
     static targets = ['modal', 'modalBody'];
     static values = {
