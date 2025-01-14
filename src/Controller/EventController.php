@@ -41,8 +41,9 @@ class EventController extends AbstractController
         private readonly AntiquityDaysRepository $adRepo, 
         private readonly EntityManagerInterface $em, 
         private readonly AdditionalVacationDaysRepository $avdRepo, 
-        private readonly int $daysForApproval = 15,
-        private readonly DaysFormattingService $daysFormattingService)
+        private readonly DaysFormattingService $daysFormattingService,
+        private readonly int $daysForApproval = 15
+        )
     {
     }
 
