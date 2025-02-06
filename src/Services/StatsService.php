@@ -172,7 +172,7 @@ class StatsService
       $totalMinutesOfHalfDaysPerUser = [];
       foreach($events as $event) {
          $workCalendars = [];
-         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
+         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);
          $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
          if ( !$event->getUsePreviousYearDays() ) {
             $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
@@ -201,7 +201,15 @@ class StatsService
          } else {
             $counters[$username][$statusId] = $workingDays;
          }
-         $counters[$username]['remaining'] = $counters[$username]["total"] - $counters[$username][$statusId];
+      }
+      # Update remaining days
+      foreach ($counters as $username => $counter) {
+         $counters[$username]['remaining'] = $counters[$username]["total"];
+         foreach ($counter as $key => $value) {
+            if ( $key !== 'total' && $key !== 'remaining' ) {
+               $counters[$username]['remaining'] -= $value;
+            }
+         }
       }
       $wc = $this->wcRepo->findOneBy(['year' => $year]);
       $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, 2, true);

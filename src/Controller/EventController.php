@@ -307,9 +307,10 @@ class EventController extends AbstractController
             return false;
         }
         if ($event->getType()->getId() !== EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
+            
             $this->addFlash('error', $this->translator->trans('message.partitionableDaysType', [
                 'hours' => $workCalendar->getPartitionableHoursAsHoursAndMinutes(),
-                'year' => $event->getStartDate()->format('Y'),
+                'year' => $this->getEffectiveYear($event),
             ]));
             return false;
         }
@@ -333,7 +334,7 @@ class EventController extends AbstractController
             return false;
         }
         if ($event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
-            if (!$this->checkDoesNotExcessMaximumPartionableHours($user, $event, $event->getStartDate()->format('Y'), $workCalendar)) {
+            if (!$this->checkDoesNotExcessMaximumPartionableHours($user, $event, $this->getEffectiveYear($event), $workCalendar)) {
                 return false;
             }
         }
@@ -404,8 +405,9 @@ class EventController extends AbstractController
      */
     private function checkDoesNotExcessMaximumDaysForType(User $user, Event $event, WorkCalendar $workCalendar): bool
     {
-        $year = $event->getStartDate()->format('Y');
-        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo, intval($year));
+        # If uses previousYearDays, we have to check if exceedes the maximum days of the previous year, not current. So we take effective year of the event.
+        $year = $this->getEffectiveYear($event);
+        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo, $year);
         $valid = true;
         $maxDays = $totals[$event->getType()->getId()];
         $valid = $this->checkDoesNotExcessMaximumDays($user, $event, $maxDays, $year, $workCalendar);
@@ -447,8 +449,9 @@ class EventController extends AbstractController
                 );
                 return false;
             }
+            return true;
         }
-        return true;
+        throw new \Exception('Can\'t save max days' . $event->getType()->getId());
     }
 
     private function renderError($form, $ajax = false, $isCityHallReferer = false, $templateName = 'new.html.twig')
