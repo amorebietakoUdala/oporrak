@@ -15,7 +15,7 @@ class EventType implements \Stringable
     final public const OVERTIME = 3;
     final public const ANTIQUITY_DAYS = 4;
     final public const ADDITONAL_VACATION_DAYS = 5;
-    final public const OTHERS = 6;
+    final public const UNION_HOURS = 6;
     
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,6 +30,9 @@ class EventType implements \Stringable
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(['event'])]
     private $descriptionEu;
+
+    #[ORM\Column(nullable: false, options: ["default" => 0])]
+    private ?bool $onlyForUnionDelegates = false;
 
     public function getId(): ?int
     {
@@ -77,5 +80,17 @@ class EventType implements \Stringable
     public function __toString(): string
     {
         return $this->descriptionEs . '/' . $this->descriptionEu;
+    }
+
+    public function isOnlyForUnionDelegates(): ?bool
+    {
+        return $this->onlyForUnionDelegates;
+    }
+
+    public function setOnlyForUnionDelegates(?bool $onlyForUnionDelegates): static
+    {
+        $this->onlyForUnionDelegates = $onlyForUnionDelegates;
+
+        return $this;
     }
 }

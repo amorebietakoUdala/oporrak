@@ -9,7 +9,8 @@ const translations = require('../../public/translations/' + Translator.locale + 
 export default class extends Controller {
     static targets = ['day', 'body', 'content'];
     static values = {
-        roles: Array,
+        isHhrr: Boolean,
+        isBoss: Boolean,
         user: String,
         boss: String, 
         previousYearDaysColor: String,
@@ -29,7 +30,7 @@ export default class extends Controller {
 
     showDetails(event) {
         this.dayTarget.innerHTML = this.localizeDate(event.detail.date, global.locale);
-        this.bodyTarget.innerHTML = this.renderDetails(event.detail.events, this.userValue, this.rolesValue);
+        this.bodyTarget.innerHTML = this.renderDetails(event.detail.events, this.userValue);
         $(this.contentTarget).show();
     }
 
@@ -41,7 +42,7 @@ export default class extends Controller {
         }
     }
 
-    renderDetails(events, user, roles) {
+    renderDetails(events, user) {
         let content = '<div id="events-details">';
         events.forEach(element => {
             content += '<div>';
@@ -62,14 +63,18 @@ export default class extends Controller {
                     let params = new URLSearchParams({
                         return: document.location.href,
                     });
-                    if (element.statusId === 1 && (roles.includes("ROLE_BOSS") || roles.includes("ROLE_ADMIN") && element.user !== user )) {
+                    // If it has HHRR role and is not the user of the event (can't approve or deny your own events from this view even if it's an administrator)
+                    if (element.statusId === 1 && this.isBossValue == true && element.user != user ) {
                             let urlApprove = app_base + Routing.generate('event_approve', { _locale: global.locale, id: element.id }) + '?' + params.toString();
                             let urlDeny = app_base + Routing.generate('event_deny', { _locale: global.locale, id: element.id }) + '?' + params.toString();
                             content += '&nbsp;&nbsp;&nbsp;<span><a href="' + urlApprove + '"><i class="fas fa-check"></i></a></span>&nbsp;' +
                                 '<span><a href="' + urlDeny + '"><i class="fas fa-times"></i></a></span>';
                     }
-                    if ( ( roles.includes("ROLE_HHRR") || roles.includes("ROLE_ADMIN") ) && element.user !== user 
-                        && this.typeValue != null && this.typeValue == 'cityHall') {
+                    // If it has HHRR role and is not the user of the event (can't modify his own events from this view even if it's an administrator)
+                    if (  this.isHhrrValue == true && 
+                          element.user != user && 
+                          this.typeValue != null && 
+                          this.typeValue == 'cityHall') {
                         content += '&nbsp;&nbsp;<span><a href="#" data-eventId="'+ element.id +'" title="'+ Translator.trans('btn.delete', null, 'messages', global.locale) +'" data-action="click->department-calendar#deleteEvent"><i class="fas fa-trash"></i></a></span>&nbsp;';
                         content += '&nbsp;&nbsp;<span><a href="#" data-eventId="'+ element.id +'" title="'+ Translator.trans('btn.edit', null, 'messages', global.locale) +'" data-action="click->department-calendar#editEvent"><i class="fas fa-edit"></i></a></span>&nbsp;';
                     }

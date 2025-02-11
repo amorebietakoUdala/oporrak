@@ -32,7 +32,7 @@
 			</div>
 			<div class="row mt-1">
 				{% if not readonly and password_change %}
-					<div class="col-lg-3">
+					<div class="col-lg-2">
 						{{ form_label(form.password.first) }}
 						<span class="text-danger">{{ form_errors(form.password.first) }}</span>
 						{{ form_widget(form.password.first, {'attr': {'class': 'form-control form-control-sm', 'data-controller' : 'readonly-remove', 'readonly': "readonly"}}) }}
@@ -40,37 +40,37 @@
 						{{ form_widget(form.password.second, {'attr': {'class': 'form-control form-control-sm mt-1', 'data-controller' : 'readonly-remove', 'readonly': "readonly"}}) }}
 					</div>
 				{% endif %}
-				<div class="col">
-					{{ form_label(form.department) }}
-					<span class="text-danger">{{ form_errors(form.department) }}</span>
-					{{ form_widget(form.department, {'attr': {'class': 'ml-1 form-control-sm', 'data-controller' : 'select2'}}) }}
+				<div class="col-lg-2">
+					{{ form_row(form.department, {'attr': {'class': 'form-select form-select-sm', 'data-controller' : 'select2'}}) }}
 				</div>
-				<div class="col">
-					{{ form_label(form.boss) }}
-					<span class="text-danger">{{ form_errors(form.boss) }}</span>
-					{{ form_widget(form.boss, {'attr': {'class': 'ml-1 form-control-sm', 'data-controller' : 'select2'}}) }}
+				<div class="col-lg-2">
+					{{ form_row(form.boss, {'attr': {'class': 'form-select form-select-sm', 'data-controller' : 'select2'}}) }}
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-lg-2">
+				<div class="col-lg-auto">
 					{{ form_label(form.startDate) }}
 					<span class="text-danger">{{ form_errors(form.startDate) }}</span>
 					{{ form_widget(form.startDate, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-				<div class="col-lg-2">
+				<div class="col-lg-auto">
 					{{ form_label(form.endDate) }}
 					<span class="text-danger">{{ form_errors(form.endDate) }}</span>
 					{{ form_widget(form.endDate, {'attr': {'class': 'form-control form-control-sm'}}) }}
 				</div>
-				<div class="col-lg-2">
+				<div class="col-lg-1">
 					{{ form_label(form.yearsWorked) }}
 					<span class="text-danger">{{ form_errors(form.yearsWorked) }}</span>
 					{{ form_widget(form.yearsWorked, {'attr': {'class': 'ml-1 form-control form-control-sm'}} ) }}
 				</div>
-				<div class="col-lg-2">
+				<div class="col-lg-1">
 					{{ form_label(form.extraDays) }}
 					<span class="text-danger">{{ form_errors(form.extraDays) }}</span>
 					{{ form_widget(form.extraDays, {'attr': {'class': 'ml-1 form-control form-control-sm'}} ) }}
+				</div>
+				<div class="col-lg-1 d-flex align-items-end justify-content-center">
+					{{ form_row(form.unionDelegate) }}
+					<span class="text-danger">{{ form_errors(form.unionDelegate) }}</span>
 				</div>
 			</div>
          <div class="row">

@@ -18,8 +18,9 @@
 					{{event.type.descriptionEu}}
 				{% endif %}
 				{% if event.halfday %}
-					&nbsp;({{ event.hours | number_format(2, ',', '.') }}&nbsp;{{ 'mail.hours' | trans }})
+					&nbsp;({{ event.hours }}:{{ event.minutes | str_pad(2, '0') }}&nbsp;{{ 'mail.hours' | trans | lower }})
 				{% endif %}
+
 			</div>
 			<div style="color: {{ event.status.color }}">{{ event.status.description(app.request.locale) | trans}}</div>
 		</body>

@@ -1,23 +1,38 @@
 <div class="card">
-	<h5 class="card-title text-center">{{'title.remaining_days' | trans }}&nbsp;<span data-remaining-days-target="year"></span></h5>
+	<h5 class="card-title text-center">
+		{{'title.remaining_days' | trans }}&nbsp;<span data-remaining-days-target="year">{{ year }}</span>
+	</h5>
 	<div class="card-body">
-		<div>
+		{% if vacationDays is defined and vacationDays != null and 
+			particularBusinessLeave is defined and particularBusinessLeave != null and
+			antiquityDays is defined and antiquityDays != null and
+			additionalVacationDays is defined and additionalVacationDays != null
+		%}
 			<div>
-				{{'label.vacationDays' | trans }}<span data-remaining-days-target="vacationDays"></span>&nbsp;<span data-remaining-days-target="vacationDaysLabelPlural"></span><span class="d-none" data-remaining-days-target="vacationDaysLabelSingular">{{'label.day' | trans }}</span>
+				<div>
+					{{'label.vacationDays' | trans }}<span>{{ vacationDays }}</span>
+				</div>
+				<div>
+					{{'label.particularBusinessLeave' | trans }}<span>{{ particularBusinessLeave }}</span>
+				</div>
+				<div id="overtimeDaysSummaryRow">
+					{{'label.overtimeDays' | trans }}<span>{{ overtimeDays }}</span>
+				</div>
+				<div id="antiquityDaysRow">
+					{{'label.antiquityDays' | trans }}:&nbsp;<span>{{ antiquityDays }}</span>
+				</div>
+				<div id="additionalVacationDaysRow">
+					{{'label.additionalVacationDays' | trans }}:&nbsp;<span>{{ additionalVacationDays }}</span>
+				</div>
+				{% if isUnionDelegate and unionHours is defined and unionHours != null %}
+					<div id="unionHoursRow">
+						{{'label.unionHours' | trans }}:&nbsp;<span>{{ unionHours }}</span>
+					</div>
+				{% endif %}
 			</div>
-			<div>
-				{{'label.particularBusinessLeave' | trans }}<span
-					data-remaining-days-target="particularBusinessLeave"></span>&nbsp;<span data-remaining-days-target="particularBusinessLeaveLabelPlural"></span><span class="d-none" data-remaining-days-target="particularBusinessLeaveLabelSingular">{{'label.day' | trans }}</span>
-			</div>
-			<div id="overtimeDaysSummaryRow">
-				{{'label.overtimeDays' | trans }}<span data-remaining-days-target="overtimeDays"></span>&nbsp;<span data-remaining-days-target="overtimeDaysLabelPlural"></span><span class="d-none" data-remaining-days-target="overtimeDaysLabelSingular">{{'label.day' | trans }}</span>
-			</div>
-			<div id="antiquityDaysRow">
-				{{'label.antiquityDays' | trans }}:&nbsp;<span data-remaining-days-target="antiquityDays"></span>&nbsp;<span data-remaining-days-target="antiquityDaysLabelPlural"></span><span class="d-none" data-remaining-days-target="antiquityDaysLabelSingular">{{'label.day' | trans }}</span>
-			</div>
-			<div id="additionalVacationDaysRow">
-				{{'label.additionalVacationDays' | trans }}:&nbsp;<span data-remaining-days-target="additionalVacationDays"></span>&nbsp;<span data-remaining-days-target="additionalVacationDaysLabelPlural"></span><span class="d-none" data-remaining-days-target="additionalVacationDaysLabelSingular">{{'label.day' | trans }}</span>
-			</div>
-		</div>
+		{% else %}
+			<div class="alert alert-warning">{{'message.workcalendarNotFound' | trans({'year' : year}) }}</div>
+		{% endif %}
 	</div>
 </div>
+

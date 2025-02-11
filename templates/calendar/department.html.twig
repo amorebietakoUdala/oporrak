@@ -3,7 +3,7 @@
 {% block title %}{{'title.departmentCalendar' | trans }}{% endblock %}
 
 {% block body %}
-	<div {{ stimulus_controller('summary', {'summary-url': path('api_getWorkCalendar') }) | 
+	<div {{ stimulus_controller('summary', {'summary-url': path('api_getSummary') }) | 
            stimulus_controller('day-details', {
             'roles': roles,
             'user': app.user.username,
@@ -14,7 +14,7 @@
          stimulus_controller('user-legend', { statsUrl: path('api_get_user_stats') }) |
          stimulus_controller('overlaps', { serviceUrl: path('api_department_overlaps', {'department': app.user.department.id})}) 
       }} 
-         data-action="department-calendar:yearChanged->summary#refreshSummary department-calendar:loaded->day-details#hideDetails department-calendar:clickDay->day-details#showDetails department-calendar:loaded->user-legend#load department-calendar:loaded->overlaps#load" 
+         data-action="department-calendar:yearChanged->summary#refresh department-calendar:loaded->day-details#hideDetails department-calendar:clickDay->day-details#showDetails department-calendar:loaded->user-legend#load department-calendar:loaded->overlaps#load" 
    >
 		<div class="container-fluid"
          {{ stimulus_controller('department-calendar', { 

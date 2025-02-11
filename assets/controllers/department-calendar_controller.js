@@ -39,6 +39,7 @@ export default class extends Controller {
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
         if ( this.hasModalTarget) {
+            console.log( 'hasModalTarget' + this.hasModalTarget );
             this.modal = new Modal(this.modalTarget);
         }
         this.calendar = new Calendar('#calendar', {
@@ -250,20 +251,24 @@ export default class extends Controller {
     }
 
     async editEvent(event) {
+        console.log('Edit event');
         try {
             event.preventDefault();
             this.modalTitleTarget.innerHTML = Translator.trans('modal.title.event.edit');
             const id = event.currentTarget.dataset.eventid;
-            let url = app_base + Routing.generate('event_edit', { _locale: global.locale, event: id });
+            console.log("Event id: " + id);
+            let url = app_base + Routing.generate('event_edit', { _locale: global.locale, id: id });
+            console.log(url);
             await $.ajax({
                 url: url,
             }).then((response) => {
                 this.modalBodyTarget.innerHTML = response;
                 this.modal.show();
                 });
-            } catch (e) {
-                this.modalBodyTarget.innerHTML = e.responseText;
-            }
+        } catch (e) {
+            console.log(e);
+            this.modalBodyTarget.innerHTML = e.responseText;
+        }
     }
         
     async submitForm(event) {

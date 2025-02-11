@@ -6,9 +6,10 @@ import 'bootstrap-datepicker/js/locales/bootstrap-datepicker.eu.js';
 import 'select2';
 
 export default class extends Controller {
-    static targets = [ 'userInput' ];
+    static targets = [ 'userInput', 'halfDay' ];
     static values = {
         locale: String,
+        unionHoursType: Number,
     }
 
     connect() {
@@ -29,29 +30,30 @@ export default class extends Controller {
         }
         $('#event_form_startDate').datepicker(options);
         $('#event_form_endDate').datepicker(options);
+        // To set halfDay check on init when editing an event
+        this.onHalfDayClick(null);
+    }
+
+    onHalfDayClick(e) {
         if ( $('.js-halfDay').is(':checked') ) {
             $('#event_form_hours').removeClass('d-none');
             $('label[for="event_form_hours"]').removeClass('d-none');
             $('#event_form_minutes').removeClass('d-none');
             $('label[for="event_form_minutes"]').removeClass('d-none');
-        } else {
+        } else {          
             $('#event_form_hours').addClass('d-none');
             $('label[for="event_form_hours"]').addClass('d-none');
             $('#event_form_minutes').addClass('d-none');
             $('label[for="event_form_minutes"]').addClass('d-none');
         }
-        $('.js-halfDay').on('click', function (event) {
-            if ( $('.js-halfDay').is(':checked') ) {
-                $('#event_form_hours').removeClass('d-none');
-                $('label[for="event_form_hours"]').removeClass('d-none');
-                $('#event_form_minutes').removeClass('d-none');
-                $('label[for="event_form_minutes"]').removeClass('d-none');
-            } else {          
-                $('#event_form_hours').addClass('d-none');
-                $('label[for="event_form_hours"]').addClass('d-none');
-                $('#event_form_minutes').addClass('d-none');
-                $('label[for="event_form_minutes"]').addClass('d-none');
-            }
-        });
+    }
+
+    onTypeChange (e) {
+        // If selected option y union hours type 
+        const unionHours = this.unionHoursTypeValue;
+        if ( e.target.value == unionHours ) { 
+            $(this.halfDayTarget).prop('checked', true);
+            this.onHalfDayClick(e);
+        }
     }
 }

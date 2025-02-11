@@ -6,11 +6,12 @@ export default class extends Controller {
         statsUrl: String,
     };
 
-    async refreshStats(event) {
+    async refresh(event) {
         let params = new URLSearchParams({
             year: event.detail.year,
         });
-        const response = await fetch(`${this.statsUrlValue}?${params.toString()}`)
-        this.statsTarget.innerHTML = await response.text();
-    } 
+        const response = await fetch(`${this.statsUrlValue}?${params.toString()}`);
+        let statsContent = await response.text();
+        this.statsTarget.innerHTML = statsContent;
+    }
 }

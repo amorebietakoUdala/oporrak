@@ -3,17 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Department;
+use App\Entity\EventType;
 use App\Entity\User;
 use App\Entity\Status;
-use App\Entity\WorkCalendar;
 use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\EventRepository;
 use App\Repository\HolidayRepository;
 use App\Repository\StatusRepository;
 use App\Repository\WorkCalendarRepository;
+use App\Services\DaysFormattingService;
 use App\Services\StatsService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +33,8 @@ class ApiController extends AbstractController
       private readonly StatsService $statsService, 
       private readonly StatusRepository $statusRepo, 
       private readonly AdditionalVacationDaysRepository $avdRepo,
+      private readonly DaysFormattingService $daysFormattingService,
+      private readonly int $unionHours
       )
    {
    }
@@ -65,9 +67,27 @@ class ApiController extends AbstractController
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       /** @var User $user */
       $user = $this->getUser();
+      $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+      if ( null == $workCalendar ) {
+         return $this->render('calendar/_remainingDays.html.twig', [
+            'isUnionDelegate' => $user->isUnionDelegate(),
+            'year' => $year,
+            'vacationDays' => null,
+            'particularBusinessLeave' => null,
+            'overtimeDays' => null,
+            'antiquityDays' => null,
+            'additionalVacationDays' => null,
+            'unionHours' => null,
+
+         ]);
+      }
       $totals = $this->totalDaysForEachType($user,$year);
       $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
-      $counters = $this->statsService->calculateStatsByUserAndEventType($events, $year);
+      // We wan't to show the union hours in hours and not in days
+      $byHours = [
+         EventType::UNION_HOURS => true,
+      ];
+      $counters = $this->statsService->calculateStatsByUserAndEventType($events, $year, $byHours);
       if (count($counters)) {
          $statsByEventType = $counters[$user->getUsername()];
          foreach ($totals as $key => $value) {
@@ -80,13 +100,31 @@ class ApiController extends AbstractController
       } else {
          $remaining = $totals;
       }
+      $totalUnionHours = 0;
+      if( array_key_exists(EventType::UNION_HOURS, $remaining) ) {
+         $totalUnionHours = $remaining[EventType::UNION_HOURS];
+         unset($remaining[EventType::UNION_HOURS]);
+      }
       $formattedCounters = $this->statsService->formatCounterAsDaysHoursAndMinutes($remaining, $this->wcRepo->findOneBy(['year' => $year]));
+
+      return $this->render('calendar/_remainingDays.html.twig', [
+         'isUnionDelegate' => $user->isUnionDelegate(),
+         'year' => $year,
+         'vacationDays' => $formattedCounters[1],
+         'particularBusinessLeave' => $formattedCounters[2],
+         'overtimeDays' => $formattedCounters[3],
+         'antiquityDays' => $formattedCounters[4],
+         'additionalVacationDays' => $formattedCounters[5],
+         'unionHours' => $this->daysFormattingService->formatHours($totalUnionHours),
+      ]);
+
+
       return $this->json($formattedCounters);
     }
 
     private function totalDaysForEachType(User $user, $year) {
       $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-      $totals = $user->getTotals($workCalendar,$this->adRepo, $this->avdRepo, intval($year));
+      $totals = $user->getTotals($workCalendar,$this->adRepo, $this->avdRepo, intval($year), $this->unionHours);
       return $totals;
     }
 
@@ -153,14 +191,6 @@ class ApiController extends AbstractController
       return $this->json($dates, 200, [], ['groups' => ['event']]);
    }
 
-   #[Route(path: '/work_calendar', name: 'api_getWorkCalendar', methods: 'GET')]
-   public function workCalendar(Request $request, EntityManagerInterface $em)
-   {
-      $year = $request->get('year');
-      $workCalendar = $em->getRepository(WorkCalendar::class)->findOneBy(['year' => $year]);
-      return $this->json($workCalendar, 200, [],);
-   }
-
    #[Route(path: '/department/{id}/users', name: 'api_get_department_users', methods: 'GET', options: ['expose' => true])]
    public function departmentUsers(Department $deparment)
    {
@@ -177,7 +207,13 @@ class ApiController extends AbstractController
       $userColors = $this->createArray($users, $colors);
       $events = $this->eventRepo->findEffectiveEventsOfTheYearByUsernames($year,$users);
       $stats = $this->statsService->calculateStatsByUserAndStatus($events, $year, $users);
-      $stats = $this->statsService->formatStatsAsDaysHoursAndMinutes($stats, $this->wcRepo->findOneBy(["year" => $year]));
+      $workCalendar = $this->wcRepo->findOneBy(["year" => $year]);
+      if ($workCalendar === null) {
+         return $this->render('calendar/_userLegend.html.twig',[
+            'stats' => null
+         ]);
+      }
+      $stats = $this->statsService->formatStatsAsDaysHoursAndMinutes($stats, $workCalendar);
       $statuses = $this->statusRepo->getArrayOfColors();
       if ($json) {
          return $this->json($stats, 200, [], ['groups' => ['event']]);
@@ -229,4 +265,20 @@ class ApiController extends AbstractController
           'overlaps' => $overlaps,
       ]);
   }
+
+  #[Route(path: '/{_locale}/summary', name: 'api_getSummary', methods: 'GET')]
+  public function summary(Request $request): Response
+  {
+     $year = $request->get('year');
+     $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+     $antiquityDays = $this->adRepo->findAll();
+     $additionalVacationDays = $this->avdRepo->findAll();
+     return $this->render('calendar/_summary.html.twig', [
+        'year' => $year,
+        'workCalendar' => $workCalendar,
+        'antiquityDays' => $antiquityDays,
+        'additionalVacationDays' => $additionalVacationDays,
+     ]);
+  }
+
 }

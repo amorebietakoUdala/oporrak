@@ -1,30 +1,33 @@
 <div class="card">
-	<h5 class="card-title text-center">{{'title.summary' | trans }}&nbsp;<span data-summary-target="year"></span>
+	<h5 class="card-title text-center">{{'title.summary' | trans }}&nbsp;<span>{{ year | default('message.notDefined' | trans) }}</span>
 	</h5>
 	<div class="card-body">
 		<div>
 			<div>
-				{{'label.vacationDays' | trans }}<span data-summary-target="vacationDays"></span>&nbsp;{{'label.days' | trans }}
+				{{'label.vacationDays' | trans }}<span>{{ workCalendar.vacationDays is defined ? workCalendar.vacationDays ~ ' ' ~ 'label.days' | trans : 'message.notDefined' | trans }}</span>
 			</div>
 			<div>
-				{{'label.particularBusinessLeave' | trans }}<span
-					data-summary-target="particularBusinessLeave"></span>&nbsp;{{'label.days' | trans }}
+				{{'label.particularBusinessLeave' | trans }}<span>{{ workCalendar.particularBusinessLeave is defined ? workCalendar.particularBusinessLeave ~ ' ' ~ 'label.days' | trans : 'message.notDefined' | trans }}</span>
 			</div>
 			<div id="overtimeDaysSummaryRow">
-				{{'label.overtimeDays' | trans }}<span data-summary-target="overtimeDays"></span>&nbsp;{{'label.days' | trans }}
+				{{'label.overtimeDays' | trans }}<span>{{ workCalendar.overtimeDays is defined ? workCalendar.overtimeDays ~ ' ' ~ 'label.days' | trans : 'message.notDefined' | trans }}</span>
 			</div>
 			<div class="d-flex justify-content-start">
 				<div class="col-lg-6">
          		<h6 class="mt-1">{{'label.antiquityDays'|trans}}:</h6>
-					{% for antiquity in antiquityDays %}
-						<div class="col-lg-auto">{{ antiquity.yearsWorked }}&nbsp;{{'label.years' | trans }}&nbsp;{{ antiquity.vacationDays }}</div>
-					{% endfor %}
+					{% if antiquityDays is defined %}
+						{% for antiquity in antiquityDays %}
+							<div class="col-lg-auto">{{ antiquity.yearsWorked }}&nbsp;{{'label.years' | trans }}&nbsp;{{ antiquity.vacationDays }}</div>
+						{% endfor %}
+					{% endif %}
 				</div>
 				<div class="col-lg-6">
 					<h6 class="mt-1">{{'label.additionalVacationDays'|trans}}:</h6>
-					{% for additionalVacationDay in additionalVacationDays %}
-						<div class="col-lg-auto">{{ additionalVacationDay.yearsWorked }}&nbsp;{{'label.years' | trans }}&nbsp;{{ additionalVacationDay.vacationDays }}</div>
-					{% endfor %}
+					{% if antiquityDays is defined %}
+						{% for additionalVacationDay in additionalVacationDays %}
+							<div class="col-lg-auto">{{ additionalVacationDay.yearsWorked }}&nbsp;{{'label.years' | trans }}&nbsp;{{ additionalVacationDay.vacationDays }}</div>
+						{% endfor %}
+					{% endif %}
 				</div>
 			</div>
 		</div>

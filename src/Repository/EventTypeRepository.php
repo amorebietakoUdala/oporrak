@@ -18,4 +18,12 @@ class EventTypeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, EventType::class);
     }
+
+    public function findByOnlyForUnionDelegatesQB (bool $onlyForUnionDelegates)
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->andWhere('t.onlyForUnionDelegates <= :onlyForUnionDelegates')
+            ->setParameter('onlyForUnionDelegates', $onlyForUnionDelegates);
+        return $qb;
+    }
 }

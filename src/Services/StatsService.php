@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entity\Event;
+use App\Entity\EventType;
 use App\Entity\Status;
 use App\Entity\WorkCalendar;
 use App\Repository\AdditionalVacationDaysRepository;
@@ -64,9 +65,10 @@ class StatsService
     * 
     * @return array $counters
     */
-   public function calculateStatsByUserAndEventType(array $events, int $year, $formattedCounters = false) {
+   public function calculateStatsByUserAndEventType(array $events, int $year, $byHours, $formattedCounters = false) {
       $counters = [];
       $totalMinutesOfHalfDaysPerUser = [];
+      // Set unionHours as a type that is calculated in hours and not in days
       $wc = $this->wcRepo->findOneBy(['year' => $year]);
       foreach($events as $event) {
          $eventStartYear = $event->getStartDate()->format('Y');
@@ -80,14 +82,18 @@ class StatsService
          }
          $userId = "{$event->getUser()->getUsername()}";
          $typeId = "{$event->getType()->getId()}";
+         // Others in days
+         if ( !array_key_exists($typeId, $byHours) ) {
+            $byHours[$typeId] = false;
+         }
          /** If workingDays is less than 0, it's a halfday. So we don't sum to the fulldays until the end 
           *  This is needed to fix the total and remaining days of typeId = 2
          */
          if( $workingDays < 1) {
             if (array_key_exists($userId, $totalMinutesOfHalfDaysPerUser)) {
-               $totalMinutesOfHalfDaysPerUser[$userId] += $event->getEventTotalMinutes();
+               $totalMinutesOfHalfDaysPerUser[$userId][$event->getType()->getId()] += $event->getEventTotalMinutes();
             } else {
-               $totalMinutesOfHalfDaysPerUser[$userId] = $event->getEventTotalMinutes();
+               $totalMinutesOfHalfDaysPerUser[$userId][$event->getType()->getId()] = $event->getEventTotalMinutes();
             }
             $workingDays = 0;
          }
@@ -103,7 +109,7 @@ class StatsService
             }
          }
       }
-      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, 2, false);
+      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, $byHours);
       $this->calculateTotals($counters);
       if ($formattedCounters) {
          $counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $wc);
@@ -111,11 +117,22 @@ class StatsService
       return $counters;
    }
 
-   private function addTotalMinutesOfHalfDaysPerUserToCounters(array &$counters, $totalMinutesOfHalfDaysPerUser, $workCalendar, $typeId = 2, $fixRemaining = true): array {
+   private function addTotalMinutesOfHalfDaysPerUserToCounters(array &$counters, $totalMinutesOfHalfDaysPerUser, $workCalendar, array $byHours): array {
       foreach ($totalMinutesOfHalfDaysPerUser as $userId => $value) {
-         $counters[$userId][$typeId] += ( $value / $workCalendar->getTotalWorkingMinutes() );
-         if (array_key_exists('remaining', $counters[$userId])) {
-            $counters[$userId]['remaining'] -= ( $value / $workCalendar->getTotalWorkingMinutes() );
+         foreach ($value as $typeId => $value2) {
+            // If byHours key for typeId is true, we calculate the result in hours and not in days dividing by 60
+            if ( array_key_exists($typeId, $byHours) && $byHours[$typeId] == true) {
+               $counters[$userId][$typeId] += $value2 / 60;
+               if (array_key_exists('remaining', $counters[$userId])) {
+                  $counters[$userId]['remaining'] -= $value2 / 60;
+               }
+            // Otherwise, we calculate the result in days and not in hours dividing by the total working minutes of the day
+            } else {
+               $counters[$userId][$typeId] += ( $value2 / $workCalendar->getTotalWorkingMinutes() );
+               if (array_key_exists('remaining', $counters[$userId])) {
+                  $counters[$userId]['remaining'] -= ( $value2 / $workCalendar->getTotalWorkingMinutes() );
+               }
+            }
          }
       }
       return $counters;
@@ -153,11 +170,11 @@ class StatsService
          $user = $this->userRepo->findOneBy(['username' => $username]);
          if ($user !== null) {
             $counters[$username]['total'] = $user->calculateCurrentYearBaseDays($workCalendar, $year);
-            $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked());
+            $antiquityDays = $this->adRepo->findAntiquityDaysForYearsWorked($user->getYearsWorked(), $year);
             if ( null !== $antiquityDays ) {
                $counters[$username]['total'] = $counters[$username]['total'] + $antiquityDays->getVacationDays();
             }
-            $additionalVacationDays = $this->avdRepo->findAdditionalVacationDaysForYearsWorked($user->getYearsWorked());
+            $additionalVacationDays = $this->avdRepo->findAdditionalVacationDaysForYearsWorked($user->getYearsWorked(), $year);
             if ( null !== $additionalVacationDays ) {
                $counters[$username]['total'] = $counters[$username]['total'] + $additionalVacationDays->getVacationDays();
             }
@@ -167,9 +184,20 @@ class StatsService
 
    }
 
+   /**
+   * Calculates the stats of the events by user and status.
+   * 
+   * @param array $events The array of events to calculate the stats.
+   * @param int $year The year to calculate the stats.
+   * @param array $usernames The array of usernames to calculate the stats.
+   */
    public function calculateStatsByUserAndStatus(array $events, int $year, array $usernames) {
       $counters = $this->calculateTotalsForUsernamesAndYear($usernames,$year);
       $totalMinutesOfHalfDaysPerUser = [];
+      // We set which types are calculated in hours and not in days. In this case we need all types in hours, so we set UNION_HOURS to false.
+      $byHours = [
+         EventType::UNION_HOURS => false,
+      ];
       foreach($events as $event) {
          $workCalendars = [];
          $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);
@@ -181,14 +209,17 @@ class StatsService
          }
          $statusId = "{$event->getStatus()->getId()}";
          $username = "{$event->getUser()->getUsername()}";
+         if ( !array_key_exists($statusId, $byHours) ) {
+            $byHours[$statusId] = false;
+         }
          /** If workingDays is less than 0, it's a halfday. So we don't sum to the fulldays until the end 
-          *  This is needed to fix the total and remaining days of typeId = 2
+          *  This is needed to fix the total and remaining days of typeId = 2 and typeId = 6
          */
          if( $workingDays < 1) {
             if (array_key_exists($username, $totalMinutesOfHalfDaysPerUser)) {
-               $totalMinutesOfHalfDaysPerUser[$username] += $event->getEventTotalMinutes();
+               $totalMinutesOfHalfDaysPerUser[$username][$statusId] += $event->getEventTotalMinutes();
             } else {
-               $totalMinutesOfHalfDaysPerUser[$username] = $event->getEventTotalMinutes();
+               $totalMinutesOfHalfDaysPerUser[$username][$statusId] = $event->getEventTotalMinutes();
             }
             $workingDays = 0;
          }
@@ -212,45 +243,17 @@ class StatsService
          }
       }
       $wc = $this->wcRepo->findOneBy(['year' => $year]);
-      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, 2, true);
+      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, $byHours);
       return $counters;
    }
 
-   public function calculateStatsByUser(array $events, int $year) {
-      $counters = [];
-      $totalMinutesOfHalfDaysPerUser = [];
-      foreach($events as $event) {
-         $workCalendars = [];
-         $workCalendars[$year] = $this->wcRepo->findOneBy(['year' => $year]);          
-         $workCalendars[$year-1] = $this->wcRepo->findOneBy(['year' => $year-1]);
-         if ( !$event->getUsePreviousYearDays() ) {
-            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year]);
-         } else {
-            $workingDays = $this->calculateWorkingDays($event, $workCalendars[$year-1]);
-         }
-         $userId = "{$event->getUser()->getUsername()}";
-         /** If workingDays is less than 0, it's a halfday. So we don't sum to the fulldays until the end 
-          *  This is needed to fix the total and remaining days of typeId = 2
-         */
-         if( $workingDays < 1) {
-            if (array_key_exists($userId, $totalMinutesOfHalfDaysPerUser)) {
-               $totalMinutesOfHalfDaysPerUser[$userId] += $event->getEventTotalMinutes();
-            } else {
-               $totalMinutesOfHalfDaysPerUser[$userId] = $event->getEventTotalMinutes();
-            }
-            $workingDays = 0;
-         }
-         if ( array_key_exists($userId, $counters) ) {
-               $counters[$userId] = $counters[$userId] + $workingDays;
-         } else {
-            $counters[$userId] = $workingDays;
-         }
-      }
-      $wc = $this->wcRepo->findOneBy(['year' => $year]);
-      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, 2, true);
-      return $counters;
-   }
-
+   /**
+    * Calculates the working days of an event. Checks if the event is has holidays and weekends in between.
+    * @param Event $event The event to calculate the working days.
+    * @param WorkCalendar $workCalendar The work calendar to be used to calculate the working days.
+    *
+    * @return float|int The working days of the event.
+    */
    public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar) {
        if (!$event->getHalfDay()) {
            $holidays = $this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate());
@@ -279,10 +282,14 @@ class StatsService
            return $workingDays;
        } else {
             return $event->getEventTotalMinutes() / $workCalendar->getTotalWorkingMinutes();
-//           return $workingDays = $event->getHoursDecimal() / $workCalendar->getWorkingHoursDecimal();
        }
    }
 
+   /**
+    * Calculates the number of holidays that fall on working days.
+    * 
+    * @param array $holidays The array of holidays to be checked.
+    */
    private function calculateHolidaysOnWorkingDays($holidays) {
       $holidaysOnWorkingDays = 0;
       foreach ($holidays as $holiday) {
@@ -305,6 +312,13 @@ class StatsService
       return $formattedCounters;
    }
 
+   /**
+    * Returns the stats array formatted as days, hours and minutes.
+    * @param array $stats The stats array to be formatted. Stats must be in days (float value).
+    * @param WorkCalendar $workCalendar The work calendar to be used to calculate the stats.
+    *
+    * @return array
+    */
    public function formatStatsAsDaysHoursAndMinutes(array $stats, WorkCalendar $workCalendar): array {
       $newStats  = [];
       foreach ($stats as $key => $value) {
@@ -316,7 +330,12 @@ class StatsService
       }
       return $newStats;
    }
-
+   /** 
+    * Calculates the total of each user in the counters array. And adds it as a new key 'total' to each user in the received array.
+    * @param array $counters The array of counters to calculate the totals.
+    *
+    * @return void Changes the received array by reference.
+    */
    private function calculateTotals(array &$counters) {
       $total = 0;
       foreach ($counters as $key => $typeValue) {
