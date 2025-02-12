@@ -31,7 +31,7 @@ parameters:
   contactEmail: '%env(CONTACT_EMAIL)%'
   departmentDefault: '%env(DEPARTMENT_DEFAULT)%'
   contactEmailDefault: '%env(CONTACT_EMAIL_DEFAULT)%'
-  unionHours: 20
+  unionHours: 35
 
 services:
   Symfony\Component\Ldap\Ldap:
