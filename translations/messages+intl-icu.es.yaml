@@ -25,6 +25,7 @@ user.yearsWorked: "años trabajados"
 user.startDate: "fecha de alta"
 user.endDate: "fecha de baja"
 user.extraDays: "Días extra"
+user.unionDelegate: "Delegado sindical"
 
 
 messages.confirmacion: "Confirmación"
@@ -146,7 +147,9 @@ Exceso jornada/Gehiegizko lanaldia: "Exceso jornada"
 Días antigüedad/Antzinatasun egunak: "Días antigüedad"
 Vacaciones Adicionales/Opor egun gehigarriak: "Vacaciones adicionales por antigüedad"
 Otros/Besteren bat: "Otros"
+Horas sindicales/Ordu sindikalak: "Horas sindicales"
 label.additionalVacationDays: "Vacaciones adicionales por antigüedad"
+label.unionHours: "Horas sindicales"
 
 #Placeholders
 placeholder.choose: "Elije una opción"
@@ -182,10 +185,9 @@ antiquityDays.vacationDays: "Días de vacaciones"
 antiquityDays.yearsWorked: "Años trabajados"
 eventType.descriptionEs: "Descripción (Es)"
 eventType.descriptionEu: "Descripción (Eu)"
+eventType.onlyForUnionDelegates: "Sólo para delegados sindicales"
 additionalVacationDays.vacationDays: "Días de vacaciones"
 additionalVacationDays.yearsWorked: "Años trabajados"
-
-
 
 Approved: "Aprobados"
 Reserved: "Solicitados"
@@ -234,13 +236,15 @@ message.daysForApproval: "Tiene { daysForApproval } días para aceptar o rechaza
 message.addAdditionalVacationDaysOnlyAfter2023: "No se pueden pedir vacaciones en este concepto antes de 2024"
 message.workCalendarNotDefined: "El calendario del año { year } no está definido no se pueden pedir vacaciones en ese año mientras no esté definido"
 message.noStatsAvailable: "Estadísticas no disponibles para ese año. Revise que haya un calendario laboral definido para dicho año"
-message.daysExcess: >-
-    {days, select,
-        0   {{hours}:{minutes} horas}
-        other   {{days} días y {hours}:{minutes} horas}
-    }
 message.days: >- 
     {days, select,
         1 {{days} día}
         other {{days} días}
     }
+message.notDefined: "No definido"
+message.workcalendarNotFound: "No se ha definidoel calendario laboral para el año { year }, por lo tanto se pueden calcular los días restantes"
+message.notUnionDelegate: "No es delegado sindical. Sólo pueden pedir horas sindicales los delegados sindicales."
+message.notHalfDay: "Las horas sindicales no pueden ser días completos, sólo parte de un día."
+message.unionHoursNotWithPreviousYearDays: "Las horas sindicales no se pueden solicitar con días del año pasado."
+message.unionDaysExceededBy: "Las horas sindicales solicitadas exceden en { hours } las disponibles este mes"
+message.tooMuchUnionHoursInADay: "No se pueden solicitar más de { hours } horas sindicales de una vez"

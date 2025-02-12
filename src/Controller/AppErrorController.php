@@ -39,7 +39,6 @@ class AppErrorController extends AbstractController {
         } else {
             $template = "@Twig\\Exception\\error.html.twig";
         }
-        // dd($template, $parameters);
         return $this->render($template, $parameters);        
     }
 }

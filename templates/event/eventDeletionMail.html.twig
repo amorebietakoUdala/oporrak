@@ -19,7 +19,7 @@
 					{{event.type.descriptionEu}}
 				{% endif %}
 				{% if event.halfday %}
-					&nbsp;({{ event.hours | number_format(2, ',', '.') }}&nbsp;{{ 'mail.hours' | trans }})
+					&nbsp;({{ event.hours }}:{{ event.minutes | str_pad(2, '0') }}&nbsp;{{ 'mail.hours' | trans | lower }})
 				{% endif %}
 			</div>
 			<div>{{ 'deleted' | trans}}</div>

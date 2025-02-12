@@ -40,7 +40,7 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
         $qb = $this->andWhereStartDateGTE($qb, $startDate);
-        $qb = $this->andWhereEndDateLT($qb, $endDate);
+        $qb = $this->andWhereEndDateLTE($qb, $endDate);
         $qb = $this->andWhereUser($qb, $user);
         if ($onlyHalfDays) {
             $qb = $this->andWhereHalfDaysEqual($qb, $onlyHalfDays);
@@ -70,7 +70,7 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->andWhereUser($qb, $user);
         $qb = $this->andWhereStartDateGTE($qb, $startDate);
         if (null !== $endDate) {
-            $qb = $this->andWhereEndDateLT($qb, $endDate);
+            $qb = $this->andWhereEndDateLTE($qb, $endDate);
         }
         $qb = $this->andWhereActivated($qb, $activated);
         $qb = $this->orderByIdAsc($qb);
@@ -263,7 +263,7 @@ class EventRepository extends ServiceEntityRepository
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
         $qb = $this->andWhereStartDateGTE($qb, $startDate);
         if (null !== $endDate) {
-            $qb = $this->andWhereEndDateLT($qb, $endDate);
+            $qb = $this->andWhereEndDateLTE($qb, $endDate);
         }
         if (null !== $status) {
             $qb = $this->andWhereStatusEqual($qb, $status);
@@ -292,7 +292,7 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->andWhereStatusEqual($qb, $status);
         $qb = $this->andWhereActivated($qb, $activated);
         if (null !== $endDate) {
-            $qb = $this->andWhereEndDateLT($qb, $endDate);
+            $qb = $this->andWhereEndDateLTE($qb, $endDate);
         }
         $qb = $this->orderByIdAsc($qb);
         ;
@@ -365,7 +365,7 @@ class EventRepository extends ServiceEntityRepository
             $qb = $this->andWhereStartDateGTE($qb, $startDate);
         }
         if ( null !== $endDate ) {
-            $qb = $this->andWhereEndDateLT($qb, $endDate);
+            $qb = $this->andWhereEndDateLTE($qb, $endDate);
         }
         $qb = $this->andWhereStatusEqual($qb, Status::APPROVED);
         $qb = $this->andWhereActivated($qb, $activated);
@@ -459,8 +459,8 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('startingDate', $startingDate);
     }
 
-    private function andWhereEndDateLT(QueryBuilder $qb, DateTime $endDate): QueryBuilder {
-        return $qb->andWhere('e.endDate >= :endDate')
+    private function andWhereEndDateLTE(QueryBuilder $qb, DateTime $endDate): QueryBuilder {
+        return $qb->andWhere('e.endDate <= :endDate')
             ->setParameter('endDate', $endDate);
     }
 

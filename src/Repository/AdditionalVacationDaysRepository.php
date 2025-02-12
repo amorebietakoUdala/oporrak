@@ -24,7 +24,7 @@ class AdditionalVacationDaysRepository extends ServiceEntityRepository
      * 
      * @return AdditionalVacationDays Returns an AdditionalVacationDays object for the yearsWorked parameter
      */
-    public function findAdditionalVacationDaysForYearsWorked(?int $yearWorked) {
+    public function findAdditionalVacationDaysForYearsWorked(?int $yearWorked): ?AdditionalVacationDays {
         if ( $yearWorked === null ) {
             return null;
         }

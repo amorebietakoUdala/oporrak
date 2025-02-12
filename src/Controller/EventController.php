@@ -42,7 +42,8 @@ class EventController extends AbstractController
         private readonly EntityManagerInterface $em, 
         private readonly AdditionalVacationDaysRepository $avdRepo, 
         private readonly DaysFormattingService $daysFormattingService,
-        private readonly int $daysForApproval = 15
+        private readonly int $daysForApproval = 15,
+        private readonly int $unionHours = 20,
         )
     {
     }
@@ -120,10 +121,13 @@ class EventController extends AbstractController
     public function edit(Event $event, Request $request): Response
     {
         $isCityHallReferer = $this->isRefererCityHallCalendar($request);
+        /** @var User $user */
+        $user = $this->getUser();
         $form = $this->createForm(EventFormType::class, $event, [
             'locale' => $request->getLocale(),
             'hhrr' => $this->isGranted('ROLE_HHRR'),
             'edit' => true,
+            'unionDelegate' => $user->isUnionDelegate(),
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -209,10 +213,13 @@ class EventController extends AbstractController
     {
         $isCityHallReferer = $this->isRefererCityHallCalendar($request);
         //$event = new Event();
+        /** @var User $user */
+        $user = $this->getUser();
         $form = $this->createForm(EventFormType::class, null, [
             'days' => $this->getParameter('days'),
             'locale' => $request->getLocale(),
             'hhrr' => $this->isGranted('ROLE_HHRR') && $isCityHallReferer,
+            'unionDelegate' => $user->isUnionDelegate(),
         ]);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -306,15 +313,38 @@ class EventController extends AbstractController
             $this->addFlash('error', 'message.partitionableDaysOneByOne');
             return false;
         }
-        if ($event->getType()->getId() !== EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getHalfDay()) {
-            
+
+        if ($event->getType()->getId() === EventType::UNION_HOURS && $user->isUnionDelegate() == false) {
+            $this->addFlash('error', $this->translator->trans('message.notUnionDelegate'));
+            return false;
+        }
+
+        if ($event->getType()->getId() === EventType::UNION_HOURS && !$event->getHalfDay()) {
+            $this->addFlash('error', $this->translator->trans('message.notHalfDay'));
+            return false;
+        }
+
+        if ($event->getType()->getId() === EventType::UNION_HOURS && $event->getUsePreviousYearDays()) {
+            $this->addFlash('error', $this->translator->trans('message.unionHoursNotWithPreviousYearDays'));
+            return false;
+        }
+
+        if ( $event->getType()->getId() === EventType::UNION_HOURS &&  $event->getHalfDay() && $event->getHoursDecimal() > $this->unionHours ) {
+            $this->addFlash('error', $this->translator->trans('message.tooMuchUnionHoursInADay', [
+                'hours' => $this->unionHours,
+            ]));
+            return false;
+        }
+
+        if ( ($event->getType()->getId() !== EventType::PARTICULAR_BUSSINESS_LEAVE && $event->getType()->getId() !== EventType::UNION_HOURS) &&    
+              $event->getHalfDay()) {
             $this->addFlash('error', $this->translator->trans('message.partitionableDaysType', [
                 'hours' => $workCalendar->getPartitionableHoursAsHoursAndMinutes(),
                 'year' => $this->getEffectiveYear($event),
             ]));
             return false;
         }
-        if ($event->getHalfDay() && ($event->getHours() < 2 || $event->getHoursDecimal() > $workCalendar->getWorkingHoursDecimal() / 2)) {
+        if ( $event->getType()->getId() === EventType::PARTICULAR_BUSSINESS_LEAVE &&  ( $event->getHalfDay() && ($event->getHours() < 2 || $event->getHoursDecimal() > $workCalendar->getWorkingHoursDecimal() / 2)) ) {
             $this->addFlash('error', $this->translator->trans('message.partitionableHoursMinAndMax', [
                 'min' => "2",
                 'maxHours' => floor($workCalendar->getWorkingHours() / 2),
@@ -376,6 +406,10 @@ class EventController extends AbstractController
         return false;
     }
 
+    /**
+     * Persist a valid event and renders the success response.
+     * Sends eventApprovalMail to the boss if it's needed.
+     */
     private function renderSuccess($event, $boss, $ajax = false, $sendMail = true)
     {
         $this->em->persist($event);
@@ -389,7 +423,10 @@ class EventController extends AbstractController
             ]);
             if ($sendMail) {
                 $user = $event->getUser();
-                $subject = "{$user->getUsername()}-en opor eskaera / Solicitud de vacaciones de {$user->getUsername()}";
+                $type = $event->getType();
+                $descriptionEu = ucfirst(mb_strtolower($type->getDescriptionEu()));
+                $descriptionEs = ucfirst(mb_strtolower($type->getDescriptionEs()));
+                $subject = "{$user->getUsername()}-en eskaera: $descriptionEu/ Solicitud de {$user->getUsername()}: $descriptionEs";
                 $this->sendEmail($boss->getEmail(), $subject, $html, false);
             }
         }
@@ -401,13 +438,20 @@ class EventController extends AbstractController
     }
 
     /**
-     * Returns true if it doesn't excess the maximum days, for that type and work calendar
+     * Returns true if it doesn't excess the maximum days, for that type and work calendar.
+     * Checks if saving this event for that user, doesn't exceed the maximum days for the type of event and work calendar.
+     * 
+     * @param User $user
+     * @param Event $event	
+     * @param WorkCalendar $workCalendar
+     * 
+     * @return bool
      */
     private function checkDoesNotExcessMaximumDaysForType(User $user, Event $event, WorkCalendar $workCalendar): bool
     {
         # If uses previousYearDays, we have to check if exceedes the maximum days of the previous year, not current. So we take effective year of the event.
         $year = $this->getEffectiveYear($event);
-        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo, $year);
+        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo, $year, $this->unionHours);
         $valid = true;
         $maxDays = $totals[$event->getType()->getId()];
         $valid = $this->checkDoesNotExcessMaximumDays($user, $event, $maxDays, $year, $workCalendar);
@@ -437,6 +481,10 @@ class EventController extends AbstractController
     private function checkDoesNotExcessMaximumDays(User $user, Event $event, $maxDays, $year, WorkCalendar $workCalendar): bool
     {
         if (null !== $maxDays) {
+            // If it's union delegate and asking for union hours, we have to check if doesn't exceed the maximum hours per month
+            if ($user->isUnionDelegate() && $event->getType()->getId() === EventType::UNION_HOURS) {
+                return $this->checkDoesNotExcessUnionHourPerMonth($user, $event);
+            }
             $eventsThisYear = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year, $event->getType(),false);
             $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
             if ($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) > $maxDays) {
@@ -513,5 +561,55 @@ class EventController extends AbstractController
             $user = $event->getUser();
         }
         return $user;
+    }
+
+    private function lastDayOfTheMonth($date) {
+        return date("Y-m-t", strtotime($date));
+    }
+
+    private function calculateTotalMinutes($events) {
+        $totalMinutes = 0;
+        foreach ($events as $event) {
+            $totalMinutes += $event->getEventTotalMinutes();
+        }
+        return $totalMinutes;
+    }
+
+    /**
+     * Check if exceedes maximum hours per month for union delegate.
+     * 
+     * Returns TRUE if it doesn't exceed the maximum hours per month. FALSE if it exceeds.
+     * 
+     * @param User $user
+     * @param Event $event
+     * 
+     * @return bool
+     */
+    private function checkDoesNotExcessUnionHourPerMonth($user, $event): bool {
+        if ($user->isUnionDelegate() && $event->getType()->getId() === EventType::UNION_HOURS) {
+            // find event start date of the month
+            $eventMonthStartDate = new DateTime(($event->getStartDate())->format('Y-m-01'));
+            $eventMonthEndDate = new DateTime($this->lastDayOfTheMonth($event->getStartDate()->format('Y-m-d')));
+            $eventMonthEndDate->add(new \DateInterval('P1D'));
+            // find all half days of the month
+            $events = $this->eventRepo->findUserEventsBeetweenDatesAndType($user, $eventMonthStartDate, $eventMonthEndDate, $event->getType(), true, true);
+            $totalMinutes = $this->calculateTotalMinutes($events);
+            // Check is exceedes the maximum hours
+            if ($totalMinutes + $event->getEventTotalMinutes() > $this->unionHours * 60) {
+                $excess = $totalMinutes + $event->getEventTotalMinutes() - $this->unionHours * 60;
+                $excessHours = intval($excess / 60);
+                $excessMinutes = $excess % 60;
+                $formattedExcess = $this->daysFormattingService->formatDaysHoursAndMinutes([
+                    'days' => 0,
+                    'hours' => $excessHours,
+                    'minutes' => $excessMinutes,
+                ]);
+                $this->addFlash('error', $this->translator->trans('message.unionDaysExceededBy', [
+                    'hours' => $formattedExcess,
+                ]));
+                return false;
+            }
+            return true;
+        }
     }
 }

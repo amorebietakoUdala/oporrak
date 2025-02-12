@@ -72,6 +72,9 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     #[ORM\Column(type: 'integer', nullable: true)]
     private $extraDays = 0;
 
+    #[ORM\Column(nullable: true, options: ["default" => 0])]
+    private ?bool $unionDelegate = false;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
@@ -285,15 +288,18 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return false;
     }
 
-    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo, AdditionalVacationDaysRepository $avdRepo, int $year ): array {
-        $additionalVacationDays = $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked) !== null ? $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0;
+    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo, AdditionalVacationDaysRepository $avdRepo, int $year, $unionHours ): array {
+        $currentYear = intval((new \DateTime())->format('Y'));
+        $diffedYears = $currentYear - $year;
+        $additionalVacationDays = $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked - $diffedYears) !== null ? $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked - $diffedYears)->getVacationDays() : 0;
         if ( $this->isThisYearWorkingAllDays($year) ) {
             $totals = [
                 EventType::VACATION => $workCalendar->getVacationDays(),
                 EventType::PARTICULAR_BUSSINESS_LEAVE => $workCalendar->getParticularBusinessLeave(),
                 EventType::OVERTIME => $workCalendar->getOvertimeDays() + $this->getExtraDays(),
-                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
+                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears)->getVacationDays() : 0,
                 EventType::ADDITONAL_VACATION_DAYS => $additionalVacationDays,
+                EventType::UNION_HOURS => $this->isUnionDelegate() ? $unionHours * $this->calculateWorkingMonthsThisYear($year) : 0,
              ];
         } else {
             $totals = [
@@ -301,10 +307,42 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
                 EventType::VACATION => $this->calculateCurrentYearBaseDays($workCalendar, $year) - 2,
                 EventType::PARTICULAR_BUSSINESS_LEAVE => 2,
                 EventType::OVERTIME => 0,
-                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked)->getVacationDays() : 0,
+                EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears)->getVacationDays() : 0,
                 EventType::ADDITONAL_VACATION_DAYS => $additionalVacationDays,
+                EventType::UNION_HOURS => $this->isUnionDelegate() ? $unionHours * $this->calculateWorkingMonthsThisYear($year) : 0
              ];
         }
         return $totals;
+    }
+
+    private function calculateWorkingMonthsThisYear(int $year): int {
+        if ( $this->isThisYearFirst($year) && $this->isThisYearLAst($year)) {
+            $interval = $this->startDate->diff($this->endDate);
+            return $interval->y * 12 + $interval->m;
+        }
+        if ( $this->isThisYearFirst($year) ) {
+            $nextYear = $year + 1;
+            $firstDayOfTheNextYear = new \DateTime("$nextYear-01-01");
+            $interval = $this->startDate->diff($firstDayOfTheNextYear);
+            return $interval->y * 12 + $interval->m;
+        }
+        if ( $this->isThisYearLast($year) ) {
+            $firstDayOfTheYear = new \DateTime("$year-01-01");
+            $interval = $firstDayOfTheYear->diff($this->endDate);
+            return $interval->y * 12 + $interval->m;
+        }
+        return 12;
+    }
+
+    public function isUnionDelegate(): ?bool
+    {
+        return $this->unionDelegate;
+    }
+
+    public function setUnionDelegate(?bool $unionDelegate): static
+    {
+        $this->unionDelegate = $unionDelegate;
+
+        return $this;
     }
 }

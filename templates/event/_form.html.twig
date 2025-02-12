@@ -2,7 +2,10 @@
 	{{ include('common/_messages.html.twig') }}
 {% endblock %}
 
-<div {{ stimulus_controller('event-form',{ 'locale': app.request.locale|split('_')[0], } ) }}>
+<div {{ stimulus_controller('event-form',{ 
+        'locale': app.request.locale|split('_')[0], 
+        'unionHoursType': constant('App\\Entity\\EventType::UNION_HOURS') , 
+     } ) }}>
 	{{ form_start(form) }}
 		{% if is_granted("ROLE_HHRR") and hhrr %}
             <div class="row align-items-center mb-1">
@@ -19,7 +22,7 @@
             </div>
         {% endif %}
         <div class="row align-items-center mb-1">
-            <div class="col-lg col-md col-sm">
+            <div class="col-lg col-md col-sm" data-action="change->event-form#onTypeChange">
                 {{ form_row(form.type, { 'attr': 
                     { 'class' : 'form-input form-input-md' }
                 }) }}
@@ -38,8 +41,8 @@
             </div>
         </div>
         <div class="row align-items-center">
-            <div class="col-lg col-md col-sm">
-                {{ form_row(form.halfday) }}
+            <div class="col-lg col-md col-sm" data-action="click->event-form#onHalfDayClick">
+                {{ form_row(form.halfday, { 'attr' : { 'data-event-form-target': 'halfDay'}}) }}
             </div>
 		</div>
         <div class="row">

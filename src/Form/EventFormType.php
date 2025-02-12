@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\EventType;
 use App\Entity\Status;
 use App\Entity\User;
+use App\Repository\EventTypeRepository;
 use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -30,11 +31,15 @@ class EventFormType extends AbstractType
         $locale = $options['locale'];
         $hhrr = $options['hhrr'] ?? false;
         $edit = $options['edit'] ?? false;
+        $unionDelegate = $options['unionDelegate'] ?? false;
         $builder
             ->add('id', HiddenType::class)
             ->add('type', EntityType::class, [
                 'class' => EventType::class,
                 'label' => 'event.type',
+                'query_builder' => function(EventTypeRepository $er) use ($unionDelegate) {
+                    return $er->findByOnlyForUnionDelegatesQB($unionDelegate);
+                },
                 'choice_label' => function ($type) use ($locale) {
                     if ('es' === $locale) {
                         return $type->getDescriptionEs();
@@ -124,6 +129,7 @@ class EventFormType extends AbstractType
             'locale' => 'eu',
             'hhrr' => false,
             'edit' => false,
+            'unionDelegate' => false,
         ]);
     }
 }

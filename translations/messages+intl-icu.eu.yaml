@@ -23,6 +23,7 @@ user.new_password: "Pasahitz berria"
 user.repeat_new_password: "Errepikatu pasahitz berria"
 user.yearsWorked: "Lan egindako urteak"
 user.extraDays: "Egun gehigarriak"
+user.unionDelegate: "Delegatu sindikala"
 
 messages.confirmacion: "Konfirmazioa"
 messages.confirmationDetail: "¿Ziur al zaude erregistroa ezabatu nahi duzula?"
@@ -142,7 +143,9 @@ Exceso jornada/Gehiegizko lanaldia: "Gehiegizko lanaldia"
 Días antigüedad/Antzinatasun egunak: "Antzinatasun egunak"
 Vacaciones Adicionales/Opor egun gehigarriak: "Antzinatasunagatiko opor egun gehigarriak"
 Otros/Besteren bat: "Besteren bat"
+Horas sindicales/Ordu sindikalak: "Ordu sindikalak"
 label.additionalVacationDays: "Antzinatasunagatiko opor egun gehigarriak"
+label.unionHours: "Ordu sindikalak"
 
 #Placeholders
 placeholder.choose: "Hautatu aukeraren bat"
@@ -181,9 +184,9 @@ antiquityDays.vacationDays: "Opor egunak"
 antiquityDays.yearsWorked: "Lan egindako urteak"
 eventType.descriptionEs: "Deskripzioa (Es)"
 eventType.descriptionEu: "Deskripzioa (Eu)"
+eventType.onlyForUnionDelegates: "Delegatu sindikalentzako bakarrik"
 additionalVacationDays.vacationDays: "Opor egunak"
 additionalVacationDays.yearsWorked: "Lan egindako urteak"
-
 
 Approved: "Onartuak"
 Reserved: "Eskatuak"
@@ -236,3 +239,10 @@ message.days: >-
         1 {egun {days}}
         other {{days} egun}
     }
+message.notDefined: "Definitu barik"
+message.workcalendarNotFound: "{ year }. urteko lan egutegia ez da definitu, beraz, izan dira kalkulatu geratzen zaizkizun egunak"
+message.notUnionDelegate: "Ez da delegatu sindakala. Bakarrik delegatu sindikalek eskatu ahal dituzte ordu sindikalak."
+message.notHalfDay: "Ordu sindikalak egun zatiak izan behar dira eta ez egun osoak."
+message.unionHoursNotWithPreviousYearDays: "Ordu sindikalak ezin dira eskatu pasa den urteko egunekin."
+message.unionDaysExceededBy: "Eskatutako ordu sindikalek { hours } ordutan gainditzen dute hilabete honetako maximoa"
+message.tooMuchUnionHoursInADay: "Ezin dira { hours } ordu sindikal baina gehiago eskatu"

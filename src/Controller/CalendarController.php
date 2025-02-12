@@ -55,19 +55,24 @@ class CalendarController extends AbstractController
         if (null === $year) {
             $year = (new \DateTime())->format('Y');
         }
+        /** @var User $user */
+        $user = $this->getUser();
         $form = $this->createForm(EventFormType::class, $event, [
             'days' => $this->getParameter('days'),
             'locale' => $request->getLocale(),
+            'unionDelegate' => $user->isUnionDelegate(),
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();
         $additionalVacationDays = $this->avdRepo->findAll();
+        $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
         return $this->render('calendar/personal.html.twig', [
             'form' => $form,
             'holidaysColor' => $this->getParameter('holidaysColor'),
             'year' => $year,
             'statuses' => $statuses,
             'days' => $this->getParameter('days'),
+            'workCalendar' => $workCalendar,
             'antiquityDays' => $antiquityDays,
             'additionalVacationDays' => $additionalVacationDays,
         ]);
@@ -94,13 +99,18 @@ class CalendarController extends AbstractController
         if (null === $year) {
             $year = (new \DateTime())->format('Y');
         }
-        $form = $this->createForm(EventFormType::class, $event);
+        /** @var User $user */
+        $user = $this->getUser();
+        $form = $this->createForm(EventFormType::class, $event,[
+            'unionDelegate' => $user->isUnionDelegate(),
+        ]);
         $userFilterForm = $this->createForm(UserFilterType::class, [
             'locale' => $request->getLocale(),
             'showDepartment' => $showDepartment,
             'department' => $department,
             'isGrantedHHRR' => $this->security->isGranted('ROLE_HHRR'),
             'isGrantedAdmin' => $this->security->isGranted('ROLE_ADMIN'),
+
         ]);
         $statuses = $this->statusRepo->findAll();
         $antiquityDays = $this->adRepo->findAll();
@@ -132,7 +142,8 @@ class CalendarController extends AbstractController
             $year = (new \DateTime())->format('Y');
         }
         $stats = $this->calculateStats($year, $locale);
-        return $this->render('calendar/_legend.html.twig', [
+
+        return $this->render('calendar/_stats.html.twig', [
             'stats' => $stats,
         ]);
     }
@@ -182,4 +193,13 @@ class CalendarController extends AbstractController
         return $stats;
     }
 
+    // #[Route(path: '/{_locale}/summary', name: 'api_getWorkCalendar', methods: 'GET')]
+    // public function summary(Request $request)
+    // {
+    //    $year = $request->get('year');
+    //    $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
+    //    $antiquityDays = $this->adRepo->findAll();
+    //    $additionalVacationDays = $this->avdRepo->findAll();
+    //    return $this->json($workCalendar, 200, [],);
+    // }
 }

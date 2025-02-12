@@ -9,6 +9,7 @@ use App\Entity\Department;
 use App\Repository\DepartmentRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -83,6 +84,14 @@ class UserType extends BaseUserType
                     new PositiveOrZero()
                 ],
                 'empty_data' => '0',
+                'disabled' => $options['readonly'],
+            ])
+            ->add('unionDelegate', CheckboxType::class,[
+                'label' => 'user.unionDelegate',
+                'required' => false,
+                'label_attr' => [
+                    'class' => 'checkbox-inline',
+                ],                
                 'disabled' => $options['readonly'],
             ])
         ;

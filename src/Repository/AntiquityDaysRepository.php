@@ -24,7 +24,7 @@ class AntiquityDaysRepository extends ServiceEntityRepository
      * 
      * @return AntiquityDays Returns an AntiquityDays object for the yearsWorked parameter
      */
-    public function findAntiquityDaysForYearsWorked(?int $yearWorked) {
+    public function findAntiquityDaysForYearsWorked(?int $yearWorked): ?AntiquityDays {
         if ( $yearWorked === null ) {
             return null;
         }
