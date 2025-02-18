@@ -80,9 +80,9 @@ class UserType extends BaseUserType
             ])
             ->add('extraDays', IntegerType::class,[
                 'label' => 'user.extraDays',
-                'constraints' => [
-                    new PositiveOrZero()
-                ],
+                // 'constraints' => [
+                //     new PositiveOrZero()
+                // ],
                 'empty_data' => '0',
                 'disabled' => $options['readonly'],
             ])
