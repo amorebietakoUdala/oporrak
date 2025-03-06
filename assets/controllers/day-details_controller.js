@@ -57,8 +57,9 @@ export default class extends Controller {
                 if (element.status !== null) {
                     content += '<span>&nbsp;-&nbsp;' + element.status + '</span>';
                     if (element.startHalfDay === true) {
+                        let hours = element.hours ?? 0;
                         let minutes = String(element.minutes ?? 0).padStart(2, '0');
-                        content += " (" + element.hours+":"+ minutes + " " + Translator.trans('label.hours', null, 'messages', global.locale) +")";
+                        content += " (" + hours +":"+ minutes + " " + Translator.trans('label.hours', null, 'messages', global.locale) +")";
                 }
                     let params = new URLSearchParams({
                         return: document.location.href,
