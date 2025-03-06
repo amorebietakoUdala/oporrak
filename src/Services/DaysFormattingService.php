@@ -78,8 +78,8 @@ class DaysFormattingService
          'days' => $daysHoursMinutes['days'],
       ]);
       $hoursLabel = $this->translator->trans('label.hours');
-      $padedHours = mb_str_pad($daysHoursMinutes['hours'],2,0,STR_PAD_LEFT);
-      $padedMinutes = mb_str_pad($daysHoursMinutes['minutes'],2,0,STR_PAD_LEFT);
+      $padedHours = mb_str_pad($daysHoursMinutes['hours'] ?? 0,2,0,STR_PAD_LEFT);
+      $padedMinutes = mb_str_pad($daysHoursMinutes['minutes'] ?? 0,2,0,STR_PAD_LEFT);
       if ($daysHoursMinutes['hours'] !== null && $daysHoursMinutes['hours'] !== 0 || $daysHoursMinutes['minutes'] !== null && $daysHoursMinutes['minutes'] !== 0) {
          if ($daysHoursMinutes['days'] !== null && $daysHoursMinutes['days'] === 0 ) {
             $formattedString = '';

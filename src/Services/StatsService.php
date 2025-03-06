@@ -217,7 +217,11 @@ class StatsService
          */
          if( $workingDays < 1) {
             if (array_key_exists($username, $totalMinutesOfHalfDaysPerUser)) {
-               $totalMinutesOfHalfDaysPerUser[$username][$statusId] += $event->getEventTotalMinutes();
+               if (array_key_exists($statusId, $totalMinutesOfHalfDaysPerUser)) {
+                  $totalMinutesOfHalfDaysPerUser[$username][$statusId] += $event->getEventTotalMinutes();
+               } else {
+                  $totalMinutesOfHalfDaysPerUser[$username][$statusId] = $event->getEventTotalMinutes();
+               }
             } else {
                $totalMinutesOfHalfDaysPerUser[$username][$statusId] = $event->getEventTotalMinutes();
             }

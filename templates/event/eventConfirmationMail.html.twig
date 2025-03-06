@@ -18,7 +18,7 @@
 					{{event.type.descriptionEu}}
 				{% endif %}
 				{% if event.halfday %}
-					&nbsp;({{ event.hours }}:{{ event.minutes | str_pad(2, '0') }}&nbsp;{{ 'mail.hours' | trans | lower }})
+					&nbsp;({{ event.hours == null ? 0 : event.hours }}:{{ event.minutes | str_pad(2, '0') }}&nbsp;{{ 'mail.hours' | trans | lower }})
 				{% endif %}
 
 			</div>

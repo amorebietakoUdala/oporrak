@@ -66,7 +66,8 @@ export default class extends Controller {
                         content += '<div class="event-name" style="color:' + e.events[i].color + '">' + e.events[i].type;
                         if ( e.events[i].startHalfDay ) {
                             let minutes = String(e.events[i].minutes ?? 0).padStart(2, '0');
-                            content += e.events[i].type + " (" + e.events[i].hours+":"+ minutes + "h.)";
+                            let hours = e.events[i].hours ?? 0;
+                            content += " (" + hours+":"+ minutes + "h.)";
                         }
                         content += '</div>';
                         if (typeof(e.events[i].status) != "undefined") {
