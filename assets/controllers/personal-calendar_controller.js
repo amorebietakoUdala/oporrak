@@ -84,7 +84,7 @@ export default class extends Controller {
                             } else {
                                 let minutes = String(e.events[i].minutes ?? 0).padStart(2, '0');
                                 let hours = e.events[i].hours ?? 0;
-                                content += e.events[i].type + " (" + hours+":"+ minutes + "h.)";
+                                content += " (" + hours+":"+ minutes + "h.)";
                             }
                         }
                         content += '</div>'
