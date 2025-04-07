@@ -486,7 +486,7 @@ class EventController extends AbstractController
                 return $this->checkDoesNotExcessUnionHourPerMonth($user, $event);
             }
             $eventsThisYear = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year, $event->getType(),false);
-            $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar);
+            $workingDays = $this->statsService->calculateTotalWorkingDays($eventsThisYear, $workCalendar, $user);
             if ($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) > $maxDays) {
                 $daysString = $this->daysFormattingService->calcularDiasHorasMinutosJornadaString($workingDays + $this->statsService->calculateWorkingDays($event, $workCalendar) - $maxDays, $workCalendar->getWorkingHours(), $workCalendar->getWorkingMinutes());
                 $this->addFlash(
@@ -611,5 +611,6 @@ class EventController extends AbstractController
             }
             return true;
         }
+        return false;
     }
 }

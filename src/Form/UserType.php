@@ -94,6 +94,14 @@ class UserType extends BaseUserType
                 ],                
                 'disabled' => $options['readonly'],
             ])
+            ->add('worksOnWeekends', CheckboxType::class,[
+                'label' => 'user.worksOnWeekends',
+                'required' => false,
+                'label_attr' => [
+                    'class' => 'checkbox-inline',
+                ],                
+                'disabled' => $options['readonly'],
+            ])
         ;
     }
 

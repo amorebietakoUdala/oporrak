@@ -26,6 +26,7 @@ export default class extends Controller {
         colorPalette: Array,
         type: String,
         enableRangeSelection: Boolean,
+        worksOnWeekends: Boolean,
     };
 
     calendar = null;
@@ -35,6 +36,10 @@ export default class extends Controller {
     approved = 0;
 
     connect() {
+        let disabledWeekDays = [];
+        if (this.worksOnWeekendsValue == false) {
+            disabledWeekDays = [0, 6];
+        }
         Routing.setRoutingData(routes);
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
@@ -46,7 +51,7 @@ export default class extends Controller {
             enableRangeSelection: this.enableRangeSelectionValue == true,
             language: this.localeValue,
             startYear: this.yearValue,
-            disabledWeekDays: [0, 6],
+            disabledWeekDays: disabledWeekDays,
             style: 'border',
             selectRange: (event) => {
                 //this.openModal(event);

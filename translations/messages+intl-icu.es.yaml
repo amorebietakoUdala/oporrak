@@ -26,7 +26,7 @@ user.startDate: "fecha de alta"
 user.endDate: "fecha de baja"
 user.extraDays: "Días extra"
 user.unionDelegate: "Delegado sindical"
-
+user.worksOnWeekends: "Trabaja fines de semana"
 
 messages.confirmacion: "Confirmación"
 messages.confirmationDetail: "¿Esta seguro de que desea eliminar el registro?"

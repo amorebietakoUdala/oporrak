@@ -75,6 +75,9 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     #[ORM\Column(nullable: true, options: ["default" => 0])]
     private ?bool $unionDelegate = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $worksOnWeekends = false;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
@@ -342,6 +345,18 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     public function setUnionDelegate(?bool $unionDelegate): static
     {
         $this->unionDelegate = $unionDelegate;
+
+        return $this;
+    }
+
+    public function isWorksOnWeekends(): ?bool
+    {
+        return $this->worksOnWeekends;
+    }
+
+    public function setWorksOnWeekends(?bool $worksOnWeekends): static
+    {
+        $this->worksOnWeekends = $worksOnWeekends;
 
         return $this;
     }

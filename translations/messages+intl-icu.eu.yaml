@@ -24,6 +24,7 @@ user.repeat_new_password: "Errepikatu pasahitz berria"
 user.yearsWorked: "Lan egindako urteak"
 user.extraDays: "Egun gehigarriak"
 user.unionDelegate: "Delegatu sindikala"
+user.worksOnWeekends: "Asteburuetan lan egiten du"
 
 messages.confirmacion: "Konfirmazioa"
 messages.confirmationDetail: "¿Ziur al zaude erregistroa ezabatu nahi duzula?"

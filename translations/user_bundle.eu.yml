@@ -7,5 +7,6 @@ user.yearsWorked: "Lan egindako urteak"
 user.startDate: "Alta data"
 user.endDate: "Baja data"
 user.extraDays: "Egun gehigarriak"
+user.worksOnWeekends: "Asteburuetan lan egiten du"
 
 security.login.remember_me: "Oroitu"
