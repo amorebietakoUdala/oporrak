@@ -82,9 +82,9 @@ class ApiController extends AbstractController
          ]);
       }
       $totals = $this->totalDaysForEachType($user,$year);
-      dump($totals);
+
       $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
-      dump($events);
+
       // We wan't to show the union hours in hours and not in days
       $byHours = [
          EventType::UNION_HOURS => true,
