@@ -5,12 +5,14 @@ namespace App\Services;
 use App\Entity\Event;
 use App\Entity\EventType;
 use App\Entity\Status;
+use App\Entity\User;
 use App\Entity\WorkCalendar;
 use App\Repository\AdditionalVacationDaysRepository;
 use App\Repository\AntiquityDaysRepository;
 use App\Repository\HolidayRepository;
 use App\Repository\UserRepository;
 use App\Repository\WorkCalendarRepository;
+use DateTime;
 
 class StatsService
 {
@@ -91,7 +93,11 @@ class StatsService
          */
          if( $workingDays < 1) {
             if (array_key_exists($userId, $totalMinutesOfHalfDaysPerUser)) {
-               $totalMinutesOfHalfDaysPerUser[$userId][$event->getType()->getId()] += $event->getEventTotalMinutes();
+               if (array_key_exists($event->getType()->getId(), $totalMinutesOfHalfDaysPerUser[$userId])) {
+                  $totalMinutesOfHalfDaysPerUser[$userId][$event->getType()->getId()] += $event->getEventTotalMinutes();
+               } else {
+                  $totalMinutesOfHalfDaysPerUser[$userId][$event->getType()->getId()] = $event->getEventTotalMinutes();
+               }
             } else {
                $totalMinutesOfHalfDaysPerUser[$userId][$event->getType()->getId()] = $event->getEventTotalMinutes();
             }
@@ -258,52 +264,88 @@ class StatsService
     *
     * @return float|int The working days of the event.
     */
-   public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar) {
-       if (!$event->getHalfDay()) {
-           $holidays = $this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate());
-           // Only in working days Saturdays and Sundays don't count.
-           $holidaysBetween = $this->calculateHolidaysOnWorkingDays( $holidays );
-           $workingDays = $event->getDays();
-           // Subtract two weekend days for every week in between
-           $weeks = floor($workingDays / 7);
-           $workingDays -= $weeks * 2;
-           // Handle special cases
-           $startDay = $this->getWeekday($event->getStartDate()->format('Y-m-d'));
-           $endDay = $this->getWeekday($event->getEndDate()->format('Y-m-d'));
-           // Remove weekend not previously removed.   
-           if ($startDay - $endDay > 1) {
-               $workingDays -= 2;
-           }
-           // Remove start day if span starts on Sunday but ends before Saturday
-           if ($startDay == 0 && $endDay < 6) {
-               $workingDays--;
-           }
-           // Remove end day if span ends on Saturday but starts after Sunday
-           if ($endDay == 6 && $startDay > 0) {
-               $workingDays--;
-           }
-           $workingDays -= $holidaysBetween;
-           return $workingDays;
-       } else {
-            return $event->getEventTotalMinutes() / $workCalendar->getTotalWorkingMinutes();
-       }
+   public function calculateWorkingDays(Event $event, WorkCalendar $workCalendar): int|float {
+      $user = $event->getUser();
+      $includeHolidays = false;
+      $includeWeekends = false;
+      if ($user !== null) {
+         $includeWeekends = $user->isWorksOnWeekends();
+         if ($includeWeekends) {
+            $includeHolidays = true;
+         }
+      }
+      if (!$event->getHalfDay()) {
+         return $this->adjustWorkingDays($event, $includeHolidays, $includeWeekends);
+      } else {
+         return $event->getEventTotalMinutes() / $workCalendar->getTotalWorkingMinutes();
+      }
    }
 
    /**
-    * Calculates the number of holidays that fall on working days.
-    * 
-    * @param array $holidays The array of holidays to be checked.
+    * It's adjusts working days by removing weekends and holidays if specified.
+    * @param Event $event The event to calculate the working days.
+    * @param bool $includeHolidays If true, holidays are included in the working days calculation.
+    * @param bool $includeWeekends If true, weekends are included in the working days calculation.
     */
-   private function calculateHolidaysOnWorkingDays($holidays) {
-      $holidaysOnWorkingDays = 0;
-      foreach ($holidays as $holiday) {
-         if ($this->getWeekday($holiday->getDate()->format('Y-m-d')) !== 0 && $this->getWeekday($holiday->getDate()->format('Y-m-d')) !== 6 ) {
-            $holidaysOnWorkingDays += 1;
+   private function adjustWorkingDays(Event $event, bool $includeHolidays = false, bool $includeWeekends = false): int {
+      $workingDays = $event->getDays();
+      // Remove weekends
+      if (!$includeWeekends) {
+         /** @var DateTime $startDay */
+         $starDay = $event->getStartDate();
+         /** @var DateTime $endDay */
+         $endDay = $event->getEndDate();
+         $endDayPlus1 = clone $endDay;
+         $endDayPlus1->modify('+1 day'); // Include last day
+     
+         $interval = new \DatePeriod($starDay, new \DateInterval('P1D'), $endDayPlus1);
+         $workingDays = 0;
+     
+         foreach ($interval as $date) {
+             $weekday = $date->format('N'); // 1 (Monday) a 7 (Sunday)
+             if ($weekday < 6) {
+                 $workingDays++;
+             }
          }
       }
-      return $holidaysOnWorkingDays;
+      // Remove weekends
+      if (!$includeHolidays) {
+         $holidays = $this->holidayRepo->findHolidaysBetween($event->getStartDate(), $event->getEndDate());
+         $holidaysBetween = $this->countHolidays($holidays, $includeWeekends);
+         $workingDays -= $holidaysBetween;
+      }
+
+      return $workingDays;
    }
 
+   /**
+    * Calculates the number of holidays including weekends or without weekends.
+    * 
+    * @param array $holidays The array of holidays to be checked.
+    * @param bool $includeWeekends If true, weekends are included in the holidays calculation.
+    * 
+    * @return int The number of holidays.
+    */
+   private function countHolidays($holidays, bool $includeWeekends = false): int {
+      $count = 0;
+      foreach ($holidays as $holiday) {
+         if ($includeWeekends) {
+            $count++;
+         } else {
+            // Check if the holiday is a weekend (Saturday or Sunday)
+            if ($this->getWeekday($holiday->getDate()->format('Y-m-d')) !== 0 && $this->getWeekday($holiday->getDate()->format('Y-m-d')) !== 6 ) {
+               $count++;
+            }
+         }
+      }
+      return $count;
+   }
+
+   /**
+    * Returns the weekday of a date.
+    * @param string $date The date to be checked.
+    * @return int The weekday of the date. 0 (Sunday) to 6 (Saturday).
+    */
    private function getWeekday($date) {
       return intval(date('w', strtotime((string) $date)));
    }

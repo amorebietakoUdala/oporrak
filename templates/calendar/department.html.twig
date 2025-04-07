@@ -25,7 +25,8 @@
                'year' : year,
                'department' : app.user.department.id,
                'colorPalette': colorPalette,
-               'type': 'department'
+               'type': 'department',
+               'worksOnWeekends': app.user.worksOnWeekends,
          } ) }}>
             {{ include('calendar/_userFilterForm.html.twig', { 'showDeparment' : false }) }}
 			<div id="calendar"></div>

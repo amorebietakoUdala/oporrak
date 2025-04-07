@@ -26,12 +26,17 @@ export default class extends Controller {
         year: String,
         // How many days before can we edit calendar
         days: String,
+        worksOnWeekends: Boolean,
     };
 
     calendar = null;
     holidays = null;
 
     connect() {
+        let disabledWeekDays = [];
+        if (this.worksOnWeekendsValue == false) {
+            disabledWeekDays = [0, 6];
+        }
         Routing.setRoutingData(routes);
         Translator.fromJSON(translations);
         Translator.locale = this.localeValue;
@@ -42,7 +47,7 @@ export default class extends Controller {
             language: this.localeValue,
             style: 'background',
             startYear: this.yearValue,
-            disabledWeekDays: [0, 6],
+            disabledWeekDays: disabledWeekDays,
             contextMenuItems: [
                 {
                     text: Translator.trans('btn.delete'),

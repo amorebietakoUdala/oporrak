@@ -17,17 +17,18 @@
          }} 
          data-action="department-calendar:yearChanged->summary#refresh department-calendar:clickDay->day-details#showDetails department-calendar:loaded->day-details#hideDetails">
 		<div class="container-fluid" {{ stimulus_controller('department-calendar', {
-          'locale': app.request.locale|split('_')[0], 
-          'holidays-url': path('api_getHolidays'), 
-          'holidays-color': holidaysColor, 
-          'department-dates-url': path('api_get_dates'),
-          'formUrl' : path('event_save'), 
-          'year' : year,
-          'department' : null, 
-          'status': constant('App\\Entity\\Status::APPROVED'),
-          'type': 'city-hall',
-          'enableRangeSelection': false,
-           } ) }}>
+         'locale': app.request.locale|split('_')[0], 
+         'holidays-url': path('api_getHolidays'), 
+         'holidays-color': holidaysColor, 
+         'department-dates-url': path('api_get_dates'),
+         'formUrl' : path('event_save'), 
+         'year' : year,
+         'department' : null, 
+         'status': constant('App\\Entity\\Status::APPROVED'),
+         'type': 'city-hall',
+         'enableRangeSelection': false,
+         'worksOnWeekends': true,
+      } ) }}>
          {% if is_granted("ROLE_HHRR") %}
             <div><button class="btn btn-primary rounded-circle fixed-bottom-right" data-action="click->department-calendar#addEvent"><i class="fa fa-plus" title='{{ "btn.new" | trans | capitalize }}'></i></button></div>
          {% endif %}

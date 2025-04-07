@@ -17,7 +17,8 @@
                'my-dates-url': path('api_get_my_dates'), 
                'formUrl' : path('event_save') , 
                'year' : year, 
-               'days' : days 
+               'days' : days,
+               'worksOnWeekends' : app.user.worksOnWeekends, 
             } ) 
          }}>
 
