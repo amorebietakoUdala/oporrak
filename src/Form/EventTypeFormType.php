@@ -30,7 +30,8 @@ class EventTypeFormType extends AbstractType
                 'label' => 'eventType.onlyForUnionDelegates',
                 'label_attr' => [
                     'class' => 'checkbox-inline',
-                ],                
+                ],
+                'required' => false,
             ]);
     }
 

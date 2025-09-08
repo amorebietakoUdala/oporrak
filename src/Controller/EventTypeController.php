@@ -25,10 +25,10 @@ class EventTypeController extends AbstractController
         $eventType = new EventType();
         $form = $this->createForm(EventTypeFormType::class, $eventType);
         $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+       if ($form->isSubmitted() && $form->isValid()) {
             /** @var EventType $data */
             $data = $form->getData();
+            
             if (null !== $data->getId()) {
                 $eventType = $repo->find($data->getId());
                 $eventType->fill($data);

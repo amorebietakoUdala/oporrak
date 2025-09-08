@@ -74,6 +74,7 @@ class EventType implements \Stringable
     {
         $this->descriptionEs = $data->getDescriptionEs();
         $this->descriptionEu = $data->getDescriptionEu();
+        $this->onlyForUnionDelegates = $data->isOnlyForUnionDelegates();
         return $this;
     }
 
