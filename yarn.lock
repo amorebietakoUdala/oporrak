@@ -7,7 +7,7 @@ __metadata:
 
 "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.0
-  resolution: "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets#vendor/amorebietakoudala/stimulus-controller-bundle/assets::hash=036da7&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets#vendor/amorebietakoudala/stimulus-controller-bundle/assets::hash=58706c&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@eonasdan/tempus-dominus": ^6.2.10
     "@hotwired/stimulus": ^3.0.0
@@ -18,7 +18,17 @@ __metadata:
     select2-bootstrap-5-theme: ^1.3.0
     sweetalert2: 11.4.8
     tableexport.jquery.plugin: ^1.26.0
-  checksum: 80ab506a472d3f8f822a62aad4c7d807aa3f8377ae08d75223bb04dada4696554a09a9aaa0c2efde8e5763f595aba7effcdddbe35ad2c048f9e53d8ba52db3fb
+  peerDependencies:
+    "@eonasdan/tempus-dominus": ^6.2.10
+    "@hotwired/stimulus": ^3.0.0
+    bootstrap: ^5.2.3
+    bootstrap-table: 1.21.1
+    jquery: 3.6.1
+    select2: ^4.1.0-rc.0
+    select2-bootstrap-5-theme: ^1.3.0
+    sweetalert2: 11.4.8
+    tableexport.jquery.plugin: ^1.26.0
+  checksum: 9113715e40f3a9b146a103dff880d7edd0f6c96aa71e6c4cc788b2f9986a2e68241d2c72e65001fd65449d8f8929413f7a81033bd29e39c2d8507dc41541e4a4
   languageName: node
   linkType: hard
 
@@ -4859,7 +4869,7 @@ __metadata:
     sass-loader: ^13.2.0
     select2: ^4.0.7
     select2-bootstrap-5-theme: ^1.3.0
-    sweetalert2: ^11.7.27
+    sweetalert2: ^11.23.0
     tableexport.jquery.plugin: ^1.26.0
     webpack: ^5.95.0
     webpack-cli: 4.9.2
@@ -5247,10 +5257,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sweetalert2@npm:^11.7.27":
-  version: 11.14.1
-  resolution: "sweetalert2@npm:11.14.1"
-  checksum: 3e31e3f9613f726476ef6dfc26bcac1a35db7664ca16192aa154dd4b75bfec8f5f9bb631cde82c3dffceba10071b7e24bf9fb4c22b6d451ab20e87fc8ac52e40
+"sweetalert2@npm:^11.23.0":
+  version: 11.23.0
+  resolution: "sweetalert2@npm:11.23.0"
+  checksum: e20c9f06de194e733ae89dfc9655883e23cc485d4e56181ef61bae22ac0007f8d90466b4e7cd3b727fd5ea4d590972974e5346878590b5961ffbe8ba4270ba4c
   languageName: node
   linkType: hard
 
