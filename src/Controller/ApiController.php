@@ -94,14 +94,15 @@ class ApiController extends AbstractController
          $statsByEventType = $counters[$user->getUsername()];
          foreach ($totals as $key => $value) {
             if (array_key_exists($key, $statsByEventType)) {
-            $remaining[$key] = round($totals[$key] - $statsByEventType[$key], 4);
+            $remaining[$key] = round($totals[$key] - $statsByEventType[$key], 6);
             } else {
-            $remaining[$key] = round($totals[$key], 4);
+            $remaining[$key] = round($totals[$key], 6);
             }
          }
       } else {
          $remaining = $totals;
       }
+
       $totalUnionHours = 0;
       if( array_key_exists(EventType::UNION_HOURS, $remaining) ) {
          $totalUnionHours = $remaining[EventType::UNION_HOURS];
@@ -215,7 +216,9 @@ class ApiController extends AbstractController
             'stats' => null
          ]);
       }
+
       $stats = $this->statsService->formatStatsAsDaysHoursAndMinutes($stats, $workCalendar);
+
       $statuses = $this->statusRepo->getArrayOfColors();
       if ($json) {
          return $this->json($stats, 200, [], ['groups' => ['event']]);

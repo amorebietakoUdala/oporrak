@@ -115,17 +115,21 @@ class StatsService
             }
          }
       }
+      //dump($counters, $totalMinutesOfHalfDaysPerUser);
       $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, $byHours);
+      //dump($counters);
       $this->calculateTotals($counters);
       if ($formattedCounters) {
          $counters = $this->formatStatsAsDaysHoursAndMinutes($counters, $wc);
       }
+      //dd($counters);
       return $counters;
    }
 
    private function addTotalMinutesOfHalfDaysPerUserToCounters(array &$counters, $totalMinutesOfHalfDaysPerUser, $workCalendar, array $byHours): array {
       foreach ($totalMinutesOfHalfDaysPerUser as $userId => $value) {
          foreach ($value as $typeId => $value2) {
+            // dump($counters, $totalMinutesOfHalfDaysPerUser, $userId, $typeId);
             // If byHours key for typeId is true, we calculate the result in hours and not in days dividing by 60
             if ( array_key_exists($typeId, $byHours) && $byHours[$typeId] == true) {
                $counters[$userId][$typeId] += $value2 / 60;
@@ -134,6 +138,7 @@ class StatsService
                }
             // Otherwise, we calculate the result in days and not in hours dividing by the total working minutes of the day
             } else {
+               // dump($workCalendar->getTotalWorkingMinutes());
                $counters[$userId][$typeId] += ( $value2 / $workCalendar->getTotalWorkingMinutes() );
                if (array_key_exists('remaining', $counters[$userId])) {
                   $counters[$userId]['remaining'] -= ( $value2 / $workCalendar->getTotalWorkingMinutes() );
@@ -221,9 +226,9 @@ class StatsService
          /** If workingDays is less than 0, it's a halfday. So we don't sum to the fulldays until the end 
           *  This is needed to fix the total and remaining days of typeId = 2 and typeId = 6
          */
-         if( $workingDays < 1) {
+         if( $workingDays < 1 ) {
             if (array_key_exists($username, $totalMinutesOfHalfDaysPerUser)) {
-               if (array_key_exists($statusId, $totalMinutesOfHalfDaysPerUser)) {
+               if (array_key_exists($statusId, $totalMinutesOfHalfDaysPerUser[$username])) {
                   $totalMinutesOfHalfDaysPerUser[$username][$statusId] += $event->getEventTotalMinutes();
                } else {
                   $totalMinutesOfHalfDaysPerUser[$username][$statusId] = $event->getEventTotalMinutes();
@@ -368,6 +373,7 @@ class StatsService
    public function formatStatsAsDaysHoursAndMinutes(array $stats, WorkCalendar $workCalendar): array {
       $newStats  = [];
       foreach ($stats as $key => $value) {
+         //dump($key, $value);
          if ( is_array($value) ) {
             foreach ( $value as $key2 => $item ) {
                $newStats[$key][$key2] = $this->daysFormattingService->calcularDiasHorasMinutosJornadaWorkCalendarString($item,$workCalendar);
