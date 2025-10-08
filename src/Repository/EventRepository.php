@@ -186,7 +186,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findByUsernamesAndBeetweenDates($startDate, array $usernames = null, $endDate = null, bool $previousYearDays = false, bool $activated = true)
+    public function findByUsernamesAndBeetweenDatesExcludingNotApproved($startDate, array $usernames = null, $endDate = null, bool $previousYearDays = false, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
@@ -215,6 +215,7 @@ class EventRepository extends ServiceEntityRepository
         }
         $qb = $this->andExcludeBeforeUserStartAndEndDate($qb);
         $qb = $this->andWhereActivated($qb,$activated);
+        $qb = $this->andWhereStatusNotEqual($qb, Status::NOT_APPROVED);
         $qb = $this->orderByIdAsc($qb);
 
         return $qb->getQuery()->getResult();
@@ -394,9 +395,9 @@ class EventRepository extends ServiceEntityRepository
         if (count($usernames) === 0) {
             return [];
         }
-        $events = $this->findByUsernamesAndBeetweenDates(new \DateTime("$year-01-01"), $usernames, new \DateTime("$year-12-31"));
+        $events = $this->findByUsernamesAndBeetweenDatesExcludingNotApproved(new \DateTime("$year-01-01"), $usernames, new \DateTime("$year-12-31"));
         $nextYear = intval($year)+1;
-        $eventsNextYearWithPreviousYearDays = $this->findByUsernamesAndBeetweenDates(new \DateTime("$nextYear-01-01"), $usernames, new \DateTime("$nextYear-12-31"), true);
+        $eventsNextYearWithPreviousYearDays = $this->findByUsernamesAndBeetweenDatesExcludingNotApproved(new \DateTime("$nextYear-01-01"), $usernames, new \DateTime("$nextYear-12-31"), true);
         $events = array_merge($events, $eventsNextYearWithPreviousYearDays);
 
         return $events;
