@@ -83,7 +83,7 @@ class ApiController extends AbstractController
       }
       $totals = $this->totalDaysForEachType($user,$year);
 
-      $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year);
+      $events = $this->eventRepo->findEffectiveUserEventsOfTheYear($user, $year, null, false);
 
       // We wan't to show the union hours in hours and not in days
       $byHours = [
