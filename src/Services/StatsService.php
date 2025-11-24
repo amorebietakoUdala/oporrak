@@ -126,15 +126,17 @@ class StatsService
       return $counters;
    }
 
-   private function addTotalMinutesOfHalfDaysPerUserToCounters(array &$counters, $totalMinutesOfHalfDaysPerUser, $workCalendar, array $byHours): array {
+   private function addTotalMinutesOfHalfDaysPerUserToCounters(array &$counters, $totalMinutesOfHalfDaysPerUser, $workCalendar, array $byHours, bool $excludeUnionHours = true): array {
       foreach ($totalMinutesOfHalfDaysPerUser as $userId => $value) {
          foreach ($value as $typeId => $value2) {
             // dump($counters, $totalMinutesOfHalfDaysPerUser, $userId, $typeId);
             // If byHours key for typeId is true, we calculate the result in hours and not in days dividing by 60
             if ( array_key_exists($typeId, $byHours) && $byHours[$typeId] == true) {
-               $counters[$userId][$typeId] += $value2 / 60;
-               if (array_key_exists('remaining', $counters[$userId])) {
-                  $counters[$userId]['remaining'] -= $value2 / 60;
+               if ( $typeId !== EventType::UNION_HOURS && $excludeUnionHours || !$excludeUnionHours ) {
+                  $counters[$userId][$typeId] += $value2 / 60;
+                  if (array_key_exists('remaining', $counters[$userId])) {
+                     $counters[$userId]['remaining'] -= $value2 / 60;
+                  }
                }
             // Otherwise, we calculate the result in days and not in hours dividing by the total working minutes of the day
             } else {
@@ -203,11 +205,12 @@ class StatsService
    * @param array $usernames The array of usernames to calculate the stats.
    */
    public function calculateStatsByUserAndStatus(array $events, int $year, array $usernames) {
+      // Add total days for the year to counters
       $counters = $this->calculateTotalsForUsernamesAndYear($usernames,$year);
       $totalMinutesOfHalfDaysPerUser = [];
       // We set which types are calculated in hours and not in days. In this case we need all types in hours, so we set UNION_HOURS to false.
       $byHours = [
-         EventType::UNION_HOURS => false,
+         EventType::UNION_HOURS => true,
       ];
       foreach($events as $event) {
          $workCalendars = [];
@@ -227,14 +230,17 @@ class StatsService
           *  This is needed to fix the total and remaining days of typeId = 2 and typeId = 6
          */
          if( $workingDays < 1 ) {
-            if (array_key_exists($username, $totalMinutesOfHalfDaysPerUser)) {
-               if (array_key_exists($statusId, $totalMinutesOfHalfDaysPerUser[$username])) {
-                  $totalMinutesOfHalfDaysPerUser[$username][$statusId] += $event->getEventTotalMinutes();
+            // We don't count Union Hours in this stats, only the other types.
+            if ( $event->getType()->getId() !== EventType::UNION_HOURS ) {
+               if (array_key_exists($username, $totalMinutesOfHalfDaysPerUser)) {
+                     if (array_key_exists($statusId, $totalMinutesOfHalfDaysPerUser[$username])) {
+                        $totalMinutesOfHalfDaysPerUser[$username][$statusId] += $event->getEventTotalMinutes();
+                     } else {
+                        $totalMinutesOfHalfDaysPerUser[$username][$statusId] = $event->getEventTotalMinutes();
+                     }
                } else {
                   $totalMinutesOfHalfDaysPerUser[$username][$statusId] = $event->getEventTotalMinutes();
                }
-            } else {
-               $totalMinutesOfHalfDaysPerUser[$username][$statusId] = $event->getEventTotalMinutes();
             }
             $workingDays = 0;
          }
@@ -248,7 +254,9 @@ class StatsService
             $counters[$username][$statusId] = $workingDays;
          }
       }
-      # Update remaining days
+      $wc = $this->wcRepo->findOneBy(['year' => $year]);
+      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, $byHours);
+      # Update remaining days. 
       foreach ($counters as $username => $counter) {
          $counters[$username]['remaining'] = $counters[$username]["total"];
          foreach ($counter as $key => $value) {
@@ -257,8 +265,6 @@ class StatsService
             }
          }
       }
-      $wc = $this->wcRepo->findOneBy(['year' => $year]);
-      $counters = $this->addTotalMinutesOfHalfDaysPerUserToCounters($counters, $totalMinutesOfHalfDaysPerUser, $wc, $byHours);
       return $counters;
    }
 
