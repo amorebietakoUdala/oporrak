@@ -64,7 +64,7 @@ class EventRepository extends ServiceEntityRepository
      * 
      * @return Event[] Returns an array of Event objects
      */
-    public function findUserEventsBeetweenDates(User $user, DateTime $startDate, DateTime $endDate = null, bool $activated = true): array
+    public function findUserEventsBeetweenDates(User $user, DateTime $startDate, DateTime|null $endDate, bool $activated = true): array
     {
         $qb = $this->createQueryBuilder('e')->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
         $qb = $this->andWhereUser($qb, $user);
@@ -88,27 +88,27 @@ class EventRepository extends ServiceEntityRepository
      * 
      * @return Event[] Returns an array of Event objects
      */
-    public function findEffectiveEventsOfTheYearForUsers(array $users, int $year, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
+    public function findEffectiveEventsOfTheYearForUsers(array $users, int $year, EventType|null $eventType, $includeNotApproved = true, bool $activated = true)
     {
         $qb = $this->findEffectiveEventsOfTheYearForUsersQB( $year, $users, null, $eventType, null, $includeNotApproved, $activated);
         return $qb->getQuery()->getResult();
     }
 
-    public function findEffectiveEventsOfTheYearForUsersStartingFromDate(array $users, int $year, DateTime $startingFromDate, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
+    public function findEffectiveEventsOfTheYearForUsersStartingFromDate(array $users, int $year, DateTime $startingFromDate, EventType|null $eventType, $includeNotApproved = true, bool $activated = true)
     {
         $qb = $this->findEffectiveEventsOfTheYearForUsersQB($year, $users, null, $eventType, null, $includeNotApproved, $activated);
         $qb = $this->andWhereStartingDateGTE($qb, $startingFromDate);
         return $qb->getQuery()->getResult();
     }
 
-    public function findEffectiveEventsOfTheYearForUsersEndingAtDate(array $users, int $year, DateTime $endingFromDate, EventType $eventType = null, $includeNotApproved = true, bool $activated = true)
+    public function findEffectiveEventsOfTheYearForUsersEndingAtDate(array $users, int $year, DateTime $endingFromDate, EventType|null $eventType, $includeNotApproved = true, bool $activated = true)
     {
         $qb = $this->findEffectiveEventsOfTheYearForUsersQB($year, $users, null, $eventType,  null, $includeNotApproved, $activated);
         $qb = $this->andWhereEndingDateLTE($qb, $endingFromDate);
         return $qb->getQuery()->getResult();
     }
 
-    private function findEffectiveEventsOfTheYearForUsersQB(int $year, ?array $users = null, Department $department = null, EventType $eventType = null, int $status = null, $includeNotApproved = true, bool $activated = true): QueryBuilder
+    private function findEffectiveEventsOfTheYearForUsersQB(int $year, array|null $users, Department|null $department, EventType|null $eventType, int|null $status, $includeNotApproved = true, bool $activated = true): QueryBuilder
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
@@ -142,7 +142,7 @@ class EventRepository extends ServiceEntityRepository
      * 
      * @return Event[] Returns an array of Event objects
      */
-    public function findEffectiveUserEventsOfTheYear(User $user, int $year, EventType $eventType = null, $includeNotApproved = true)
+    public function findEffectiveUserEventsOfTheYear(User $user, int $year, EventType|null $eventType = null, $includeNotApproved = true)
     {
         if (null !== $user->getStartDate() && intval($user->getStartDate()->format('Y')) === $year ) {
             return $this->findEffectiveEventsOfTheYearForUsersStartingFromDate([$user],$year, $user->getStartDate(),$eventType,$includeNotApproved);    
@@ -186,7 +186,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findByUsernamesAndBeetweenDatesExcludingNotApproved($startDate, array $usernames = null, $endDate = null, bool $previousYearDays = false, bool $activated = true)
+    public function findByUsernamesAndBeetweenDatesExcludingNotApproved($startDate, array|null $usernames, $endDate = null, bool $previousYearDays = false, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
@@ -224,7 +224,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findByDepartmentAndUsersAndStatusBeetweenDates($startDate, $endDate, $department = null, array $users = null, $status = null, bool $activated = true)
+    public function findByDepartmentAndUsersAndStatusBeetweenDates($startDate, $endDate, string|null $department, array|null $users, int|null $status, bool $activated = true)
     {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
@@ -351,7 +351,7 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[] Returns an array of Event objects
      */
-    public function findApprovedEventsByDateUserAndDepartment(\Datetime $startDate = null, \DateTime $endDate = null, User $user = null, Department $department = null, bool $activated=true): array
+    public function findApprovedEventsByDateUserAndDepartment(\Datetime|null $startDate, \DateTime|null $endDate, User|null $user, Department|null $department, bool $activated=true): array
     {
         $qb = $this->createQueryBuilder('e');
         if ( null !== $user ) {
@@ -374,7 +374,7 @@ class EventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findEventsByYearUserAndDepartment(int $year, User $user = null, Department $department = null, int $status = null, bool $activated=true): array
+    public function findEventsByYearUserAndDepartment(int $year, User|null $user, Department|null $department, int|null $status, bool $activated=true): array
     {
         $users = ( null !== $user ) ? [$user] : null;
         $qb = $this->findEffectiveEventsOfTheYearForUsersQB($year, $users, $department, null, $status, false, $activated);

@@ -5,12 +5,13 @@ namespace App\Command;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[\Symfony\Component\Console\Attribute\AsCommand('app:antiquity-days-updater', 'This command updates the antiquity days for all activated users. Is intended to be run on 1st of January every year through a cron job.')]
+#[AsCommand('app:antiquity-days-updater', 'This command updates the antiquity days for all activated users. Is intended to be run on 1st of January every year through a cron job.')]
 class AntiquityDaysUpdaterCommand extends Command
 {
     public function __construct(private readonly UserRepository $repo, private readonly EntityManagerInterface $em)

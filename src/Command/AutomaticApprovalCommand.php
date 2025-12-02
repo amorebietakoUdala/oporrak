@@ -8,13 +8,14 @@ use App\Repository\StatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[\Symfony\Component\Console\Attribute\AsCommand('app:automatic-approval', 'This command automatically approves events asked more than the number of days specified.')]
+#[AsCommand('app:automatic-approval', 'This command automatically approves events asked more than the number of days specified.')]
 class AutomaticApprovalCommand extends Command
 {
     private int $days = 0;

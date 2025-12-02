@@ -239,20 +239,25 @@ class ApiController extends AbstractController
    }
 
     #[Route(path: '/{_locale}/department/{department}/overlaps', name: 'api_department_overlaps', methods: 'GET')]
-    public function reservedEvents(Request $request, Department $department = null) {
+    public function reservedEvents(Request $request, Department|null $department) {
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       $json = (null === $request->get('json') || $request->get('json') === '') ? false : boolval($request->get('json'));
+      $wc = $this->wcRepo->findOneBy(["year" => $year]);
+      // Even if we show this year calendar we show next years event with usePreviousYearDays set to true
+      // This allows to approve all dates of this year count, even they are reserved on next year.
+      // So take next year`s deadline date to show overlaps and unapproved events.
+      $deadlineNextYear = $wc->getDeadlineNextYear();
       $reservedEvents = [];
       $overlaps = [];
       if ( $department !== null) {
           $reservedEvents = $this->eventRepo->findByDepartmentAndUsersAndStatusBeetweenDates(
             date_create_from_format('Y-m-d',$year.'-01-01'), 
-            date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'),
+            $deadlineNextYear,
             $department, 
               null, 
               Status::RESERVED 
           );
-          $reservedEventsFromMyMinions = $this->eventRepo->findByBossAndStatusBeetweenDates($department, date_create_from_format('Y-m-d',$year.'-01-01'), $this->getUser(), Status::RESERVED, date_create_from_format('Y-m-d',(intval($year)+1).'-01-01'));
+          $reservedEventsFromMyMinions = $this->eventRepo->findByBossAndStatusBeetweenDates($department, date_create_from_format('Y-m-d',$year.'-01-01'), $this->getUser(), Status::RESERVED, $deadlineNextYear);
           $reservedEvents = array_merge($reservedEvents, $reservedEventsFromMyMinions);
           $overlaps = [];
           foreach ($reservedEvents as $event) {
