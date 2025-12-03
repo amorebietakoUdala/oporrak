@@ -64,7 +64,7 @@ class EventRepository extends ServiceEntityRepository
      * 
      * @return Event[] Returns an array of Event objects
      */
-    public function findUserEventsBeetweenDates(User $user, DateTime $startDate, DateTime|null $endDate, bool $activated = true): array
+    public function findUserEventsBeetweenDates(User $user, DateTime $startDate, DateTime $endDate = null, bool $activated = true): array
     {
         $qb = $this->createQueryBuilder('e')->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
         $qb = $this->andWhereUser($qb, $user);
