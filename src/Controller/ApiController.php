@@ -173,9 +173,9 @@ class ApiController extends AbstractController
       $me = $this->getUser();
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       $nextYear = intVal($year) + 1;
-      if ($request->get('department') !== null && (in_array('ROLE_ADMIN', $me->getRoles()) || in_array('ROLE_HHRR', $me->getRoles()))) {
+      if ($request->get('department') !== null && ( $this->isGranted("ROLE_ADMIN") || $this->isGranted("ROLE_HHRR") )) {
          $department = $request->get('department');
-      } elseif (!in_array('ROLE_ADMIN', $me->getRoles()) && !in_array('ROLE_HHRR', $me->getRoles())) {
+      } elseif (!$this->isGranted("ROLE_ADMIN") && !$this->isGranted("ROLE_HHRR")) {
          $department = $me->getDepartment();
       } else {
          $department = null;
@@ -239,7 +239,7 @@ class ApiController extends AbstractController
    }
 
     #[Route(path: '/{_locale}/department/{department}/overlaps', name: 'api_department_overlaps', methods: 'GET')]
-    public function reservedEvents(Request $request, Department|null $department) {
+    public function reservedEvents(Request $request, Department|null $department = null) {
       $year = ( null === $request->get('year') || $request->get('year') === '') ? (new \DateTime())->format('Y') : $request->get('year');
       $json = (null === $request->get('json') || $request->get('json') === '') ? false : boolval($request->get('json'));
       $wc = $this->wcRepo->findOneBy(["year" => $year]);
