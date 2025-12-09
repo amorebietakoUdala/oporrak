@@ -1,7 +1,8 @@
 {% trans_default_domain 'user_bundle' %}
+
 {{ form_start(form) }}
 
-<div class="container-fluid m-0">
+<div class="container-fluid m-0" {{ stimulus_controller('user-form', { unionHoursPerMonth: unionHoursPerMonth}) }}>
 	<div class="row m-1">
 		<div class="col">
 			<div class="row mt-1">
@@ -69,8 +70,12 @@
 					{{ form_widget(form.extraDays, {'attr': {'class': 'ml-1 form-control form-control-sm'}} ) }}
 				</div>
 				<div class="col-lg-1 d-flex align-items-end justify-content-center">
-					{{ form_row(form.unionDelegate) }}
+					{{ form_row(form.unionDelegate, {'attr': {'data-action': 'change->user-form#onUnionDelegateChange', 'data-user-form-target': 'unionDelegate'}}) }}
 					<span class="text-danger">{{ form_errors(form.unionDelegate) }}</span>
+				</div>
+				<div class="col-lg-1 d-flex align-items-end justify-content-center">
+					{{ form_row(form.unionHoursPerMonth, {'attr': {'data-user-form-target': 'unionHoursPerMonth'}}) }}
+					<span class="text-danger">{{ form_errors(form.unionHoursPerMonth) }}</span>
 				</div>
 				<div class="col-lg-2 d-flex align-items-end justify-content-center">
 					{{ form_row(form.worksOnWeekends) }}

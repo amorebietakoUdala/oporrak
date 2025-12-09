@@ -26,6 +26,7 @@ user.startDate: "fecha de alta"
 user.endDate: "fecha de baja"
 user.extraDays: "Días extra"
 user.unionDelegate: "Delegado sindical"
+user.unionHoursPerMonth: "Horas sindicales máximas mensuales"
 user.worksOnWeekends: "Trabaja fines de semana"
 
 messages.confirmacion: "Confirmación"
@@ -149,7 +150,7 @@ Vacaciones Adicionales/Opor egun gehigarriak: "Vacaciones adicionales por antig�
 Otros/Besteren bat: "Otros"
 Horas sindicales/Ordu sindikalak: "Horas sindicales"
 label.additionalVacationDays: "Vacaciones adicionales por antigüedad"
-label.unionHours: "Horas sindicales"
+label.unionHoursPerMonth: "Horas sindicales mensuales restantes"
 
 #Placeholders
 placeholder.choose: "Elije una opción"

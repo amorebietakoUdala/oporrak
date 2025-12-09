@@ -78,6 +78,9 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     #[ORM\Column(nullable: true)]
     private ?bool $worksOnWeekends = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $unionHoursPerMonth = null;
+
     public function __construct()
     {
         $this->employees = new ArrayCollection();
@@ -291,7 +294,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
         return false;
     }
 
-    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo, AdditionalVacationDaysRepository $avdRepo, int $year, $unionHours ): array {
+    public function getTotals( WorkCalendar $workCalendar, AntiquityDaysRepository $adRepo, AdditionalVacationDaysRepository $avdRepo, int $year ): array {
         $currentYear = intval((new \DateTime())->format('Y'));
         $diffedYears = $currentYear - $year;
         $additionalVacationDays = $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked - $diffedYears) !== null ? $avdRepo->findAdditionalVacationDaysForYearsWorked($this->yearsWorked - $diffedYears)->getVacationDays() : 0;
@@ -302,7 +305,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
                 EventType::OVERTIME => $workCalendar->getOvertimeDays() + $this->getExtraDays(),
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears)->getVacationDays() : 0,
                 EventType::ADDITONAL_VACATION_DAYS => $additionalVacationDays,
-                EventType::UNION_HOURS => $this->isUnionDelegate() ? $unionHours * $this->calculateWorkingMonthsThisYear($year) : 0,
+                EventType::UNION_HOURS => $this->isUnionDelegate() ? $this->unionHoursPerMonth : 0,
              ];
         } else {
             $totals = [
@@ -312,7 +315,7 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
                 EventType::OVERTIME => 0,
                 EventType::ANTIQUITY_DAYS => $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears) !== null ? $adRepo->findAntiquityDaysForYearsWorked($this->yearsWorked - $diffedYears)->getVacationDays() : 0,
                 EventType::ADDITONAL_VACATION_DAYS => $additionalVacationDays,
-                EventType::UNION_HOURS => $this->isUnionDelegate() ? $unionHours * $this->calculateWorkingMonthsThisYear($year) : 0
+                EventType::UNION_HOURS => $this->isUnionDelegate() ? $this->unionHoursPerMonth : 0
              ];
         }
         return $totals;
@@ -357,6 +360,18 @@ class User extends BaseUser implements AMREUserInterface, PasswordAuthenticatedU
     public function setWorksOnWeekends(?bool $worksOnWeekends): static
     {
         $this->worksOnWeekends = $worksOnWeekends;
+
+        return $this;
+    }
+
+    public function getUnionHoursPerMonth(): ?int
+    {
+        return $this->unionHoursPerMonth;
+    }
+
+    public function setUnionHoursPerMonth(?int $unionHoursPerMonth): static
+    {
+        $this->unionHoursPerMonth = $unionHoursPerMonth;
 
         return $this;
     }

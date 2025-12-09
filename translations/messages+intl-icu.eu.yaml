@@ -24,6 +24,7 @@ user.repeat_new_password: "Errepikatu pasahitz berria"
 user.yearsWorked: "Lan egindako urteak"
 user.extraDays: "Egun gehigarriak"
 user.unionDelegate: "Delegatu sindikala"
+user.unionHoursPerMonth: "Hilabeteko gehienezko ordu sindikalak"
 user.worksOnWeekends: "Asteburuetan lan egiten du"
 
 messages.confirmacion: "Konfirmazioa"
@@ -146,7 +147,7 @@ Vacaciones Adicionales/Opor egun gehigarriak: "Antzinatasunagatiko opor egun geh
 Otros/Besteren bat: "Besteren bat"
 Horas sindicales/Ordu sindikalak: "Ordu sindikalak"
 label.additionalVacationDays: "Antzinatasunagatiko opor egun gehigarriak"
-label.unionHours: "Ordu sindikalak"
+label.unionHoursPerMonth: "Hilabete honetan geratzen zaizkidan ordu sindikalak"
 
 #Placeholders
 placeholder.choose: "Hautatu aukeraren bat"

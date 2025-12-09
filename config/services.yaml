@@ -31,7 +31,7 @@ parameters:
   contactEmail: '%env(CONTACT_EMAIL)%'
   departmentDefault: '%env(DEPARTMENT_DEFAULT)%'
   contactEmailDefault: '%env(CONTACT_EMAIL_DEFAULT)%'
-  unionHours: 35
+  unionHoursPerMonth: 35
 
 services:
   Symfony\Component\Ldap\Ldap:
@@ -59,7 +59,7 @@ services:
         $contactEmail: '%contactEmail%'
         $departmentDefault: '%departmentDefault%'
         $contactEmailDefault: '%contactEmailDefault%'
-        $unionHours: '%unionHours%'
+        $unionHoursPerMonth: '%unionHoursPerMonth%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

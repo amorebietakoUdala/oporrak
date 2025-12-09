@@ -70,7 +70,7 @@ class StatsService
    public function calculateStatsByUserAndEventType(array $events, int $year, $byHours, $formattedCounters = false) {
       $counters = [];
       $totalMinutesOfHalfDaysPerUser = [];
-      // Set unionHours as a type that is calculated in hours and not in days
+      // Set unionHoursPerMonth as a type that is calculated in hours and not in days
       $wc = $this->wcRepo->findOneBy(['year' => $year]);
       foreach($events as $event) {
          $eventStartYear = $event->getStartDate()->format('Y');

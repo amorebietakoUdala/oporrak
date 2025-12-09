@@ -43,7 +43,6 @@ class EventController extends AbstractController
         private readonly AdditionalVacationDaysRepository $avdRepo, 
         private readonly DaysFormattingService $daysFormattingService,
         private readonly int $daysForApproval = 15,
-        private readonly int $unionHours = 20,
         )
     {
     }
@@ -329,9 +328,9 @@ class EventController extends AbstractController
             return false;
         }
 
-        if ( $event->getType()->getId() === EventType::UNION_HOURS &&  $event->getHalfDay() && $event->getHoursDecimal() > $this->unionHours ) {
+        if ( $event->getType()->getId() === EventType::UNION_HOURS &&  $event->getHalfDay() && $event->getHoursDecimal() > $user->getUnionHoursPerMonth() ) {
             $this->addFlash('error', $this->translator->trans('message.tooMuchUnionHoursInADay', [
-                'hours' => $this->unionHours,
+                'hours' => $user->getUnionHoursPerMonth(),
             ]));
             return false;
         }
@@ -451,7 +450,7 @@ class EventController extends AbstractController
     {
         # If uses previousYearDays, we have to check if exceedes the maximum days of the previous year, not current. So we take effective year of the event.
         $year = $this->getEffectiveYear($event);
-        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo, $year, $this->unionHours);
+        $totals = $user->getTotals($workCalendar, $this->adRepo, $this->avdRepo, $year);
         $valid = true;
         $maxDays = $totals[$event->getType()->getId()];
         $valid = $this->checkDoesNotExcessMaximumDays($user, $event, $maxDays, $year, $workCalendar);
@@ -595,8 +594,8 @@ class EventController extends AbstractController
             $events = $this->eventRepo->findUserEventsBeetweenDatesAndType($user, $eventMonthStartDate, $eventMonthEndDate, $event->getType(), true, true);
             $totalMinutes = $this->calculateTotalMinutes($events);
             // Check is exceedes the maximum hours
-            if ($totalMinutes + $event->getEventTotalMinutes() > $this->unionHours * 60) {
-                $excess = $totalMinutes + $event->getEventTotalMinutes() - $this->unionHours * 60;
+            if ($totalMinutes + $event->getEventTotalMinutes() > $user->getUnionHoursPerMonth() * 60) {
+                $excess = $totalMinutes + $event->getEventTotalMinutes() - $user->getUnionHoursPerMonth() * 60;
                 $excessHours = intval($excess / 60);
                 $excessMinutes = $excess % 60;
                 $formattedExcess = $this->daysFormattingService->formatDaysHoursAndMinutes([

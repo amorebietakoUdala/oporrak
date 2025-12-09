@@ -12,6 +12,7 @@ use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -19,7 +20,7 @@ use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 class UserType extends BaseUserType
 {
-    public function __construct($class, $allowedRoles)
+    public function __construct($class, $allowedRoles, private int $unionHoursPerMonth)
     {
         parent::__construct($class, $allowedRoles);
     }
@@ -93,6 +94,15 @@ class UserType extends BaseUserType
                     'class' => 'checkbox-inline',
                 ],                
                 'disabled' => $options['readonly'],
+            ])
+            ->add('unionHoursPerMonth', TextType::class,[
+                'label' => 'user.unionHoursPerMonth',
+                'required' => false,
+                'empty_data' => 0,
+                'disabled' => $options['readonly'],
+                'constraints' => [
+                    new PositiveOrZero(),
+                ]
             ])
             ->add('worksOnWeekends', CheckboxType::class,[
                 'label' => 'user.worksOnWeekends',

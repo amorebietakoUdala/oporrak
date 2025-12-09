@@ -34,7 +34,7 @@ class ApiController extends AbstractController
       private readonly StatusRepository $statusRepo, 
       private readonly AdditionalVacationDaysRepository $avdRepo,
       private readonly DaysFormattingService $daysFormattingService,
-      private readonly int $unionHours
+      private readonly int $unionHoursPerMonth
       )
    {
    }
@@ -77,7 +77,7 @@ class ApiController extends AbstractController
             'overtimeDays' => null,
             'antiquityDays' => null,
             'additionalVacationDays' => null,
-            'unionHours' => null,
+            'unionHoursPerMonth' => null,
 
          ]);
       }
@@ -118,7 +118,7 @@ class ApiController extends AbstractController
          'overtimeDays' => $formattedCounters[3],
          'antiquityDays' => $formattedCounters[4],
          'additionalVacationDays' => $formattedCounters[5],
-         'unionHours' => $this->daysFormattingService->formatHours($totalUnionHours),
+         'unionHoursPerMonth' => $this->daysFormattingService->formatHours($totalUnionHours),
       ]);
 
 
@@ -127,7 +127,8 @@ class ApiController extends AbstractController
 
     private function totalDaysForEachType(User $user, $year) {
       $workCalendar = $this->wcRepo->findOneBy(['year' => $year]);
-      $totals = $user->getTotals($workCalendar,$this->adRepo, $this->avdRepo, intval($year), $this->unionHours);
+      /** Union Hours Per Month are now User aware and not Fixed */
+      $totals = $user->getTotals($workCalendar,$this->adRepo, $this->avdRepo, intval($year));
       return $totals;
     }
 

@@ -24,9 +24,9 @@
 				<div id="additionalVacationDaysRow">
 					{{'label.additionalVacationDays' | trans }}:&nbsp;<span>{{ additionalVacationDays }}</span>
 				</div>
-				{% if isUnionDelegate and unionHours is defined and unionHours != null %}
-					<div id="unionHoursRow">
-						{{'label.unionHours' | trans }}:&nbsp;<span>{{ unionHours }}</span>
+				{% if isUnionDelegate and unionHoursPerMonth is defined and unionHoursPerMonth != null %}
+					<div id="unionHoursPerMonthRow">
+						{{'label.unionHoursPerMonth' | trans }}:&nbsp;<span>{{ unionHoursPerMonth }}</span>
 					</div>
 				{% endif %}
 			</div>

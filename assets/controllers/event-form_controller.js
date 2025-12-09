@@ -50,8 +50,8 @@ export default class extends Controller {
 
     onTypeChange (e) {
         // If selected option y union hours type 
-        const unionHours = this.unionHoursTypeValue;
-        if ( e.target.value == unionHours ) { 
+        const unionHoursPerMonth = this.unionHoursTypeValue;
+        if ( e.target.value == unionHoursPerMonth ) { 
             $(this.halfDayTarget).prop('checked', true);
             this.onHalfDayClick(e);
         }
