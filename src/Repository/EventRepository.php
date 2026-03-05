@@ -188,6 +188,23 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findByUsernamesAndBeetweenDatesExcludingNotApproved($startDate, array $usernames, $endDate = null, bool $previousYearDays = false, bool $activated = true)
     {
+        $qb = $this->findByUsernamesAndBeetweenDatesExcludingNotApprovedQB($startDate, $usernames, $endDate, $previousYearDays, $activated);
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Event[] Returns an array of Event objects
+     */
+    public function findByUsernamesAndBeetweenDatesExcludingNotApprovedExcludingEventType($startDate, array $usernames, $endDate = null, bool $previousYearDays = false, bool $activated = true, $excludeEventType = null)
+    {
+        $qb = $this->findByUsernamesAndBeetweenDatesExcludingNotApprovedQB($startDate, $usernames, $endDate, $previousYearDays, $activated);
+        if ( null !== $excludeEventType() ) {
+            $qb = $this->andWhereEventTypeNotEqual($qb, $excludeEventType);
+        }
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findByUsernamesAndBeetweenDatesExcludingNotApprovedQB($startDate, array $usernames, $endDate = null, bool $previousYearDays = false, bool $activated = true): QueryBuilder {
         $qb = $this->createQueryBuilder('e')
             ->innerJoin('e.user', 'u', 'WITH', 'e.user = u.id');
         if ($previousYearDays) {
@@ -218,7 +235,7 @@ class EventRepository extends ServiceEntityRepository
         $qb = $this->andWhereStatusNotEqual($qb, Status::NOT_APPROVED);
         $qb = $this->orderByIdAsc($qb);
 
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
 
     /**
@@ -441,6 +458,11 @@ class EventRepository extends ServiceEntityRepository
     }
 
     private function andWhereEventTypeEqual(QueryBuilder $qb, EventType $eventType): QueryBuilder {
+        return $qb->andWhere('e.type = :type')
+            ->setParameter('type', $eventType);
+    }
+
+    private function andWhereEventTypeNotEqual(QueryBuilder $qb, EventType $eventType): QueryBuilder {
         return $qb->andWhere('e.type = :type')
             ->setParameter('type', $eventType);
     }
