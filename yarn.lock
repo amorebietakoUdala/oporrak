@@ -7,7 +7,7 @@ __metadata:
 
 "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.0
-  resolution: "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets#vendor/amorebietakoudala/stimulus-controller-bundle/assets::hash=036da7&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets#vendor/amorebietakoudala/stimulus-controller-bundle/assets::hash=58706c&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@eonasdan/tempus-dominus": ^6.2.10
     "@hotwired/stimulus": ^3.0.0
@@ -18,7 +18,17 @@ __metadata:
     select2-bootstrap-5-theme: ^1.3.0
     sweetalert2: 11.4.8
     tableexport.jquery.plugin: ^1.26.0
-  checksum: 80ab506a472d3f8f822a62aad4c7d807aa3f8377ae08d75223bb04dada4696554a09a9aaa0c2efde8e5763f595aba7effcdddbe35ad2c048f9e53d8ba52db3fb
+  peerDependencies:
+    "@eonasdan/tempus-dominus": ^6.2.10
+    "@hotwired/stimulus": ^3.0.0
+    bootstrap: ^5.2.3
+    bootstrap-table: 1.21.1
+    jquery: 3.6.1
+    select2: ^4.1.0-rc.0
+    select2-bootstrap-5-theme: ^1.3.0
+    sweetalert2: 11.4.8
+    tableexport.jquery.plugin: ^1.26.0
+  checksum: 9113715e40f3a9b146a103dff880d7edd0f6c96aa71e6c4cc788b2f9986a2e68241d2c72e65001fd65449d8f8929413f7a81033bd29e39c2d8507dc41541e4a4
   languageName: node
   linkType: hard
 
@@ -1521,6 +1531,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/ciphers@npm:^1.0.0":
+  version: 1.3.0
+  resolution: "@noble/ciphers@npm:1.3.0"
+  checksum: 19722c35475df9bc78db60d261d0b5ef8a6d722561efc2135453f943eaa421b492195dc666e3e4df2b755bca3739e04f04b9c660198559f5dd05d3cfbf1b9e92
+  languageName: node
+  linkType: hard
+
+"@noble/hashes@npm:^1.6.0":
+  version: 1.8.0
+  resolution: "@noble/hashes@npm:1.8.0"
+  checksum: c94e98b941963676feaba62475b1ccfa8341e3f572adbb3b684ee38b658df44100187fa0ef4220da580b13f8d27e87d5492623c8a02ecc61f23fb9960c7918f5
+  languageName: node
+  linkType: hard
+
 "@nuxt/friendly-errors-webpack-plugin@npm:^2.5.1":
   version: 2.6.0
   resolution: "@nuxt/friendly-errors-webpack-plugin@npm:2.6.0"
@@ -2531,13 +2555,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "crypto-js@npm:4.2.0"
-  checksum: f051666dbc077c8324777f44fbd3aaea2986f198fe85092535130d17026c7c2ccf2d23ee5b29b36f7a4a07312db2fae23c9094b644cc35f7858b1b4fcaf27774
-  languageName: node
-  linkType: hard
-
 "css-declaration-sorter@npm:^7.2.0":
   version: 7.2.0
   resolution: "css-declaration-sorter@npm:7.2.0"
@@ -3387,17 +3404,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jpeg-exif@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "jpeg-exif@npm:1.1.4"
-  checksum: a8693a7eeb6c6572ca39acc8bbaf4bac1eea1331a26ec7d460410c0c7aefcb944bbc6c31d3c4649a308eea9da89ee4d38e35fe2f2604e4bf2ed09abd600cff0b
-  languageName: node
-  linkType: hard
-
 "jquery@npm:3.6.1":
   version: 3.6.1
   resolution: "jquery@npm:3.6.1"
   checksum: 6177d866a74f1137cad800f142c7cdbd5ab19cd4282546f8bdb4890c9f933b1d542ab96f2aa15d007e43c98de7315b0513e849ec5359d3ac5640f720892fe547
+  languageName: node
+  linkType: hard
+
+"js-md5@npm:^0.8.3":
+  version: 0.8.3
+  resolution: "js-md5@npm:0.8.3"
+  checksum: b8578232d8004978036f114aa4d46ad7c06ca36b2a6889f241762263424cfea6099701ec5394a1b463ad95f18f74a2acb8c6033b5ebd6a188d67a9e704b41e05
   languageName: node
   linkType: hard
 
@@ -3812,27 +3829,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfkit@npm:^0.17.1":
-  version: 0.17.2
-  resolution: "pdfkit@npm:0.17.2"
+"pdfkit@npm:^0.18.0":
+  version: 0.18.0
+  resolution: "pdfkit@npm:0.18.0"
   dependencies:
-    crypto-js: ^4.2.0
+    "@noble/ciphers": ^1.0.0
+    "@noble/hashes": ^1.6.0
     fontkit: ^2.0.4
-    jpeg-exif: ^1.1.4
+    js-md5: ^0.8.3
     linebreak: ^1.1.0
     png-js: ^1.0.0
-  checksum: 4f0cb9fe309f83c688f2c2f33ec5b09787d1dc1c16041833589a6cba03f16c2cb4589bfd15493e6a4ba527384f37c409032087fe5e9673cd4c252cd3118a0dbb
+  checksum: fc89560d16b4396ba2b7bd93cc6de6e2d446aeff18ded5d53620eae234aa9efd1c9d7dd07ff7df3c4203462d74712d618305fa4f681267a0fb651da27687f38c
   languageName: node
   linkType: hard
 
-"pdfmake@npm:^0.3.0-beta.17":
-  version: 0.3.0-beta.18
-  resolution: "pdfmake@npm:0.3.0-beta.18"
+"pdfmake@npm:^0.3.6":
+  version: 0.3.7
+  resolution: "pdfmake@npm:0.3.7"
   dependencies:
     linebreak: ^1.1.0
-    pdfkit: ^0.17.1
-    xmldoc: ^2.0.1
-  checksum: 316dc5b19fbc39d6cc637d267362958aa313fcb84446e290177071d72c9fd6a145e9ebdba361adea0df163eac1ae44cb0ce285764a3dd30ebcf1104860bdef69
+    pdfkit: ^0.18.0
+    xmldoc: ^2.0.3
+  checksum: 4836ac50fbd66b37748a0f2bcf8766e553da3f1c94d99641e92cc51836f66455563b7a0a0405ea8ba9b1820e2d7f78f9587600cab97e0f0a464bc1318757e88b
   languageName: node
   linkType: hard
 
@@ -4555,10 +4573,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sax@npm:^1.2.4":
-  version: 1.4.1
-  resolution: "sax@npm:1.4.1"
-  checksum: 3ad64df16b743f0f2eb7c38ced9692a6d924f1cd07bbe45c39576c2cf50de8290d9d04e7b2228f924c7d05fecc4ec5cf651423278e0c7b63d260c387ef3af84a
+"sax@npm:^1.4.3":
+  version: 1.6.0
+  resolution: "sax@npm:1.6.0"
+  checksum: 83ae2a17f524bd35b1b7d1c867700b1fab41e4cbb4f7635b7e66398421e06ff2cd43ec651c151cb99c67c3681ec7d0493cb6a98fd2e7799ea15b5d0a4615f870
   languageName: node
   linkType: hard
 
@@ -5270,12 +5288,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xmldoc@npm:^2.0.1":
-  version: 2.0.2
-  resolution: "xmldoc@npm:2.0.2"
+"xmldoc@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "xmldoc@npm:2.0.3"
   dependencies:
-    sax: ^1.2.4
-  checksum: 583b956e15d8e681f99cd8aa09bfce3071f5f75b75c4f65e981796c09bbe24897f2613d32ba94b98b9128a710cf1e7fedf678aca861347a6f16611fb7c96be4a
+    sax: ^1.4.3
+  checksum: ec18790717b6eeba3dc5f16f20d09d264292bdca3a9b58b656d2800c8a1c8f59971f7a5919dc7008a05f8c0471eed8de1b87ccde144265dfd7ec77c01c3815ed
   languageName: node
   linkType: hard
 
