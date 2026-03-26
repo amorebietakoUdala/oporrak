@@ -7,7 +7,7 @@ __metadata:
 
 "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets::locator=root-workspace-0b6124%40workspace%3A.":
   version: 0.1.0
-  resolution: "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets#vendor/amorebietakoudala/stimulus-controller-bundle/assets::hash=58706c&locator=root-workspace-0b6124%40workspace%3A."
+  resolution: "@amorebietakoudala/stimulus-controller-bundle@file:vendor/amorebietakoudala/stimulus-controller-bundle/assets#vendor/amorebietakoudala/stimulus-controller-bundle/assets::hash=036da7&locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     "@eonasdan/tempus-dominus": ^6.2.10
     "@hotwired/stimulus": ^3.0.0
@@ -18,17 +18,7 @@ __metadata:
     select2-bootstrap-5-theme: ^1.3.0
     sweetalert2: 11.4.8
     tableexport.jquery.plugin: ^1.26.0
-  peerDependencies:
-    "@eonasdan/tempus-dominus": ^6.2.10
-    "@hotwired/stimulus": ^3.0.0
-    bootstrap: ^5.2.3
-    bootstrap-table: 1.21.1
-    jquery: 3.6.1
-    select2: ^4.1.0-rc.0
-    select2-bootstrap-5-theme: ^1.3.0
-    sweetalert2: 11.4.8
-    tableexport.jquery.plugin: ^1.26.0
-  checksum: 9113715e40f3a9b146a103dff880d7edd0f6c96aa71e6c4cc788b2f9986a2e68241d2c72e65001fd65449d8f8929413f7a81033bd29e39c2d8507dc41541e4a4
+  checksum: 80ab506a472d3f8f822a62aad4c7d807aa3f8377ae08d75223bb04dada4696554a09a9aaa0c2efde8e5763f595aba7effcdddbe35ad2c048f9e53d8ba52db3fb
   languageName: node
   linkType: hard
 
@@ -3876,9 +3866,9 @@ __metadata:
   linkType: hard
 
 "picomatch@npm:^4.0.2":
-  version: 4.0.3
-  resolution: "picomatch@npm:4.0.3"
-  checksum: 6817fb74eb745a71445debe1029768de55fd59a42b75606f478ee1d0dc1aa6e78b711d041a7c9d5550e042642029b7f373dc1a43b224c4b7f12d23436735dba0
+  version: 4.0.4
+  resolution: "picomatch@npm:4.0.4"
+  checksum: 76b387b5157951422fa6049a96bdd1695e39dd126cd99df34d343638dc5cdb8bcdc83fff288c23eddcf7c26657c35e3173d4d5f488c4f28b889b314472e0a662
   languageName: node
   linkType: hard
 
