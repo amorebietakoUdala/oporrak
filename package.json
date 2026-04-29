@@ -39,6 +39,7 @@
         "build": "encore production --progress"
     },
     "resolutions": {
+        "uuid": "^14.0.0",
         "canvg": "^4.0.2",
         "css-minimizer-webpack-plugin": "^8.0",
         "jquery": "3.6.1",
